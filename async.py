@@ -38,15 +38,23 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento FROM cliente where id_status = 0 order by id DESC LIMIT 30 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento FROM cliente where id_status = 0 order by id DESC LIMIT 40 ")
     result = executor.fetchall()
     lista = []
     for x in result:
         if x[0]!= None and x[1]!=None:
+            # Registar os removidos...
+            #Validador_de_cpf() 
+            #Registar log 
             lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
     return lista   
 
 
+def query_generator(data):
+    with open("query.txt","a+") as f:
+        for item in data:
+            if data['status']=='TRUE':
+                f.write("UPDATE cliente SET Nome = {0}, id_status={1}".format())#Gerar query caso o TRUE
 
 
 if __name__ == "__main__":
@@ -55,9 +63,9 @@ if __name__ == "__main__":
     start_time = time.time()
     asyncio.get_event_loop().run_until_complete(download_all_sites(sites))
     duration = time.time() - start_time
-    with open("response.json","a+") as f:
+    with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
         for item in responses:
-            f.write("%s\n"%item)
+            f.write("%s\n"%item)  
     
     print(f"Total de {len(sites)} dados consultados em {duration} seconds")
 
@@ -68,7 +76,11 @@ if __name__ == "__main__":
 
      Exemplo de uso da API
 https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token=63764620RjLiAJcVnv115125088 
-
+status_id {
+    1 - ok
+    2 - suspenso
+    0 - nao verificado
+}
 
 
 
