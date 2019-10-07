@@ -52,15 +52,15 @@ def list_generator(database):
             if checa_cpfcnpj==True:
                 lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
             else:
-                responses.append("Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto".format(x[2],x[0]))
+                responses.append('Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto '.format(x[2],x[0]))
         else:
             if x[0]== None:
                 
-                responses.append("Cliente {0} não foi validado pois o campo CPF esta em branco".format(x[2]))
+                responses.append('Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2]))
             else:    
                 if x[1]== None:
                     
-                    responses.append("Cliente {0} não foi validado pois o campo Dtnascimento esta em branco".format(x[2]))
+                    responses.append("Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2]))
 
 
     return lista   
