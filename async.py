@@ -5,6 +5,7 @@ import json
 import mysql.connector
 import datetime
 from aiofile import AIOFile, LineReader, Writer
+import cpf
 
 
 responses = []
@@ -38,15 +39,30 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento FROM cliente where id_status = 0 order by id DESC LIMIT 40 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 40 ")
     result = executor.fetchall()
     lista = []
     for x in result:
         if x[0]!= None and x[1]!=None:
-            # Registar os removidos...
-            #Validador_de_cpf() 
-            #Registar log 
-            lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
+            if len(x[0]) > 11:
+                checa_cpfcnpj = cpf.isCnpjValid(x[0])
+            else:
+                checa_cpfcnpj = cpf.isCpfValid(x[0])
+
+            if checa_cpfcnpj==True:
+                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
+            else:
+                responses.append("Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto".format(x[2],x[0]))
+        else:
+            if x[0]== None:
+                
+                responses.append("Cliente {0} não foi validado pois o campo CPF esta em branco".format(x[2]))
+            else:    
+                if x[1]== None:
+                    
+                    responses.append("Cliente {0} não foi validado pois o campo Dtnascimento esta em branco".format(x[2]))
+
+
     return lista   
 
 
