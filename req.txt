@@ -1,0 +1,6 @@
+asyncio
+aiohttp
+json
+mysql.connector
+aiofile
+
