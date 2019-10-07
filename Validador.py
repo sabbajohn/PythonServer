@@ -50,7 +50,7 @@ def list_generator(database):
                 checa_cpfcnpj = cpf.isCpfValid(x[0])
 
             if checa_cpfcnpj==True:
-                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
+                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={Bota o token aqui}".format(x[0], x[1].strftime("%d/%m/%Y")))
             else:
                 responses.append('Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto '.format(x[2],x[0]))
         else:
@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
 
      Exemplo de uso da API
-https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token=63764620RjLiAJcVnv115125088 
+https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token={bota o token aqui} 
 status_id {
     1 - ok
     2 - suspenso
