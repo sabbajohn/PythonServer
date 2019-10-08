@@ -16,7 +16,8 @@ class Clientes(Resource):
         Nome = request.json['Nome']
         CPFCNPJ= request.json['CPFCNPJ']
         Dtnascimento= request.json['Dtnascimento']
-        # manda os dados dessa requisição pra uma estrutura de dados
+        #Faz um post pra api...
+
         return {'status':'success','message':'Cliente inserido na fila para validação de dados1'}
 
 

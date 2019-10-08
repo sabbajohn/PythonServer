@@ -16,6 +16,6 @@ class Relatorios(object):
                         f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))#Gerar query caso o TRUE
 
     def Responses_log(self, responses):
-        with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+        with open("response.json","a+") as f: 
             for item in responses:
                 f.write("%s\n"%item)  
