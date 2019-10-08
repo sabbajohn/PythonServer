@@ -39,7 +39,7 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 40 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 100 ")
     result = executor.fetchall()
     lista = []
     for x in result:
@@ -50,7 +50,7 @@ def list_generator(database):
                 checa_cpfcnpj = cpf.isCpfValid(x[0])
 
             if checa_cpfcnpj==True:
-                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={token}".format(x[0], x[1].strftime("%d/%m/%Y")))
+                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
             else:
                 data = {}
                 data['status'] = False

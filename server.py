@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# coding: utf-8
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from sqlalchemy import create_engine
@@ -13,7 +14,7 @@ class Clientes(Resource):
     
     def post(self):
        
-        #TODO: Inserir validação ṕor token....
+       
         resp = []
         print(request.json)
         Nome = request.json['Nome']
