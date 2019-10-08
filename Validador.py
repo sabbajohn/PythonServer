@@ -9,7 +9,7 @@ import cpf
 
 
 responses = []
-async def download_site(session, url):
+async def api_validation_request(session, url):
     async with session.get(url) as response:
         response = await response.read()
         response_fix =json.loads(response)
@@ -18,11 +18,11 @@ async def download_site(session, url):
        
 
 
-async def download_all_sites(sites):
+async def list_of_requests_pending(sites):
     async with aiohttp.ClientSession() as session:
         tasks = []
         for url in sites:
-            task = asyncio.ensure_future(download_site(session, url))
+            task = asyncio.ensure_future(api_validation_request(session, url))
             tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -50,7 +50,7 @@ def list_generator(database):
                 checa_cpfcnpj = cpf.isCpfValid(x[0])
 
             if checa_cpfcnpj==True:
-                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={Token}".format(x[0], x[1].strftime("%d/%m/%Y")))
+                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={token}".format(x[0], x[1].strftime("%d/%m/%Y")))
             else:
                 data = {}
                 data['status'] = False
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     db = db_handler()
     sites = list_generator(db) 
     start_time = time.time()
-    asyncio.get_event_loop().run_until_complete(download_all_sites(sites))
+    asyncio.get_event_loop().run_until_complete(list_of_requests_pending(sites))
     duration = time.time() - start_time
     query_generator(responses)
     with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
@@ -115,13 +115,22 @@ if __name__ == "__main__":
 
 
      Exemplo de uso da API
-https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token={Token}
+https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token={token}
 status_id {
     1 - ok
     2 - suspenso
     0 - nao verificado
     3 - campos pendentes
 }
+
+
+Posso Transformar esse metodo em uma classe, fazenfo com que ela seja gerenciada por um outro script, rodando em outras subrotinas:
+- Retira o handler do banco de dados para uma outra classe;
+
+- Passa como parametro para desta classe a lista de pendentes com uso do slice
+- a cada ciclo do slice ela retorna a variavel respones que pode ser recebida por um metodo de relatorios retirando desta a query_generator e a escrita do arquivo  responses.json
+- 
+
 
 
 
