@@ -9,7 +9,7 @@ import json
 from Relatorios import Relatorios as log
 import cpf
 
-
+#TODO: Deverá ser migrado para uma aplicação de produção como uWSGi
 class Clientes(Resource):
     
     def post(self):
