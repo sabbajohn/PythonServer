@@ -2,7 +2,7 @@ import mysql.connector
 
 class Relatorios(object):
     def query_generator(data):
-        with open("query.txt","a+") as f:
+        with open("query_api.txt","a+") as f:
             for item in data:
                 if item['status']==True:
                     message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
@@ -16,7 +16,7 @@ class Relatorios(object):
                         f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['id']))
 
     def responses(responses):
-        with open("response.json","a+") as f: 
+        with open("response_api.json","a+") as f: 
             for item in responses:
                 f.write("%s\n"%item)  
 
