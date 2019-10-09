@@ -13,6 +13,7 @@ async def api_validation_request(session, url):
     async with session.get(url) as response:
         response = await response.read()
         response_fix =json.loads(response)
+        response_fix['CPF'] = url[49:60]
         print(response_fix)
         responses.append(response_fix)
        
@@ -39,7 +40,7 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 100 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 30 ")
     result = executor.fetchall()
     lista = []
     for x in result:
@@ -89,13 +90,18 @@ def query_generator(data):
                 message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
                 f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
             elif item['status']==False:
-                if item['code'] == 1:
-                    f.write("UPDATE cliente SET id_status=2, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))#Gerar query caso o TRUE
-                elif item['code'] == 2:
-                    f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))#Gerar query caso o TRUE
-                elif item['code'] == 3:
-                    f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))#Gerar query caso o TRUE
-
+                if item['code']:
+                    
+                    if item['code'] == 1:
+                        f.write("UPDATE cliente SET id_status=2, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                    elif item['code'] == 2:
+                        f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                    elif item['code'] == 3:
+                        f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                elif item['return']=="NOK":
+                   f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+                else:
+                    pass
 if __name__ == "__main__":
     db = db_handler()
     sites = list_generator(db) 
