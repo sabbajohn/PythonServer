@@ -1,5 +1,5 @@
 import mysql.connector
-class db(object):
+class DB(object):
     def __init__(self):
         self.mydb = mysql.connector.connect(
         host="localhost",
@@ -7,7 +7,7 @@ class db(object):
         passwd="spqQVJ161",
         database="megasorte"
         )
-        self.haldler()
+        self.handler()
     
     def handler(self):
         return self.mydb
