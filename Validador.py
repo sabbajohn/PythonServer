@@ -15,8 +15,11 @@ async def api_validation_request(session, url):
         response_fix =json.loads(response)
         response_fix['CPF'] = url[49:60]
         print(response_fix)
-        responses.append(response_fix)
-       
+        if len(response_fix)>0:
+            await query_generator(response_fix)
+        
+        else:
+            pass
 
 
 async def list_of_requests_pending(sites):
@@ -40,7 +43,7 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 30 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 300 ")
     result = executor.fetchall()
     lista = []
     for x in result:
@@ -51,7 +54,7 @@ def list_generator(database):
                 checa_cpfcnpj = cpf.isCpfValid(x[0])
 
             if checa_cpfcnpj==True:
-                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
+                lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={token}".format(x[0], x[1].strftime("%d/%m/%Y")))
             else:
                 data = {}
                 data['status'] = False
@@ -59,7 +62,7 @@ def list_generator(database):
                 data['code'] = 1
                 data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
                 
-                responses.append(data)
+                query_generator(data)
         else:
             if x[0]== None:
                 data = {}
@@ -67,7 +70,7 @@ def list_generator(database):
                 data['id'] = x[2]
                 data['code'] = 2
                 data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
-                responses.append(data)
+                query_generator(data)
                 
             else:    
                 if x[1]== None:
@@ -76,42 +79,51 @@ def list_generator(database):
                     data['id'] = x[2]
                     data['code'] = 3
                     data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
-                    responses.append(data)
+                    query_generator(data)
                     
 
 
     return lista   
 
 
-def query_generator(data):
-    with open("query.txt","a+") as f:
-        for item in data:
-            if item['status']==True:
-                message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
-                f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
-            elif item['status']==False:
-                if item['code']:
-                    
-                    if item['code'] == 1:
-                        f.write("UPDATE cliente SET id_status=2, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-                    elif item['code'] == 2:
-                        f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-                    elif item['code'] == 3:
-                        f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-                elif item['return']=="NOK":
-                   f.write("UPDATE cliente SET id_status=3, motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-                else:
-                    pass
+def query_generator(resp):
+    if len(resp)>0:
+           
+        data=[]
+        data.append(resp)
+        with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+            for item in data:
+                f.write("%s\n"%item)  
+        
+        with open("query.txt","a+") as f:
+            for item in data:
+                if item['status']==True:
+                    message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
+                    f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
+                elif item['status']==False:
+                    try:
+                        item['code']
+                        if item['code'] == 1:
+                            f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                        elif item['code'] == 2:
+                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                        elif item['code'] == 3:
+                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                    except:
+                        if item['return']=='NOK':
+                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+                    else:
+                        pass
 if __name__ == "__main__":
     db = db_handler()
     sites = list_generator(db) 
     start_time = time.time()
     asyncio.get_event_loop().run_until_complete(list_of_requests_pending(sites))
     duration = time.time() - start_time
-    query_generator(responses)
-    with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+    #query_generator(responses)
+    """   with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
         for item in responses:
-            f.write("%s\n"%item)  
+            f.write("%s\n"%item)   """
     
     print(f"Total de {len(sites)} dados consultados em {duration} seconds")
 
