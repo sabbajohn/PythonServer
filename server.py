@@ -9,6 +9,7 @@ from Relatorios import Relatorios as log
 import cpf
 
 #TODO: Deverá ser migrado para uma aplicação de produção como uWSGi
+#TODO: É preciso implementar mecanismos de autenticação
 class Clientes(Resource):
     
     def post(self):
