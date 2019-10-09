@@ -20,6 +20,12 @@
       |_______________|                 |___________| ----------> | Relatórios  |
                                                                   |_____________|
 
+
+
+    Os Arquvos de log já são gerados durante a consulta, entretanto com ajuda de sinaleiros.
+
+    Pendente:
+        Implementar mecanismos de autenticação server.py
         
 Modulos necessários em req.txt
 
