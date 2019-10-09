@@ -43,7 +43,7 @@ def db_handler():
 
 def list_generator(database):
     executor= database.cursor()
-    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id DESC LIMIT 300 ")
+    executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id ASC LIMIT 1000 ")
     result = executor.fetchall()
     lista = []
     for x in result:
@@ -106,14 +106,18 @@ def query_generator(resp):
                         if item['code'] == 1:
                             f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
                         elif item['code'] == 2:
-                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                            f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
                         elif item['code'] == 3:
-                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+                            f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
                     except:
                         if item['return']=='NOK':
-                            f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+                            if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
+                                f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+                            else:
+                                f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
                     else:
                         pass
+
 if __name__ == "__main__":
     db = db_handler()
     sites = list_generator(db) 
