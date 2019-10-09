@@ -42,7 +42,7 @@ class Clientes(Resource):
                 resp.append(data) 
                 log.responses(resp)
                 log.query_generator(resp)
-                return {'status':'erro','message':'bad_request'}
+                return {'status':'erro','message':"Cliente não foi validado pois o CPF/CNPJ: {0} esta incorreto ".format(CPFCNPJ)}
         else:
             if CPFCNPJ== None:
                 data = {}
@@ -52,7 +52,7 @@ class Clientes(Resource):
                 
                 resp.append(data) 
                 log.responses(resp)
-                return {'status':'erro','message':'bad_request'}
+                return {'status':'erro','message':'Cliente  não foi validado pois o CPF/CNPJ esta em branco'}
         return {'status':'erro','message':'bad_request'}        
                 
            
