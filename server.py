@@ -1,12 +1,58 @@
 #!/usr/bin/python3
 # coding: utf-8
-from flask import Flask, request, jsonify
-from flask_restful import Resource, Api
-from json import dumps
-import urllib.request
-import json
-from Relatorios import Relatorios as log
+import sys
+import os
+import time
+from time import sleep
 import cpf
+import json
+from json import dumps
+from Relatorios import Relatorios as log
+
+if sys.version_info[0] < 3:
+
+    raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
+try:
+    from flask import Flask, request, jsonify
+except:
+    comando = os.system
+    comando('pip install flask')
+    print('[!] Tentando Instalar as Dependencias')    
+    if IOError:    
+        sys.exit("[!] Please install the flask library: pip install flask")
+    else:
+        sleep(7) 
+        comando('python3 server.py')
+
+try:
+   from flask_restful import Resource, Api
+except:
+    comando = os.system
+    comando('pip install flask_restful')
+    print('[!] Tentando Instalar as Dependencias')
+    if IOError:    
+        sys.exit("[!] Please install the flask_restful library: pip install flask_restful")    
+    
+    else:  
+        sleep(10)   
+        comando('python3 server.py')    
+        
+try:
+  import urllib.request
+except:
+    comando = os.system
+    comando('pip install urllib')
+    print('[!] Tentando Instalar as Dependencias')
+    if IOError:    
+        sys.exit("[!] Please install the urllib library: pip install urllib")    
+    
+    else:  
+        sleep(10)   
+        comando('python3 server.py')    
+        
+
+
+
 
 #TODO: Deverá ser migrado para uma aplicação de produção como uWSGi
 #TODO: É preciso implementar mecanismos de autenticação
