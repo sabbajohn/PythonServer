@@ -1,12 +1,77 @@
-import asyncio
-import time
-import aiohttp
-import json
-import mysql.connector
-import datetime
-from aiofile import AIOFile, LineReader, Writer
-import cpf
+#!/usr/bin/python3
+# coding: utf-8
 import sys
+import os
+import time
+import json
+import cpf
+from time import sleep
+import datetime
+
+
+if sys.version_info[0] < 3:
+
+    raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
+try:
+   import asyncio
+    
+except:
+    comando = os.system
+    comando('pip install asyncio')
+    print('[!] Tentando Instalar as Dependencias')    
+    if IOError:    
+        sys.exit("[!] Please install the asyncio library: pip install asyncio")
+    else:
+        sleep(7) 
+        comando('python3 Validador.py')
+
+try:
+   import aiohttp
+except:
+    comando = os.system
+    comando('pip install aiohttp')
+    print('[!] Tentando Instalar as Dependencias')
+    if IOError:    
+        sys.exit("[!] Please install the aiohttp library: pip install aiohttp")    
+    
+    else:  
+        sleep(10)   
+        comando('python3 Validador.py')    
+        
+try:
+   import mysql.connector
+except:
+    comando = os.system
+    comando('pip install mysql')
+    print('[!] Tentando Instalar as Dependencias')
+    if IOError:    
+        sys.exit("[!] Please install the mysql library: pip install mysql")    
+    
+    else:  
+        sleep(10)   
+        comando('python3 Validador.py')    
+        
+
+try:
+  from aiofile import AIOFile, LineReader, Writer
+
+except:
+    comando = os.system
+    comando('pip install aiofile')
+    print('[!] Tentando Instalar as Dependencias')
+    if IOError:    
+        sys.exit("[!] Please install the aiofile library: pip install aiofile")    
+    
+    else:  
+        sleep(10)   
+        comando('python3 Validador.py')    
+
+
+
+
+
+
+
 
 responses = []
 async def api_validation_request(session, url):
