@@ -16,7 +16,7 @@ try:
     from flask import Flask, request, jsonify
 except:
     comando = os.system
-    comando('pip install flask')
+    comando('pip3 install flask')
     print('[!] Tentando Instalar as Dependencias')    
     if IOError:    
         sys.exit("[!] Please install the flask library: pip install flask")
@@ -28,10 +28,10 @@ try:
    from flask_restful import Resource, Api
 except:
     comando = os.system
-    comando('pip install flask_restful')
+    comando('pip3 install flask_restful')
     print('[!] Tentando Instalar as Dependencias')
     if IOError:    
-        sys.exit("[!] Please install the flask_restful library: pip install flask_restful")    
+        sys.exit("[!] Please install the flask_restful library: pip3 install flask_restful")    
     
     else:  
         sleep(10)   
@@ -41,10 +41,10 @@ try:
   import urllib.request
 except:
     comando = os.system
-    comando('pip install urllib')
+    comando('pip3 install urllib')
     print('[!] Tentando Instalar as Dependencias')
     if IOError:    
-        sys.exit("[!] Please install the urllib library: pip install urllib")    
+        sys.exit("[!] Please install the urllib library: pip3 install urllib")    
     
     else:  
         sleep(10)   
@@ -52,15 +52,17 @@ except:
         
 
 
+app = Flask(__name__)
+api = Api(app)
 
 
-#TODO: Deverá ser migrado para uma aplicação de produção como uWSGi
-#TODO: É preciso implementar mecanismos de autenticação
 class Clientes(Resource):
-    
+    """  def get(self):
+        conn = db_connect.connect() # connect to database
+        query = conn.execute("select * from employees") # This line performs query and returns json result
+        return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID """
+
     def post(self):
-       
-       
         resp = []
         print(request.json)
         Nome = request.json['Nome']
@@ -101,24 +103,18 @@ class Clientes(Resource):
                 log.responses(resp)
                 return {'status':'erro','message':'Cliente  não foi validado pois o CPF/CNPJ esta em branco'}
         return {'status':'erro','message':'bad_request'}        
-                
-           
-     
-        
 
 
 
 
 
-class ApiSetting(object):
-    def __init__(self):
-        
-        self.app = Flask(__name__)
-        self.api = Api(self.app)
-        self.api.add_resource(Clientes, '/fila') # Route_1
 
-        self.runner(self.app)
-    def runner(self, app):
-        app.run(port=4444)
+
+
+api.add_resource(Clientes, '/fila') # Route_1
+
+
+
 if __name__ == '__main__':
-    test= ApiSetting()     
+    app.run()
+
