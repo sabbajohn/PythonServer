@@ -17,10 +17,10 @@ try:
     
 except:
     comando = os.system
-    comando('pip install asyncio')
+    comando('pip3 install asyncio')
     print('[!] Tentando Instalar as Dependencias')    
     if IOError:    
-        sys.exit("[!] Please install the asyncio library: pip install asyncio")
+        sys.exit("[!] Please install the asyncio library: pip3 install asyncio")
     else:
         sleep(7) 
         comando('python3 Validador.py')
@@ -29,10 +29,10 @@ try:
    import aiohttp
 except:
     comando = os.system
-    comando('pip install aiohttp')
+    comando('pip3 install aiohttp')
     print('[!] Tentando Instalar as Dependencias')
     if IOError:    
-        sys.exit("[!] Please install the aiohttp library: pip install aiohttp")    
+        sys.exit("[!] Please install the aiohttp library: pip3 install aiohttp")    
     
     else:  
         sleep(10)   
@@ -42,10 +42,10 @@ try:
    import mysql.connector
 except:
     comando = os.system
-    comando('pip install mysql')
+    comando('pip3 install mysql')
     print('[!] Tentando Instalar as Dependencias')
     if IOError:    
-        sys.exit("[!] Please install the mysql library: pip install mysql")    
+        sys.exit("[!] Please install the mysql library: pip3 install mysql")    
     
     else:  
         sleep(10)   
@@ -57,10 +57,10 @@ try:
 
 except:
     comando = os.system
-    comando('pip install aiofile')
+    comando('pip3 install aiofile')
     print('[!] Tentando Instalar as Dependencias')
     if IOError:    
-        sys.exit("[!] Please install the aiofile library: pip install aiofile")    
+        sys.exit("[!] Please install the aiofile library: pip3 install aiofile")    
     
     else:  
         sleep(10)   
