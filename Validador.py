@@ -6,7 +6,7 @@ import mysql.connector
 import datetime
 from aiofile import AIOFile, LineReader, Writer
 import cpf
-
+import sys
 
 responses = []
 async def api_validation_request(session, url):
@@ -113,8 +113,10 @@ def query_generator(resp):
                         if item['return']=='NOK':
                             if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
                                 f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-                            else:
+                            elif "Data Nascimento invalida." in item['message']:
                                 f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+                            elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
+                                sys.exit(item['message'])    
                     else:
                         pass
 
