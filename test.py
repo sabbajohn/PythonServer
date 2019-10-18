@@ -7,8 +7,10 @@ import json
 import cpf
 from time import sleep
 import datetime
-
-
+import asyncio.coroutines
+import logging
+import concurrent.futures
+import urllib
 if sys.version_info[0] < 3:
 
 	raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
@@ -85,33 +87,46 @@ except:
 
 
 responses = []
-async def api_validation_request(session, url):
-	async with session.get(url) as response:
-		response = await response.read()
+async def api_validation_request(executor, url):
+		
+		response =urllib.request.urlopen(url)
 		response_fix =json.loads(response)
 		response_fix['CPF'] = url[49:60]
 		print(response_fix)
 		if len(response_fix)>0:
-			await query_generator(response_fix)
+			QG.send(response_fix)
+			
 		
 		else:
 			pass
 
 
-async def list_of_requests_pending(sites):
-	async with aiohttp.ClientSession() as session:
-		tasks = []
-		for url in sites:
-			task = asyncio.ensure_future(api_validation_request(session, url))
-			tasks.append(task)
-		await asyncio.gather(*tasks, return_exceptions=True)
+async def list_of_requests_pending(executor,sites):
+	log = logging.getLogger('list_of_requests_pending')
+	log.info('starting')
+
+	log.info('creating executor tasks')
+
+		
+	loop = asyncio.get_event_loop()
+	tasks = [
+		loop.run_in_executor(executor,api_validation_request, url)
+		for url in sites
+	]
+		
+	""" await asyncio.gather(*tasks, return_exceptions=True) """
+	log.info('waiting for executor tasks')
+	completed, pending = await asyncio.wait(tasks)
+	results = [t.result() for t in completed]
+    log.info('results: {!r}'.format(results))
+	log.info('exiting')
 
 def db_handler():
 	try:
 		mydb = mysql.connector.connect(
-		host="10.255.237.4",
-		user="bwadmin",
-		passwd="8bNmFLiIPhVRrM",
+		host="localhost",
+		user="objetiva",
+		passwd="spqQVJ161",
 		database="megasorte"
 	   
 		)   
@@ -142,7 +157,8 @@ def list_generator(database):
 				data['code'] = 1
 				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
 				
-				query_generator(data)
+				
+				QG.send(data)
 		else:
 			if x[0]== None:
 				data = {}
@@ -150,7 +166,8 @@ def list_generator(database):
 				data['id'] = x[2]
 				data['code'] = 2
 				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
-				query_generator(data)
+				
+				QG.send(data)
 				
 			else:	
 				if x[1]== None:
@@ -159,58 +176,83 @@ def list_generator(database):
 					data['id'] = x[2]
 					data['code'] = 3
 					data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
-					query_generator(data)
+					
+					QG.send(data)
 					
 
 
 	return lista   
 
 
-def query_generator(resp):
-	
-	if len(resp)>0:
-		   
-		data=[]
-		data.append(resp)
-		with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-			for item in data:
-				f.write("%s\n"%item)  
-		
-		with open("query.txt","a+") as f:
-			for item in data:
-				if item['status']==True:
-					message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
-					f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
-				elif item['status']==False:
-					try:
-						item['code']
-						if item['code'] == 1:
-							f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-						elif item['code'] == 2:
-							f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-						elif item['code'] == 3:
-							f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-					except:
-						if item['return']=='NOK':
-							if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
-								f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-							elif "Data Nascimento invalida." in item['message']:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-							elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-								sys.exit(item['message'])	
-					else:
-						pass
+def query_generator():
+	try:
+		while True:
+			
+			resp = (yield) 
+			data=[]
+			data.append(resp)
+			if(resp):
+				with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+					for item in data:
+						f.write("%s\n"%item)  
 
+				with open("query.txt","a+") as f:
+					for item in data:
+						if item['status']==True:
+							message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
+							f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
+						elif item['status']==False:
+							try:
+								item['code']
+								if item['code'] == 1:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+								elif item['code'] == 2:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+								elif item['code'] == 3:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
+							except:
+								if item['return']=='NOK':
+									if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
+										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+									elif "Data Nascimento invalida." in item['message']:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
+										sys.exit(item['message'])	
+							else:
+								pass
+							
+	except GeneratorExit:
+		pass
+	
+		   
+		
 if __name__ == "__main__":
+	logging.basicConfig(
+		level=logging.INFO,
+		format='PID %(process)5s %(name)18s: %(message)s',
+		stream=sys.stderr,
+	)
+	QG = query_generator()
+	QG.__next__()
 	db = db_handler()
+	
 	sites = list_generator(db) 
 	start_time = time.time()
-	asyncio.get_event_loop().run_until_complete(list_of_requests_pending(sites))
-	duration = time.time() - start_time
-	#query_generator(responses)
-	"""   with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-		for item in responses:
-			f.write("%s\n"%item)   """
+	
+	
+	executor = concurrent.futures.ThreadPoolExecutor(
+		max_workers=4,
+	)
+	event_loop = asyncio.get_event_loop()
+	try:
+		event_loop.run_until_complete(
+			list_of_requests_pending(executor,sites)
+		)
+	finally:
+		event_loop.close()
+		duration = time.time() - start_time
+	
+	
 	
 	print(f"Total de {len(sites)} dados consultados em {duration} seconds")
 

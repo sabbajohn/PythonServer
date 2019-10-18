@@ -15,41 +15,49 @@ if sys.version_info[0] < 3:
 try:
     from flask import Flask, request, jsonify
 except:
-    comando = os.system
-    comando('pip3 install flask')
-    print('[!] Tentando Instalar as Dependencias')    
-    if IOError:    
-        sys.exit("[!] Please install the flask library: pip install flask")
-    else:
-        sleep(7) 
-        comando('python3 server.py')
+    try:
+        comando = os.system
+        comando('pip3 install flask')
+        print('[!] Tentando Instalar as Dependencias')    
+    except :
+        if IOError:    
+            sys.exit("[!] Please install the flask library: pip install flask")
+        else:
+            sleep(7) 
+            comando('python3 server.py')
 
+    
+    
 try:
    from flask_restful import Resource, Api
 except:
-    comando = os.system
-    comando('pip3 install flask_restful')
-    print('[!] Tentando Instalar as Dependencias')
-    if IOError:    
-        sys.exit("[!] Please install the flask_restful library: pip3 install flask_restful")    
-    
-    else:  
-        sleep(10)   
-        comando('python3 server.py')    
+    try:
+        comando = os.system
+        comando('pip3 install flask_restful')
+        print('[!] Tentando Instalar as Dependencias')
+    except:
+        if IOError:    
+            sys.exit("[!] Please install the flask_restful library: pip3 install flask_restful")    
+        
+        else:  
+            sleep(10)   
+            comando('python3 server.py')    
         
 try:
   import urllib.request
 except:
-    comando = os.system
-    comando('pip3 install urllib')
-    print('[!] Tentando Instalar as Dependencias')
-    if IOError:    
-        sys.exit("[!] Please install the urllib library: pip3 install urllib")    
-    
-    else:  
-        sleep(10)   
-        comando('python3 server.py')    
+    try:
+        comando = os.system
+        comando('pip3 install urllib')
+        print('[!] Tentando Instalar as Dependencias')
+    except:
+        if IOError:    
+            sys.exit("[!] Please install the urllib library: pip3 install urllib")    
         
+        else:  
+            sleep(10)   
+            comando('python3 server.py')    
+            
 
 
 app = Flask(__name__)
