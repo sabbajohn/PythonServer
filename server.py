@@ -9,6 +9,8 @@ import json
 from json import dumps
 from Relatorios import Relatorios as log
 
+
+
 if sys.version_info[0] < 3:
 
     raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
