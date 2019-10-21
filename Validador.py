@@ -109,12 +109,12 @@ async def list_of_requests_pending(sites):
 def db_handler():
 	try:
 		mydb = mysql.connector.connect(
-		host="10.255.237.4",
-		user="bwadmin",
-		passwd="8bNmFLiIPhVRrM",
-		database="megasorte"
-	   
-		)   
+			host="10.255.237.4",
+			user="bwadmin",
+			passwd="8bNmFLiIPhVRrM",
+			database="megasorte"
+
+		)
 		return mydb
 	except mysql.connector.Error as err:
 		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
@@ -123,7 +123,7 @@ def db_handler():
 
 def list_generator(database):
 	executor= database.cursor()
-	executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id ASC LIMIT 1000 ")
+	executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente_dev where id_status = 0 order by id ASC LIMIT 1000 ")
 	result = executor.fetchall()
 	lista = []
 	for x in result:
@@ -169,7 +169,7 @@ def list_generator(database):
 def query_generator(resp):
 	
 	if len(resp)>0:
-		   
+		caracteres = ['.','-']
 		data=[]
 		data.append(resp)
 		with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
@@ -178,7 +178,15 @@ def query_generator(resp):
 		
 		with open("query.txt","a+") as f:
 			for item in data:
+				try:
+					r = item['result']['numero_de_cpf']
+					if r:
+						item['result']['numero_de_cpf'] = item['result']['numero_de_cpf'].replace(caracteres,'')	
+				except :
+					pass
+
 				if item['status']==True:
+					
 					message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
 					f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
 				elif item['status']==False:
@@ -192,9 +200,11 @@ def query_generator(resp):
 							f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
 					except:
 						if item['return']=='NOK':
+							
 							if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
 								f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 							elif "Data Nascimento invalida." in item['message']:
+							
 								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 							elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
 								sys.exit(item['message'])	

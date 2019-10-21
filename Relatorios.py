@@ -8,7 +8,7 @@ class Relatorios(object):
 	def query_generator(resp):
 		
 		if len(resp)>0:
-			
+		
 			
 			data = resp
 			
@@ -18,6 +18,7 @@ class Relatorios(object):
 						message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
 						try:
 							print("[!] Tentando atualizar a base de dados!")
+							
 							db.execute("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))
 						except:
 							print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
