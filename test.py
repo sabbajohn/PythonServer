@@ -2,15 +2,20 @@
 # coding: utf-8
 import sys
 import os
+import logging
 import time
 import json
-import cpf
+from  urllib import request, parse
 from time import sleep
 import datetime
-import asyncio.coroutines
-import logging
 import concurrent.futures
-import urllib
+import asyncio.coroutines
+
+
+
+sys.path.insert(1,'/home/objetiva/PythonServer/Class')
+import cpf
+
 if sys.version_info[0] < 3:
 
 	raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
@@ -85,60 +90,64 @@ except:
 
 
 
-
+failsafe_tasks=[]
+failsafe_cpf = []
 responses = []
-async def api_validation_request(executor, url):
-		
-		response =urllib.request.urlopen(url)
+pendentes_f = []
+result=None	
+contador_failsafe = 0
+
+async def api_validation_request(session, url):
+	async with session.get(url) as response:
+		response = await response.read()
 		response_fix =json.loads(response)
 		response_fix['CPF'] = url[49:60]
 		print(response_fix)
 		if len(response_fix)>0:
-			QG.send(response_fix)
-			
+			""" query_task = [asyncio.ensure_future(query_generator(response_fix)) ]
+			await asyncio.gather(*query_task, return_exceptions=True) """
+			await query_generator(response_fix)
 		
 		else:
 			pass
 
 
-async def list_of_requests_pending(executor,sites):
-	log = logging.getLogger('list_of_requests_pending')
-	log.info('starting')
+""" async def list_of_requests_pending(pendentes):
+	async with aiohttp.ClientSession() as session:
+		tasks = []
+		for url in sites:
+			task = asyncio.ensure_future(api_validation_request(session, url))
+			tasks.append(task)
+		await asyncio.gather(*tasks, return_exceptions=True)
 
-	log.info('creating executor tasks')
+ """
 
-		
-	loop = asyncio.get_event_loop()
-	tasks = [
-		loop.run_in_executor(executor,api_validation_request, url)
-		for url in sites
-	]
-		
-	""" await asyncio.gather(*tasks, return_exceptions=True) """
-	log.info('waiting for executor tasks')
-	completed, pending = await asyncio.wait(tasks)
-	results = [t.result() for t in completed]
-    log.info('results: {!r}'.format(results))
-	log.info('exiting')
 
 def db_handler():
+	log = logging.getLogger('db_handler')
+	log.info('iniciando conexão com Banco de Dados.')
 	try:
 		mydb = mysql.connector.connect(
-		host="localhost",
-		user="objetiva",
-		passwd="spqQVJ161",
-		database="megasorte"
-	   
-		)   
+			host="10.255.237.4",
+			user="bwadmin",
+			passwd="8bNmFLiIPhVRrM",
+			database="megasorte"
+
+		)
+		log.info('Conexão esstabelecida com Sucesso!')
 		return mydb
 	except mysql.connector.Error as err:
+		log.info('Erro ao conecar com o Banco de Dados.')
+		sleep(3)
 		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
 	
    
 
-def list_generator(database):
+async def list_generator(database ):
+	log = logging.getLogger('list_generator')
+	log.info('Buscando registros pendentes na base de dados.')
 	executor= database.cursor()
-	executor.execute("SELECT CPFCNPJ, DtNascimento, id FROM cliente where id_status = 0 order by id ASC LIMIT 1000 ")
+	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome FROM cliente_dev where id_status = 0 order by Nome ASC LIMIT 30 ")
 	result = executor.fetchall()
 	lista = []
 	for x in result:
@@ -149,7 +158,7 @@ def list_generator(database):
 				checa_cpfcnpj = cpf.isCpfValid(x[0])
 
 			if checa_cpfcnpj==True:
-				lista.append ("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
+				lista.append("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
 			else:
 				data = {}
 				data['status'] = False
@@ -157,8 +166,7 @@ def list_generator(database):
 				data['code'] = 1
 				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
 				
-				
-				QG.send(data)
+				await query_generator(data)
 		else:
 			if x[0]== None:
 				data = {}
@@ -166,121 +174,206 @@ def list_generator(database):
 				data['id'] = x[2]
 				data['code'] = 2
 				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
-				
-				QG.send(data)
+				await query_generator(data)
 				
 			else:	
-				if x[1]== None:
-					data = {}
-					data['status'] = False
-					data['id'] = x[2]
-					data['code'] = 3
-					data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
+				if( x[1]== None and (x[3]==None or x[3]=="" )):
 					
-					QG.send(data)
-					
+					await failsafe_api_validation_request(x[0])
+				else:	
+					if	x[1]== None:
+						data = {}
+						data['status'] = False
+						data['id'] = x[2]
+						data['code'] = 3
+						data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
+						await query_generator(data)
 
+	
+	return lista 	
 
-	return lista   
+""" def failsafe_task_m(CPF):
+	global failsafe_tasks
+	failsafe_tasks= [asyncio.ensure_future(failsafe_api_validation_request(CPF))]
+	failsafe_tasks.append(failsafe_tasks)
+	
+ """
 
+async def failsafe_api_validation_request(CPF):
+	
+		
+	global contador_failsafe
+	contador_failsafe = contador_failsafe+1
+	log = logging.getLogger('failsafe_api_validation_request')
+	log.info('Realizando requisição à API soawebservices')
+	
+	url = "http://www.soawebservices.com.br/restservices/producao/cdc/pessoafisicaestendida.ashx"
+	data={
+	'Credenciais': {
+		'Email': 'ti@bwabrasil.com.br',
+		'Senha': 'prucdNTE'
+	},
+	"Documento": str(CPF)
+	}
+	params = json.dumps(data).encode('utf8')
 
-def query_generator():
-	try:
-		while True:
-			
-			resp = (yield) 
-			data=[]
-			data.append(resp)
-			if(resp):
-				with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-					for item in data:
-						f.write("%s\n"%item)  
+	req =  request.Request(url, data=params,headers={'content-type': 'application/json'} ) # this will make the method "POST"
+	response = request.urlopen(req)
+	
+	response =  response.read()
+	response_fix=json.loads(response)
+	response_fix['failsafe'] = True
+	if len(response_fix)>0:
+			""" query_task = [asyncio.ensure_future(query_generator(response_fix)) ]
+			await asyncio.gather(*query_task, return_exceptions=True) """
+			await query_generator(response_fix) 
+	
+		
+""" 
+async def failsafe():
+	global failsafe_tasks
+	if  failsafe_tasks !=None :
+		await asyncio.gather(*failsafe_tasks, return_exceptions=True)
+	else:
+		pass """
+		
 
-				with open("query.txt","a+") as f:
-					for item in data:
-						if item['status']==True:
-							message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
-							f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))#Gerar query caso o TRUE
-						elif item['status']==False:
-							try:
-								item['code']
-								if item['code'] == 1:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-								elif item['code'] == 2:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-								elif item['code'] == 3:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
-							except:
-								if item['return']=='NOK':
-									if "CPF Nao Encontrado na Base de Dados Federal." in item['message']:
-										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-									elif "Data Nascimento invalida." in item['message']:
-										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-										sys.exit(item['message'])	
+async def query_generator(resp):
+	caracteres = ['.','-']
+	data=[]
+	failsafe=[]
+	if len(resp)>0:
+		try:
+			r = resp['failsafe']
+			if r:
+				if(resp['failsafe']==True):
+					failsafe.append(resp)
+					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+						for item in failsafe:
+							f.write("%s\n"%item)
+					with open("query.txt","a+") as f:
+						for item in failsafe:
+							if item['Status'] == True:
+								message = 'Verificado via API '
+								f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}', DtNascimento=0{2}  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
+							if item['Status'] == False:
+								f.write("UPDATE cliente SET id_status='3', ' , motivo ='{0}  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
 							else:
 								pass
+			else:
+				pass
+				
+		except:
+			pass
+				
+			
+			data.append(resp)
+			with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+				for item2 in data:
+					f.write("%s\n"%item2)  
+			
+			with open("query.txt","a+") as f:
+				for item2 in data:
+					try:
+						r = item2['result']['numero_de_cpf']
+						if r:
+							item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')	
+					except :
+						pass
+
+					if item2['status']==True:
+						
+						message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+						f.write("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
+					elif item2['status']==False:
+						try:
+							item2['code']
+							if item2['code'] == 1:
+								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+							elif item2['code'] == 2:
+								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+							elif item2['code'] == 3:
+								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+						except:
+
+							if item2['return']=='NOK':
+								
+								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message']:
+									f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
+								elif "Data Nascimento invalida." in item2['message']:
+									if item['CPF'] in item2:
+										i = result.index(item2['CPF'])+1
+										if item2[i]['nome']=="":
+
+											await failsafe_api_validation_request(item2['CPF'])
+
 							
-	except GeneratorExit:
-		pass
-	
-		   
-		
+
+									#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+								elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
+									sys.exit(item2['message'])	
+						else:
+							pass
+
+async def runner(executor):
+	log = logging.getLogger('Iniciando Solicitações a API hubdodesenvolvedor ')
+	log.info('starting')
+	tasks=[]
+	log.info('Criando tarefas')
+	loop = asyncio.get_event_loop()
+	async with aiohttp.ClientSession() as session:
+		with concurrent.futures.ThreadPoolExecutor() as pool:
+			for url in pendentes:
+				task = asyncio.ensure_future(api_validation_request(session, url))
+				tasks.append(task)
+
+		await asyncio.gather(*tasks, return_exceptions=True)
+		""" completed, pending = await asyncio.wait(tasks)
+		results = [t.result() for t in completed]
+		log.info('results: {!r}'.format(results))
+		"""	
+		log.info('exiting')
+
+
 if __name__ == "__main__":
 	logging.basicConfig(
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
 		stream=sys.stderr,
-	)
-	QG = query_generator()
-	QG.__next__()
-	db = db_handler()
-	
-	sites = list_generator(db) 
+ 	)
 	start_time = time.time()
 	
 	
+	log = logging.getLogger('main')
+	log.info('Inicializando serviço de Validação de cadastros...')
+	db = db_handler()
+	
+	loop = asyncio.get_event_loop()
+	pendentes=loop.run_until_complete(list_generator(db))
+ 
+	
+
+	
 	executor = concurrent.futures.ThreadPoolExecutor(
-		max_workers=4,
-	)
+		max_workers=3,
+    )
 	event_loop = asyncio.get_event_loop()
 	try:
 		event_loop.run_until_complete(
-			list_of_requests_pending(executor,sites)
+			runner(executor)
 		)
 	finally:
 		event_loop.close()
-		duration = time.time() - start_time
+
+	duration = time.time() - start_time
+
 	
-	
-	
-	print(f"Total de {len(sites)} dados consultados em {duration} seconds")
-
-
-
-"""
-
-
-	 Exemplo de uso da API
-https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf=21315050862&data=02/05/1978&token={token}
-status_id {
-	1 - ok
-	2 - suspenso
-	0 - nao verificado
-	3 - campos pendentes
-}
-
-
-Posso Transformar esse metodo em uma classe, fazenfo com que ela seja gerenciada por um outro script, rodando em outras subrotinas:
-- Retira o handler do banco de dados para uma outra classe;
-
-- Passa como parametro para desta classe a lista de pendentes com uso do slice
-- a cada ciclo do slice ela retorna a variavel respones que pode ser recebida por um metodo de relatorios retirando desta a query_generator e a escrita do arquivo  responses.json
-- 
+	log.info("Foram efetuadas {0} requisições à API soawebservices".format(contador_failsafe))
+	log.info(f"Total de {len(pendentes)+contador_failsafe} dados consultados em {duration} seconds")
+	log.info("Encerrando serviço")
 
 
 
 
-"""
 
 

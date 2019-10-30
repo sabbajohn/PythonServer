@@ -4,12 +4,10 @@ import sys
 import os
 import time
 import json
-
+import cpf
 from time import sleep
 import datetime
 
-sys.path.insert(1,'/home/objetiva/PythonServer/Class')
-import cpf
 
 if sys.version_info[0] < 3:
 
