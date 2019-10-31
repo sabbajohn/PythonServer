@@ -6,3 +6,4 @@ aiofile
 flask
 flask_restful
 sqlalchemy
+concurrent
