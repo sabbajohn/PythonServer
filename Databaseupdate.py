@@ -53,9 +53,8 @@ def QueryRunner(database):
 				sleep(0.5)
 				log.info("Executando Querys n°{0}".format(n_updates))
 			except mysql.connector.Error as err:
-				log.info('Erro ao Atualiza o Banco de Dados.')
-				sleep(3)
-				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {}".format(err))
+				log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
 		return n_updates
 	
 	else:
@@ -78,9 +77,8 @@ def db_handler():
 		log.info('Conexão esstabelecida com Sucesso!')
 		return mydb
 	except mysql.connector.Error as err:
-		log.info('Erro ao conecar com o Banco de Dados.')
-		sleep(3)
-		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
+		log.info('Erro ao conecar com o Banco de Dados:{0}'.format(err))
+		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {0}".format(err))  
 
 
 if __name__ == "__main__":
