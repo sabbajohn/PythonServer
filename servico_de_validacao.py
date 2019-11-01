@@ -284,10 +284,10 @@ async def query_generator(resp):
 										try:
 											err = endereco['erro']
 										except:
-											f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+											f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
 											
 									else:
-										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
+										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
 								elif "Data Nascimento invalida." in item2['message']:
 									try:
 										check = item2['CPF']
@@ -302,9 +302,9 @@ async def query_generator(resp):
 												try:
 													err = endereco['erro']
 												except:
-													f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+													f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
 											else:
-												f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
+												f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
 											
 									except:
 										pass
