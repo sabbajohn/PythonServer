@@ -74,7 +74,7 @@ def db_handler():
 			database="megasorte"
 
 		)
-		log.info('Conexão esstabelecida com Sucesso!')
+		log.info('Conexão estabelecida com Sucesso!')
 		return mydb
 	except mysql.connector.Error as err:
 		log.info('Erro ao conecar com o Banco de Dados:{0}'.format(err))
