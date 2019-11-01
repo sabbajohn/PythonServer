@@ -348,9 +348,9 @@ async def list_generator(database):
 	if len(result) > 0:
 		log.info('{0} itens serão analisados.'.format(len(result)))
 	else:
-		log.info('Não há itens pendentes no momento')
+		log.info('Não há itens pendentes no momento!')
 		sys.exit()
-		
+
 	log.info('Aguarde!')
 	lista = {}
 	lista['pendentes']={}
@@ -488,7 +488,7 @@ if __name__ == "__main__":
 	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
 	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
-	log.info('*******')
+	log.info('#######')
 
 
 

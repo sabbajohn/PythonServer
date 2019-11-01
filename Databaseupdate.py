@@ -54,6 +54,7 @@ def QueryRunner(database):
 				log.info("Executando Querys n°{0}".format(n_updates))
 			except mysql.connector.Error as err:
 				log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+				log.info('#######')
 				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
 		return n_updates
 	
@@ -78,6 +79,7 @@ def db_handler():
 		return mydb
 	except mysql.connector.Error as err:
 		log.info('Erro ao conecar com o Banco de Dados:{0}'.format(err))
+		log.info('#######')
 		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {0}".format(err))  
 
 
@@ -107,5 +109,5 @@ if __name__ == "__main__":
 		os.system("mv  /home/"+USER+"/PythonServer/query.txt query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
-	log.info('*******')
+	log.info('#######')
 	
