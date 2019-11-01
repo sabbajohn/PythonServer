@@ -102,7 +102,8 @@ if __name__ == "__main__":
 	db = db_handler()
 	result = QueryRunner(db)
 	log.info('Serviço de Atualização da Base de Dados Concluido')
-	log.info('{0} registros foram Atualizados'.format(result))
+	duration = time.time() - start_time
+	log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
 	
 	agora = datetime.datetime.now()
 	
