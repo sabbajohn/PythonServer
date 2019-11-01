@@ -87,10 +87,12 @@ if __name__ == "__main__":
 		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
-		stream=sys.stderr,
+		#stream=sys.stderr,
  	)
 	log = logging.getLogger('Serviço de Atualização da Base de Dados')
+	log.info('________________________________________________________')
 	log.info('Inicializando serviço  de Atualização da Base de Dados')
+	log.info(datetime.datetime.now())
 	db = db_handler()
 	result = QueryRunner(db)
 	log.info('Serviço de Atualização da Base de Dados Concluido')
@@ -101,5 +103,6 @@ if __name__ == "__main__":
 
 		os.system("mv query.txt query_old{0}.txt".format(agora))
 		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
-
-	sys.exit("Encerrando Serviço de Atuliazação.")
+	log.info("Encerrando Serviço de Atuliazação.")
+	log.info('________________________________________________________')
+	

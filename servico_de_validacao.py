@@ -446,13 +446,15 @@ if __name__ == "__main__":
 		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
-		stream=sys.stderr,
+		#stream=sys.stderr,
  	)
 	start_time = time.time()
 	
 	
 	log = logging.getLogger('main')
+	log.info('_______________________________________________________________________________')
 	log.info('Inicializando serviço de Validação de cadastros...')
+	log.info(datetime.datetime.now())
 	db = db_handler()
 	
 	loop = asyncio.get_event_loop()
@@ -479,8 +481,9 @@ if __name__ == "__main__":
 	log.info("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
 	log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
 	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
-	log.info(f"Total de {len(pendentes)} dados consultados em {duration} seconds")
+	log.info(f"Total de {len(pendentes[pendentes])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
+	log.info('_______________________________________________________________________________')
 
 
 
