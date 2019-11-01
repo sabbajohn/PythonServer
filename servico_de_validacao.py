@@ -343,7 +343,7 @@ async def list_generator(database):
 	log = logging.getLogger('list_generator')
 	log.info('Buscando registros pendentes na base de dados.')
 	executor= database.cursor()
-	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente_dev where id_status =0 order by Nome asc ,id desc LIMIT 100")
+	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status =0 order by Nome asc ,id desc LIMIT 100")
 	result = executor.fetchall()
 	log.info('{0} itens serão analisados.'.format(len(result)))
 	log.info('Aguarde!')
@@ -481,7 +481,7 @@ if __name__ == "__main__":
 	log.info("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
 	log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
 	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
-	log.info(f"Total de {len(pendentes[pendentes])} dados consultados em {duration} seconds")
+	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
 	log.info('_______________________________________________________________________________')
 
