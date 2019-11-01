@@ -175,11 +175,11 @@ async def query_generator(resp):
 				if(resp['failsafe']==True):
 					failsafe.append(resp)
 
-					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+					with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 						for item in failsafe:
 							agora = datetime.datetime.now()
 							f.write("{0}:{1}\n".format(agora ,item))
-					with open("query.txt","a+") as f:
+					with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
 						for item in failsafe:
 							if item['viaCep'] == True:
 								endereco =  await viaCEP(item["CEP"])
@@ -213,12 +213,12 @@ async def query_generator(resp):
 				
 			
 			data.append(resp)
-			with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+			with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 				for item2 in data:
 					agora = datetime.datetime.now()
 					f.write("{0}:{1}\n".format(agora ,item2))
 			
-			with open("query.txt","a+") as f:
+			with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
 				for item2 in data:
 					try:
 						r = item2['result']['numero_de_cpf']
@@ -350,7 +350,7 @@ async def list_generator(database):
 		log.info('Não há itens pendentes no momento!')
 		log.info("Encerrando serviço.")
 		log.info('#######')
-		sys.exit()
+		sys.exit("")
 
 	log.info('Aguarde!')
 	lista = {}
