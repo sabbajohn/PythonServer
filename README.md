@@ -1,31 +1,19 @@
 # PythonServer
-    Hoje o Validador.py esta em funcionamento somene, seguindo os esforços para fazer com que os posts recebidos no server.py sejam encaminhadas para
-    validador.
-    
-    Alguns metodos foram copiados para arquivos separados para que em breve toda esta estrutura possa ser organizada em classes
-    
-    Proximo desafio:
-        Escrever as saidas de relatorio a medida que as respostas vão chegando...
+Aqui estão sendo desenvolvidos scripts para validação de regsitros por meio de API's
+por se tratarem de um alto volume de registros os mesmos não podem ser realizados de
+forma síncrona, para solucionar tal problema está sendo utilizado a biblioteca ASYNCIO
+	Diagrama:
 
-
-        Instanciar objeto e deixar que suas respesctivas threads:
-        Inicializo a estrutura de dados vazia...
-        O pool de requisições alimenta a estrutura
-        cada thread insere um nó em uma ponta ao finalizar;
-        Uma subrotina Relatorios consumirá na outra ponta da estrutura os nós enquanto eles existirem.     
-       _______________                 ___________  
+	   _______________                 ___________  
       |     Pool      |               |  FILA     |  
       |      de       |-------------->|___________|                _____________  
       |  requisições  |                |___________|              |             |
       |_______________|                 |___________| ----------> | Relatórios  |
                                                                   |_____________|
+As validações são realizadas verificando informações como CEP, CPF e data de nascimento,
+e por fim gera querys para serem executadas no banco de dados
 
 
 
-    Os Arquvos de log já são gerados durante a consulta, entretanto com ajuda de sinaleiros.
 
-    Pendente:
-        Implementar mecanismos de autenticação server.py
-        
-Modulos necessários em req.txt
 
