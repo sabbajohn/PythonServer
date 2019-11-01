@@ -107,7 +107,7 @@ if __name__ == "__main__":
 	if result > 0:
 
 		os.system("mv  home/"+USER+"/PythonServer/queries/query.txt home/"+USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
-		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
+		os.system("touch /home/{0}/PythonServer/queries/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
 	log.info('#######')
 	
