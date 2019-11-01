@@ -32,7 +32,7 @@ def QueryRunner(database):
 	rest = 0
 	log = logging.getLogger('QueryRunner')
 	log.info("Procurando Por Arquivo de Querys.")
-	fname = "/home/{0}/PythonServer/query.txt".format(USER)
+	fname = "/home/{0}/PythonServer/queries/query.txt".format(USER)
 	executor= database.cursor()
 	if os.path.isfile(fname):
 		infile = open(fname, 'r').readlines()
