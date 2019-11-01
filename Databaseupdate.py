@@ -22,7 +22,7 @@ except:
 		
 		else:
 			sleep(10)   
-			comando('python3 Validador.py')
+			comando('python3 Databaseupdate.py')
 sys.path.insert(1,'/home/objetiva/PythonServer/Class')
 
 def QueryRunner(database):
@@ -96,6 +96,6 @@ if __name__ == "__main__":
 	log.info('Serviço de Atualização da Base de Dados Concluido')
 	log.info('{0} registros foram Atualizados'.format(result))
 	log.info('Deletando arquivo de Querys')
-	hoje = today = date.today()
-	os.system("mv query.txt query_old{0}.txt".format(	hoje.strftime("%d-%m-%Y")))
-	os.system("touch query.txt")
+	agora = datetime.datetime.now()
+	os.system("mv query.txt query_old{0}.txt".format(agora))
+	os.system("touch /home/objetiva/PythonServer/query.txt")
