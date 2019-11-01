@@ -3,6 +3,7 @@
 import sys
 import os
 import os.path
+import getpass
 import logging
 import time
 import datetime
@@ -23,8 +24,8 @@ except:
 		else:
 			sleep(10)   
 			comando('python3 Databaseupdate.py')
-sys.path.insert(1,'/home/objetiva/PythonServer/Class')
-
+sys.path.insert(1,'/home/USER/PythonServer/Class')
+USER =getpass.getuser()
 def QueryRunner(database):
 	n_updates = 0
 	rest = 0
@@ -34,6 +35,9 @@ def QueryRunner(database):
 	executor= database.cursor()
 	if os.path.isfile(fname):
 		infile = open(fname, 'r').readlines()
+		if ( not len(infile)>0):
+			log.info("Não há registros a serem atualizados.")
+			sys.exit("Encerrando Serviço de Atuliazação.")
 		for line in infile:
 		
 			try:
@@ -49,17 +53,10 @@ def QueryRunner(database):
 				log.info("Executando Querys n°{0}".format(n_updates))
 			except mysql.connector.Error as err:
 				log.info('Erro ao Atualiza o Banco de Dados.')
-				if err == 'Erro Use multi=True when executing multiple statements':
-					continue
-				else:
-					sleep(3)
-					sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {}".format(err))
+				sleep(3)
+				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {}".format(err))
 		
 	return n_updates
-
-
-
-		
 
 
 
@@ -95,7 +92,11 @@ if __name__ == "__main__":
 	result = QueryRunner(db)
 	log.info('Serviço de Atualização da Base de Dados Concluido')
 	log.info('{0} registros foram Atualizados'.format(result))
-	log.info('Deletando arquivo de Querys')
+	
 	agora = datetime.datetime.now()
-	os.system("mv query.txt query_old{0}.txt".format(agora))
-	os.system("touch /home/objetiva/PythonServer/query.txt")
+	if result >0:
+
+		os.system("mv query.txt query_old{0}.txt".format(agora))
+		os.system("touch /home/USER/PythonServer/query.txt")
+
+	sys.exit("Encerrando Serviço de Atuliazação.")

@@ -12,10 +12,10 @@ from time import sleep
 import datetime
 import concurrent.futures
 import asyncio.coroutines
+import getpass
 
 
-
-sys.path.insert(1,'/home/objetiva/PythonServer/Class')
+sys.path.insert(1,'/home/USER/PythonServer/Class')
 import cpf
 
 if sys.version_info[0] < 3:
@@ -88,18 +88,17 @@ except:
 
 
 
-
-
-
-PYTHONASYNCIODEBUG=1
 failsafe_tasks=[]
 failsafe_cpf = []
 responses = []
 pendentes_f = []
 result=None	
 contador_failsafe = 0
-
+contador_hd = 0
+contador_dispensadas = 0
+USER = getpass.getuser()
 async def api_validation_request(session, url,index):
+	global contador_hd
 	async with session.get(url) as response:
 		response = await response.read()
 		response_fix =json.loads(response)
@@ -107,6 +106,7 @@ async def api_validation_request(session, url,index):
 		response_fix['index'] = index
 		""" print(response_fix) """
 		if len(response_fix)>0:
+			contador_hd =contador_hd+1 
 			await query_generator(response_fix)
 		
 		else:
@@ -137,7 +137,8 @@ def db_handler():
    
 
 async def list_generator(database):
-	global result
+	global result, contador_dispensadas
+
 	log = logging.getLogger('list_generator')
 	log.info('Buscando registros pendentes na base de dados.')
 	executor= database.cursor()
@@ -162,7 +163,7 @@ async def list_generator(database):
 				data['id'] = x[2]
 				data['code'] = 1
 				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
-				
+				contador_dispensadas = contador_dispensadas+1 
 				await query_generator(data)
 		else:
 			if x[0]== None:
@@ -171,6 +172,7 @@ async def list_generator(database):
 				data['id'] = x[2]
 				data['code'] = 2
 				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
+				contador_dispensadas = contador_dispensadas+1 
 				await query_generator(data)
 				
 			else:	
@@ -184,6 +186,7 @@ async def list_generator(database):
 						data['id'] = x[2]
 						data['code'] = 3
 						data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
+						contador_dispensadas = contador_dispensadas+1 
 						await query_generator(data)
 
 	
@@ -363,7 +366,9 @@ if __name__ == "__main__":
 	duration = time.time() - start_time
 
 	
-	log.info("Foram efetuadas {0} requisições à API soawebservices".format(contador_failsafe))
+	log.info("Foram efetuadas {0} requisições à API Soawebservices".format(contador_failsafe))
+	log.info("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
+	log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
 	log.info(f"Total de {len(pendentes)} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
 
