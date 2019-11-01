@@ -14,7 +14,7 @@ import concurrent.futures
 import asyncio.coroutines
 import getpass
 
-
+USER = getpass.getuser()
 sys.path.insert(1,'/home/USER/PythonServer/Class')
 import cpf
 
@@ -96,7 +96,7 @@ result=None
 contador_failsafe = 0
 contador_hd = 0
 contador_dispensadas = 0
-USER = getpass.getuser()
+
 async def api_validation_request(session, url,index):
 	global contador_hd
 	async with session.get(url) as response:
