@@ -40,22 +40,25 @@ def QueryRunner(database):
 			log.info("Não há registros a serem atualizados.")
 			log.info("Encerrando Serviço de Atuliazação.")
 		for line in infile:
-		
+			line = line.replace('\n','')
 			try:
 				if(rest == 30):
 					rest = 0
 					log.info("Standy by 1s")
 					sleep(1)
-
-				executor.execute(line, multi=True)
+				executor.execute(line)
+				database.commit()
+				executor.rowcount
 				n_updates = n_updates +1
 				rest = rest +1
-				sleep(0.5)
+				
 				log.info("Executando Querys n°{0}".format(n_updates))
 			except mysql.connector.Error as err:
 				log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
 				log.info('#######')
 				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
+	
+		
 		return n_updates
 	
 	else:
