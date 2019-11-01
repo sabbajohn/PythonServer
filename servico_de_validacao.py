@@ -345,7 +345,12 @@ async def list_generator(database):
 	executor= database.cursor()
 	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status =0 order by Nome asc ,id desc LIMIT 100")
 	result = executor.fetchall()
-	log.info('{0} itens serão analisados.'.format(len(result)))
+	if len(result) > 0:
+		log.info('{0} itens serão analisados.'.format(len(result)))
+	else:
+		log.info('Não há itens pendentes no momento')
+		sys.exit()
+		
 	log.info('Aguarde!')
 	lista = {}
 	lista['pendentes']={}
