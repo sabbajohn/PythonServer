@@ -24,8 +24,9 @@ except:
 		else:
 			sleep(10)   
 			comando('python3 Databaseupdate.py')
-sys.path.insert(1,'/home/USER/PythonServer/Class')
+
 USER =getpass.getuser()
+sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
 def QueryRunner(database):
 	n_updates = 0
 	rest = 0
@@ -97,6 +98,6 @@ if __name__ == "__main__":
 	if result >0:
 
 		os.system("mv query.txt query_old{0}.txt".format(agora))
-		os.system("touch /home/USER/PythonServer/query.txt")
+		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
 
 	sys.exit("Encerrando Serviço de Atuliazação.")

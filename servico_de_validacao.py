@@ -15,7 +15,7 @@ import asyncio.coroutines
 import getpass
 
 USER = getpass.getuser()
-sys.path.insert(1,'/home/USER/PythonServer/Class')
+sys.path.insert(1,'/home/[{0}]/PythonServer/Class'.format(USER))
 import cpf
 
 if sys.version_info[0] < 3:
