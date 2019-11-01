@@ -34,36 +34,77 @@ def QueryRunner(database):
 	log.info("Procurando Por Arquivo de Querys.")
 	fname = "/home/{0}/PythonServer/queries/query.txt".format(USER)
 	executor= database.cursor()
-	if os.path.isfile(fname):
-		infile = open(fname, 'r').readlines()
-		if ( not len(infile)>0):
-			log.info("Não há registros a serem atualizados.")
-			log.info("Encerrando Serviço de Atuliazação.")
-		for line in infile:
-			line = line.replace('\n','')
-			try:
-				if(rest == 30):
-					rest = 0
-					log.info("Standy by 1s")
-					sleep(1)
-				executor.execute(line)
-				database.commit()
-				executor.rowcount
-				n_updates = n_updates +1
-				rest = rest +1
-				
-				log.info("Executando Querys n°{0}".format(n_updates))
-			except mysql.connector.Error as err:
-				log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
-				log.info('#######')
-				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
+	try:
+		if(os.path.isfile(fname)):
+			infile = open(fname, 'r').readlines()
+			if ( not len(infile)>0):
+				log.info("Não há registros a serem atualizados.")
+				log.info("Encerrando Serviço de Atuliazação.")
+			for line in infile:
+				line = line.replace('\n','')
+				try:
+					if(rest == 30):
+						rest = 0
+						log.info("Standy by 1s")
+						sleep(1)
+					executor.execute(line)
+					database.commit()
+					executor.rowcount
+					n_updates = n_updates +1
+					rest = rest +1
+
+					log.info("Executando Querys n°{0}".format(n_updates))
+				except mysql.connector.Error as err:
+					log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+					log.info('#######')
+					sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
 	
 		
-		return n_updates
+		
 	
+	except :
+		pass
+	
+	try:
+		if(os.path.isfile(fname)):
+			fname = "/home/{0}/PythonServer/queries/query_api.txt".format(USER)
+			#os.path.isfile(fname)
+			infile = open(fname, 'r').readlines()
+			if ( not len(infile)>0):
+				log.info("Não há registros a serem atualizados.")
+				log.info("Encerrando Serviço de Atuliazação.")
+			for line in infile:
+				line = line.replace('\n','')
+				try:
+					if(rest == 30):
+						rest = 0
+						log.info("Standy by 1s")
+						sleep(1)
+					executor.execute(line)
+					database.commit()
+					executor.rowcount
+					n_updates = n_updates +1
+					rest = rest +1
+
+					log.info("Executando Querys n°{0}".format(n_updates))
+				except mysql.connector.Error as err:
+					log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+					log.info('#######')
+					sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
+	except:
+		pass
+	
+	if n_updates>0:
+
+		return n_updates
 	else:
-		log.info("Arquivo não encontrado!")
+		log.info("Nenhum arquivo encontrado!")
 		return 0
+
+
+		
+
+	
 	
 
 
