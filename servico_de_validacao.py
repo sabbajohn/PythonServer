@@ -294,9 +294,15 @@ async def query_generator(resp):
 									
 										if check and (result[item2['index']][3] == None or result[item2['index']][3] == "" ):
 											params={}
-											params['CPF'] = item2['CPF']
-											params['viaCep'] =item2['viaCep']
-											params['CEP'] = item2['CEP']
+											if item2['viaCep']:
+											
+												params['CPF'] = item2['CPF']
+												params['viaCep'] =item2['viaCep']
+												params['CEP'] = item2['CEP']
+											else:
+												params['CPF'] = item2['CPF']
+												params['viaCep'] =item2['viaCep']
+
 											await failsafe_api_validation_request(params)
 										
 										else:
