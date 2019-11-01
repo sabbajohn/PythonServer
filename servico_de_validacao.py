@@ -278,7 +278,7 @@ async def query_generator(resp):
 
 							if item2['return']=='NOK':
 								
-								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message']:
+								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message'] or  "CPF não existe na base até o momento!" in item2['message']:
 									if item2['viaCep'] is True:
 										endereco = await viaCEP(item2["CEP"])
 										try:
