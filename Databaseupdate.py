@@ -42,10 +42,10 @@ def QueryRunner(database):
 		for line in infile:
 		
 			try:
-				if(rest == 5):
+				if(rest == 30):
 					rest = 0
-					log.info("Standy by por 5s")
-					sleep(2)
+					log.info("Standy by 1s")
+					sleep(1)
 
 				executor.execute(line, multi=True)
 				n_updates = n_updates +1
