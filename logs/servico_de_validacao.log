@@ -1,0 +1,39 @@
+PID 20937               main: *******
+PID 20937               main: Inicializando serviço de Validação de cadastros...
+PID 20937               main: 2019-11-01 14:04:17.925620
+PID 20937         db_handler: iniciando conexão com Banco de Dados.
+PID 20937         db_handler: Conexão esstabelecida com Sucesso!
+PID 20937     list_generator: Buscando registros pendentes na base de dados.
+PID 20937     list_generator: 10 itens serão analisados.
+PID 20937     list_generator: Aguarde!
+PID 20937 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 20937 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 20937 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 20937 Iniciando Solicitações a API hubdodesenvolvedor : starting
+PID 20937 Iniciando Solicitações a API hubdodesenvolvedor : Criando tarefas
+PID 20937 Iniciando Solicitações a API hubdodesenvolvedor : exiting
+PID 20937               main: Foram efetuadas 3 requisições à API Soawebservices
+PID 20937               main: Foram efetuadas 3 requisições à API HubdoDesenvolvedor
+PID 20937               main: Foram dispensados 4 registros da validação online por falta de parametros
+PID 20937               main: Foram realizadas 2 ao Via Cep
+PID 20937               main: Total de 3 dados consultados em 41.66142010688782 seconds
+PID 20937               main: Encerrando serviço
+PID 20937               main: *******
+PID 24717               main: *******
+PID 24717               main: Inicializando serviço de Validação de cadastros...
+PID 24717               main: 2019-11-01 15:05:00.147796
+PID 24717         db_handler: iniciando conexão com Banco de Dados.
+PID 24717         db_handler: Conexão esstabelecida com Sucesso!
+PID 24717     list_generator: Buscando registros pendentes na base de dados.
+PID 24717     list_generator: Não há itens pendentes no momento!
+PID 24717     list_generator: Encerrando serviço.
+PID 24717     list_generator: #######
+PID 24774               main: *******
+PID 24774               main: Inicializando serviço de Validação de cadastros...
+PID 24774               main: 2019-11-01 15:05:18.802556
+PID 24774         db_handler: iniciando conexão com Banco de Dados.
+PID 24774         db_handler: Conexão esstabelecida com Sucesso!
+PID 24774     list_generator: Buscando registros pendentes na base de dados.
+PID 24774     list_generator: Não há itens pendentes no momento!
+PID 24774     list_generator: Encerrando serviço.
+PID 24774     list_generator: #######

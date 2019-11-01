@@ -1,0 +1,10 @@
+UPDATE cliente_dev SET id_status='1', Nome = 'MARLON CARRILHO RIBEIRO DOS SANTOS' , motivo ='Verificado via API ', DtNascimento='1997-08-04'  WHERE CPFCNPJ = '14453028709';
+UPDATE cliente_dev SET id_status='1', Nome = 'MONICA REIS DE BRITO' , motivo ='Verificado via API ', DtNascimento='1984-05-11'  WHERE CPFCNPJ = '02580166556';
+UPDATE cliente_dev SET id_status='1', Nome = 'LILIAN VANESSA SILVA MINOTTI' , motivo ='Verificado via API ', DtNascimento='1982-02-07'  WHERE CPFCNPJ = '98451103049';
+UPDATE cliente_dev SET id_status='2', motivo = 'Cliente 113764 não foi validado pois o CPF/CNPJ esta em branco' WHERE id = 113764;
+UPDATE cliente_dev SET id_status='2', motivo = 'Cliente 22248 não foi validado pois o CPF/CNPJ esta em branco' WHERE id = 22248;
+UPDATE cliente_dev SET id_status='2', motivo = 'Cliente 3840 não foi validado pois o CPF/CNPJ esta em branco' WHERE id = 3840;
+UPDATE cliente_dev SET id_status='2', motivo = 'Cliente 106242 não foi validado pois o CPF/CNPJ esta em branco' WHERE id = 106242;
+UPDATE cliente_dev SET id_status='1', Nome = 'THAIS DE JESUS GARCIA' , motivo ='Verificado via API através do codigo 583A.7BAF.20DA.D795 em 14:04:50 às 01/11/2019'  WHERE CPFCNPJ = '047.012.221-86';
+UPDATE cliente_dev SET id_status='1', Nome = 'JOSE GOMES NETO' , motivo ='Verificado via API através do codigo 60E0.8B86.26BF.285D em 14:04:53 às 01/11/2019', Cidade='São Mateus do Maranhão', SgUF='MA'  WHERE CPFCNPJ = '061.447.193-18';
+UPDATE cliente_dev SET id_status='1', Nome = 'ELINEIDE CARLOS SILVA' , motivo ='Verificado via API através do codigo 462A.384F.A00C.378A em 14:04:53 às 01/11/2019', Cidade='Nossa Senhora do Socorro', SgUF='SE'  WHERE CPFCNPJ = '025.567.595-00';
