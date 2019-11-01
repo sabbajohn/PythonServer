@@ -13,7 +13,6 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
-
 USER = getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
 import cpf

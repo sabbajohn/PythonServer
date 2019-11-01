@@ -1,6 +1,8 @@
 
 import sys
 from db import DB
+import getpass
+USER = getpass.getuser()
 handler = DB()
 db = handler.mydb.cursor()
 class Relatorios(object):
@@ -12,7 +14,7 @@ class Relatorios(object):
 			
 			data = resp
 			
-			with open("query.txt","a+") as f:
+			with open("/home/"+USER+"/PythonServer/Servers/query.txt","a+") as f:
 				for item in data:
 					if item['status']==True:
 						message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
@@ -86,7 +88,7 @@ class Relatorios(object):
 							pass
 
 	def responses(responses):
-		with open("response_api.json","a+") as f: 
+		with open("/home/"+USER+"/PythonServer/Servers/response_api.json","a+") as f: 
 			for item in responses:
 				f.write("%s\n"%item)  
 

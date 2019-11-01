@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 # coding: utf-8
 import sys
-sys.path.insert(1,'/home/objetiva/PythonServer/Class')
 import os
 import time
 from time import sleep
-import cpf
 import json
 from json import dumps
+import getpass
+USER = getpass.getuser()
+sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
+import cpf
 from Relatorios import Relatorios as log
-
-
 
 if sys.version_info[0] < 3:
 

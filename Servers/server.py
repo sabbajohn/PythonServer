@@ -4,6 +4,9 @@ import sys
 import os
 import time
 from time import sleep
+import getpass
+USER = getpass.getuser()
+sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
 import cpf
 import json
 from json import dumps
