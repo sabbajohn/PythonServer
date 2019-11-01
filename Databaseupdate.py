@@ -71,7 +71,7 @@ def QueryRunner(database):
 			#os.path.isfile(fname)
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
-				log.info("Não há registros a serem atualizados.")
+				log.info("Não há registros oriundos da API a serem atualizados.")
 				log.info("Encerrando Serviço de Atuliazação.")
 			for line in infile:
 				line = line.replace('\n','')
@@ -86,7 +86,7 @@ def QueryRunner(database):
 					n_updates = n_updates +1
 					rest = rest +1
 
-					log.info("Executando Querys n°{0}".format(n_updates))
+					log.info("Executando Querys da API. n°{0}".format(n_updates))
 				except mysql.connector.Error as err:
 					log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
 					log.info('#######')
