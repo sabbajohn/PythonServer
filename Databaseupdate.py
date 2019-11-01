@@ -32,7 +32,7 @@ def QueryRunner(database):
 	rest = 0
 	log = logging.getLogger('QueryRunner')
 	log.info("Procurando Por Arquivo de Querys.")
-	fname = "query.txt"
+	fname = "/home/{0}/PythonServer/query.txt".format(USER)
 	executor= database.cursor()
 	if os.path.isfile(fname):
 		infile = open(fname, 'r').readlines()
@@ -56,9 +56,12 @@ def QueryRunner(database):
 				log.info('Erro ao Atualiza o Banco de Dados.')
 				sleep(3)
 				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {}".format(err))
-		
-	return n_updates
-
+		return n_updates
+	
+	else:
+		log.info("Arquivo não encontrado!")
+		return 0
+	
 
 
 def db_handler():
@@ -99,9 +102,11 @@ if __name__ == "__main__":
 	log.info('{0} registros foram Atualizados'.format(result))
 	
 	agora = datetime.datetime.now()
-	if result >0:
+	
 
-		os.system("mv query.txt query_old{0}.txt".format(agora))
+	if result > 0:
+
+		os.system("mv  /home/"+USER+"/PythonServer/query.txt query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
 	log.info('*******')
