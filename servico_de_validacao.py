@@ -235,7 +235,8 @@ async def query_generator(resp):
 					failsafe.append(resp)
 					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 						for item in failsafe:
-							f.write("%s\n"%item)
+							agora = datetime.datetime.now()
+							f.write("%s:%s\n"%agora %item)
 					with open("query.txt","a+") as f:
 						for item in failsafe:
 							if item['Status'] == True:
@@ -256,7 +257,8 @@ async def query_generator(resp):
 			data.append(resp)
 			with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 				for item2 in data:
-					f.write("%s\n"%item2)  
+					agora = datetime.datetime.now()
+					f.write("%s:%s\n"%agora %item2)
 			
 			with open("query.txt","a+") as f:
 				for item2 in data:
@@ -307,87 +309,6 @@ async def query_generator(resp):
 						else:
 							pass
 
-async def query_generator2(resp):
-	global result
-	caracteres = ['.','-']
-	data=[]
-	failsafe=[]
-	if len(resp)>0:
-		try:
-			r = resp['failsafe']
-			if r:
-				if(resp['failsafe']==True):
-					failsafe.append(resp)
-					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-						for item in failsafe:
-							f.write("%s\n"%item)
-					with open("query.txt","a+") as f:
-						for item in failsafe:
-							if item['Status'] == True:
-								message = 'Verificado via API '
-								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento=0{2}  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
-							if item['Status'] == False:
-								f.write("UPDATE cliente SET id_status='3', ' , motivo ='{0}  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
-							else:
-								pass
-			else:
-				pass
-				
-		except:
-			pass
-				
-			
-			data.append(resp)
-			with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-				for item2 in data:
-					f.write("%s\n"%item2)  
-			
-			with open("query.txt","a+") as f:
-				for item2 in data:
-					try:
-						r = item2['result']['numero_de_cpf']
-						if r:
-							item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')	
-					except :
-						pass
-
-					if item2['status']==True:
-						
-						message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
-						f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
-					elif item2['status']==False:
-						try:
-							item2['code']
-							if item2['code'] == 1:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-							elif item2['code'] == 2:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-							elif item2['code'] == 3:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-						except:
-
-							if item2['return']=='NOK':
-								
-								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message']:
-									f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
-								elif "Data Nascimento invalida." in item2['message']:
-									try:
-										check = item2['CPF']
-										if check and (result[item2['index']][3] == None or result[item2['index']][3] == "" ):
-											
-											await failsafe_api_validation_request(item2['CPF'])
-											
-												
-											
-									except:
-										pass
-							
-
-									#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-								elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-									sys.exit(item2['message'])	
-						else:
-							pass
 
 async def runner(executor):
 	index = 0
