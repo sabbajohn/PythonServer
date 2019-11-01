@@ -236,7 +236,7 @@ async def query_generator(resp):
 					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 						for item in failsafe:
 							agora = datetime.datetime.now()
-							f.write("%s:%s\n"%agora %item)
+							f.write("{0}:{1}\n".format(agora ,item))
 					with open("query.txt","a+") as f:
 						for item in failsafe:
 							if item['Status'] == True:
@@ -258,7 +258,7 @@ async def query_generator(resp):
 			with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 				for item2 in data:
 					agora = datetime.datetime.now()
-					f.write("%s:%s\n"%agora %item2)
+					f.write("{0}:{1}\n".format(agora ,item2))
 			
 			with open("query.txt","a+") as f:
 				for item2 in data:
