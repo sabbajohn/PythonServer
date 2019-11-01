@@ -38,7 +38,7 @@ def QueryRunner(database):
 		infile = open(fname, 'r').readlines()
 		if ( not len(infile)>0):
 			log.info("Não há registros a serem atualizados.")
-			sys.exit("Encerrando Serviço de Atuliazação.")
+			log.info("Encerrando Serviço de Atuliazação.")
 		for line in infile:
 		
 			try:
