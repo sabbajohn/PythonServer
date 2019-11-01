@@ -452,7 +452,7 @@ if __name__ == "__main__":
 	
 	
 	log = logging.getLogger('main')
-	log.info('_______________________________________________________________________________')
+	log.info('*******')
 	log.info('Inicializando serviço de Validação de cadastros...')
 	log.info(datetime.datetime.now())
 	db = db_handler()
@@ -483,7 +483,7 @@ if __name__ == "__main__":
 	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
 	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
-	log.info('_______________________________________________________________________________')
+	log.info('*******')
 
 
 

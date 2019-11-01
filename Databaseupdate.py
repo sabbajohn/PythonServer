@@ -90,7 +90,7 @@ if __name__ == "__main__":
 		#stream=sys.stderr,
  	)
 	log = logging.getLogger('Serviço de Atualização da Base de Dados')
-	log.info('________________________________________________________')
+	log.info('*******')
 	log.info('Inicializando serviço  de Atualização da Base de Dados')
 	log.info(datetime.datetime.now())
 	db = db_handler()
@@ -104,5 +104,5 @@ if __name__ == "__main__":
 		os.system("mv query.txt query_old{0}.txt".format(agora))
 		os.system("touch /home/{0}/PythonServer/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
-	log.info('________________________________________________________')
+	log.info('*******')
 	
