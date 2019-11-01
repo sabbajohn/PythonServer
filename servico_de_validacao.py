@@ -349,6 +349,8 @@ async def list_generator(database):
 		log.info('{0} itens serão analisados.'.format(len(result)))
 	else:
 		log.info('Não há itens pendentes no momento!')
+		log.info("Encerrando serviço.")
+		log.info('#######')
 		sys.exit()
 
 	log.info('Aguarde!')
@@ -487,7 +489,7 @@ if __name__ == "__main__":
 	log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
 	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
 	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
-	log.info("Encerrando serviço")
+	log.info("Encerrando serviço.")
 	log.info('#######')
 
 
