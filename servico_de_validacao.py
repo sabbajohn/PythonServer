@@ -96,105 +96,39 @@ result=None
 contador_failsafe = 0
 contador_hd = 0
 contador_dispensadas = 0
+contador_ViaCep = 0
+
+async def viaCEP(CEP):
+	global contador_ViaCep
+	url = "https://viacep.com.br/ws/{0}/json".format(CEP)
+	async with aiohttp.ClientSession() as s:
+		async with s.get(url) as r:
+			endereco = await r.read()
+			endereco =json.loads(endereco)
+			contador_ViaCep = contador_ViaCep + 1
+			return endereco
 
 async def api_validation_request(session, url,index):
 	global contador_hd
 	async with session.get(url) as response:
 		response = await response.read()
-		response_fix =json.loads(response)
-		response_fix['CPF'] = url[49:60]
-		response_fix['index'] = index
+		response =json.loads(response)
+		response['CPF'] = url[49:60]
+		response['index'] = index
+		if ((result[index][4] == "" or result[index][4] == None) and (result[index][5] == "" or  result[index][5] == None)) and  (result[index][6] !="" and  result[index][6] !=None):
+			response['viaCep'] = True
+			response['CEP'] =  result[index][6]
+		else:
+			response['viaCep'] = False
 		""" print(response_fix) """
-		if len(response_fix)>0:
+		if len(response)>0:
 			contador_hd =contador_hd+1 
-			await query_generator(response_fix)
+			await query_generator(response)
 		
 		else:
 			pass
 
-
-
-
-
-def db_handler():
-	log = logging.getLogger('db_handler')
-	log.info('iniciando conexão com Banco de Dados.')
-	try:
-		mydb = mysql.connector.connect(
-			host="10.255.237.4",
-			user="bwadmin",
-			passwd="8bNmFLiIPhVRrM",
-			database="megasorte"
-
-		)
-		log.info('Conexão esstabelecida com Sucesso!')
-		return mydb
-	except mysql.connector.Error as err:
-		log.info('Erro ao conecar com o Banco de Dados.')
-		sleep(3)
-		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
-	
-   
-
-async def list_generator(database):
-	global result, contador_dispensadas
-
-	log = logging.getLogger('list_generator')
-	log.info('Buscando registros pendentes na base de dados.')
-	executor= database.cursor()
-	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome FROM cliente_dev where id_status =0 order by Nome asc ,id desc LIMIT 30")
-	result = executor.fetchall()
-	log.info('{0} itens serão analisados.'.format(len(result)))
-	log.info('Aguarde!')
-	lista = []
-
-	for x in result:
-		if x[0]!= None and x[1]!=None:
-			if len(x[0]) > 11:
-				checa_cpfcnpj = cpf.isCnpjValid(x[0])
-			else:
-				checa_cpfcnpj = cpf.isCpfValid(x[0])
-
-			if checa_cpfcnpj==True:
-				lista.append("https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y")))
-			else:
-				data = {}
-				data['status'] = False
-				data['id'] = x[2]
-				data['code'] = 1
-				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
-				contador_dispensadas = contador_dispensadas+1 
-				await query_generator(data)
-		else:
-			if x[0]== None:
-				data = {}
-				data['status'] = False
-				data['id'] = x[2]
-				data['code'] = 2
-				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
-				contador_dispensadas = contador_dispensadas+1 
-				await query_generator(data)
-				
-			else:	
-				if( x[1]== None and (x[3]==None or x[3]=="" )):
-					
-					await failsafe_api_validation_request(x[0])
-				else:	
-					if	x[1]== None:
-						data = {}
-						data['status'] = False
-						data['id'] = x[2]
-						data['code'] = 3
-						data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
-						contador_dispensadas = contador_dispensadas+1 
-						await query_generator(data)
-
-	
-	return lista 	
-
-
-
-async def failsafe_api_validation_request(CPF):
+async def failsafe_api_validation_request(params):
 	
 		
 	global contador_failsafe
@@ -208,22 +142,27 @@ async def failsafe_api_validation_request(CPF):
 		'Email': 'ti@bwabrasil.com.br',
 		'Senha': 'prucdNTE'
 	},
-	"Documento": str(CPF)
+	"Documento": str(params['CPF'])
 	}
-	params = json.dumps(data).encode('utf8')
+		
+
+	body = json.dumps(data).encode('utf8')
 	async with aiohttp.ClientSession() as s:
-		async with s.post(url, data=params) as r:
+		async with s.post(url, data=body) as r:
 
 			""" req =  request.Request(url, data=params,headers={'content-type': 'application/json'} ) # this will make the method "POST"
 			response = request.urlopen(req) """
 		
 			response =  await r.read()
-			response_fix=json.loads(response)
-			response_fix['failsafe'] = True
-			if len(response_fix)>0:
-				await query_generator(response_fix)
-	
-		
+			response=json.loads(response)
+			response['failsafe'] = True
+			if  params['viaCep']:
+				response['viaCep'] = params['viaCep']
+				response['CEP'] = params['CEP']
+			else:
+				response['viaCep'] = params['viaCep']
+			if len(response)>0:
+				await query_generator(response)
 
 async def query_generator(resp):
 	global result
@@ -236,20 +175,37 @@ async def query_generator(resp):
 			if r:
 				if(resp['failsafe']==True):
 					failsafe.append(resp)
+
 					with open("response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 						for item in failsafe:
 							agora = datetime.datetime.now()
 							f.write("{0}:{1}\n".format(agora ,item))
 					with open("query.txt","a+") as f:
 						for item in failsafe:
-							if item['Status'] == True:
-								item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-								message = 'Verificado via API '
-								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
-							if item['Status'] == False:
-								f.write("UPDATE cliente SET id_status='3' , motivo ='{0}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
+							if item['viaCep'] == True:
+								endereco =  await viaCEP(item["CEP"])
+								try:
+									err = endereco['erro']
+								except:
+			
+									if item['Status'] == True:
+										item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										message = 'Verificado via API '
+										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
+									if item['Status'] == False:
+										f.write("UPDATE cliente SET id_status='3' , motivo ='{0}', Cidade = '{2}', SgUF='{3}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
+									else:
+										pass
+								
 							else:
-								pass
+								if item['Status'] == True:
+									item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+									message = 'Verificado via API '
+									f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
+								if item['Status'] == False:
+									f.write("UPDATE cliente SET id_status='3' , motivo ='{0}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
+								else:
+									pass
 			else:
 				pass
 				
@@ -273,33 +229,83 @@ async def query_generator(resp):
 						pass
 
 					if item2['status']==True:
-						
-						message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
-						f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
+						if item2['viaCep'] is True:
+							endereco = await viaCEP(item2["CEP"])
+							try:
+								err = endereco['erro']
+							except:
+
+								message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
+
+						else:
+
+							message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+							f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
+
 					elif item2['status']==False:
+
 						try:
 							item2['code']
 							if item2['code'] == 1:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+
+								if item2['viaCep'] is True:
+									endereco = await viaCEP(item2["CEP"])
+									try:
+										err = endereco['erro']
+									except:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf']))	
+								else:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 							elif item2['code'] == 2:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+								if item2['viaCep'] is True:
+									endereco = await viaCEP(item2["CEP"])
+									try:
+										err = endereco['erro']
+									except:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf']))	
+								else:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 							elif item2['code'] == 3:
-								f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+								if item2['viaCep'] is True:
+									endereco = await viaCEP(item2["CEP"])
+									try:
+										err = endereco['erro']
+									except:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf']))	
+								else:
+									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 						except:
 
 							if item2['return']=='NOK':
 								
 								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message']:
-									f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
+									if item2['viaCep'] is True:
+										endereco = await viaCEP(item2["CEP"])
+										try:
+											err = endereco['erro']
+										except:
+											f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+											
+									else:
+										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
 								elif "Data Nascimento invalida." in item2['message']:
 									try:
 										check = item2['CPF']
+									
 										if check and (result[item2['index']][3] == None or result[item2['index']][3] == "" ):
 											
 											await failsafe_api_validation_request(item2['CPF'])
 										
 										else:
-											f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
+											if item2['viaCep'] is True:
+												endereco = await viaCEP(item2["CEP"])
+												try:
+													err = endereco['erro']
+												except:
+													f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+											else:
+												f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item2['message'],item2['CPF']))
 											
 									except:
 										pass
@@ -312,7 +318,6 @@ async def query_generator(resp):
 						else:
 							pass
 
-
 async def runner(executor):
 	index = 0
 	log = logging.getLogger('Iniciando Solicitações a API hubdodesenvolvedor ')
@@ -322,17 +327,119 @@ async def runner(executor):
 	loop = asyncio.get_event_loop()
 	async with aiohttp.ClientSession() as session:
 		with concurrent.futures.ThreadPoolExecutor() as pool:
-			for url in pendentes:#Não to usando os Workers, para utilizar devo quebrar a lista usando slices
-				
-				task = asyncio.ensure_future(api_validation_request(session, url, index))
+			for i in pendentes['pendentes']:
+				url = pendentes['pendentes'][i]
+				task = asyncio.ensure_future(api_validation_request(session, url, i))
 				tasks.append(task)
-				index = index +1 
+			
 
 			await asyncio.gather(*tasks, return_exceptions=True)
 		
 			log.info('exiting')
 
+async def list_generator(database):
+	global result, contador_dispensadas
 
+	log = logging.getLogger('list_generator')
+	log.info('Buscando registros pendentes na base de dados.')
+	executor= database.cursor()
+	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente_dev where id_status =0 order by Nome asc ,id desc LIMIT 10")
+	result = executor.fetchall()
+	log.info('{0} itens serão analisados.'.format(len(result)))
+	log.info('Aguarde!')
+	lista = {}
+	lista['pendentes']={}
+	i = 0
+	for x in result:
+
+		if x[0]!= None and x[1]!=None:
+			
+				
+				
+			if len(x[0]) > 11:
+				checa_cpfcnpj = cpf.isCnpjValid(x[0])
+			else:
+				checa_cpfcnpj = cpf.isCpfValid(x[0])
+
+			if checa_cpfcnpj==True:
+				lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y"))
+			else:
+				
+				data = {}
+				data['status'] = False
+				data['id'] = x[2]
+				data['code'] = 1
+				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
+				if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+					data['viaCep']=True
+					data['CEP'] = x[6]
+				else:
+					data['viaCep']=False
+				contador_dispensadas = contador_dispensadas+1 
+				await query_generator(data)
+		else:
+			if x[0]== None:
+				data = {}
+				data['status'] = False
+				data['id'] = x[2]
+				data['code'] = 2
+				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
+				if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+					data['viaCep']=True
+					data['CEP'] = x[6]
+				else:
+					data['viaCep']=False
+				contador_dispensadas = contador_dispensadas+1 
+				await query_generator(data)
+				
+			else:	
+				if( x[1]== None and (x[3]==None or x[3]=="" )):
+					
+					params={}
+					params['CPF']=x[0]
+					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+						params['viaCep']=True
+						params['CEP'] = x[6]
+					else:
+						params['viaCep']=False
+
+					await failsafe_api_validation_request(params)
+				else:	
+					if	x[1]== None:
+						data = {}
+						data['status'] = False
+						data['id'] = x[2]
+						data['code'] = 3
+						data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
+						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+							data['viaCep']=True
+							data['CEP'] = x[6]
+						else:
+							data['viaCep']=False
+						contador_dispensadas = contador_dispensadas+1 
+						await query_generator(data)
+		i = i+1		
+	
+	return lista 	
+
+def db_handler():
+	log = logging.getLogger('db_handler')
+	log.info('iniciando conexão com Banco de Dados.')
+	try:
+		mydb = mysql.connector.connect(
+			host="10.255.237.4",
+			user="bwadmin",
+			passwd="8bNmFLiIPhVRrM",
+			database="megasorte"
+
+		)
+		log.info('Conexão esstabelecida com Sucesso!')
+		return mydb
+	except mysql.connector.Error as err:
+		log.info('Erro ao conecar com o Banco de Dados.')
+		sleep(3)
+		sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
+	
 if __name__ == "__main__":
 	logging.basicConfig(
 		level=logging.INFO,
@@ -369,6 +476,7 @@ if __name__ == "__main__":
 	log.info("Foram efetuadas {0} requisições à API Soawebservices".format(contador_failsafe))
 	log.info("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
 	log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
+	log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
 	log.info(f"Total de {len(pendentes)} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço")
 
