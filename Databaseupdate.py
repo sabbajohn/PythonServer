@@ -83,6 +83,8 @@ def db_handler():
 if __name__ == "__main__":
 	start_time = time.time()
 	logging.basicConfig(
+		filename='Databaseupdate.log',
+		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
 		stream=sys.stderr,

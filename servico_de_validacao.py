@@ -442,6 +442,8 @@ def db_handler():
 	
 if __name__ == "__main__":
 	logging.basicConfig(
+		filename='servico_de_validacao.log',
+		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
 		stream=sys.stderr,
