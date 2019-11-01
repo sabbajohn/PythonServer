@@ -343,7 +343,7 @@ async def list_generator(database):
 	log = logging.getLogger('list_generator')
 	log.info('Buscando registros pendentes na base de dados.')
 	executor= database.cursor()
-	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente_dev where id_status =0 order by Nome asc ,id desc LIMIT 10")
+	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente_dev where id_status =0 order by Nome asc ,id desc LIMIT 100")
 	result = executor.fetchall()
 	log.info('{0} itens serão analisados.'.format(len(result)))
 	log.info('Aguarde!')
