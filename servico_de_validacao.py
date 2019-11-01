@@ -296,6 +296,7 @@ async def query_generator(resp):
 											params={}
 											params['CPF'] = item2['CPF']
 											params['viaCep'] =item2['viaCep']
+											params['CEP'] = item2['CEP']
 											await failsafe_api_validation_request(params)
 										
 										else:
