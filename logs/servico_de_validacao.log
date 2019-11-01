@@ -1,0 +1,13 @@
+PID 19443               main: _______________________________________________________________________________
+PID 19443               main: Inicializando serviço de Validação de cadastros...
+PID 19443               main: 2019-11-01 13:44:40.962419
+PID 19443         db_handler: iniciando conexão com Banco de Dados.
+PID 19443         db_handler: Conexão esstabelecida com Sucesso!
+PID 19443     list_generator: Buscando registros pendentes na base de dados.
+PID 19443     list_generator: 100 itens serão analisados.
+PID 19443     list_generator: Aguarde!
+PID 19443 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 19443 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 19443 failsafe_api_validation_request: Realizando requisição à API soawebservices
+PID 19443 Iniciando Solicitações a API hubdodesenvolvedor : starting
+PID 19443 Iniciando Solicitações a API hubdodesenvolvedor : Criando tarefas
