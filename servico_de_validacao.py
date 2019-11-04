@@ -234,12 +234,12 @@ async def query_generator(resp):
 								err = endereco['erro']
 							except:
 
-								message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+								message = 'Verificado via API através do código {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
 								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
 
 						else:
 
-							message = 'Verificado via API através do codigo {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+							message = 'Verificado via API através do código {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
 							f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
 
 					elif item2['status']==False:
@@ -384,7 +384,7 @@ async def list_generator(database):
 				data['status'] = False
 				data['id'] = x[2]
 				data['code'] = 1
-				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} esta incorreto ".format(x[2],x[0])
+				data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} está incorreto ".format(x[2],x[0])
 				if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
 					data['viaCep']=True
 					data['CEP'] = x[6]
@@ -398,7 +398,7 @@ async def list_generator(database):
 				data['status'] = False
 				data['id'] = x[2]
 				data['code'] = 2
-				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ esta em branco'.format(x[2])
+				data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ está em branco'.format(x[2])
 				if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
 					data['viaCep']=True
 					data['CEP'] = x[6]
@@ -425,7 +425,7 @@ async def list_generator(database):
 						data['status'] = False
 						data['id'] = x[2]
 						data['code'] = 3
-						data['message'] ="Cliente {0} não foi validado pois 0 campo Dtnascimento esta em branco".format(x[2])
+						data['message'] ="Cliente {0} não foi validado pois o campo data de nascimento está em branco".format(x[2])
 						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
 							data['viaCep']=True
 							data['CEP'] = x[6]
