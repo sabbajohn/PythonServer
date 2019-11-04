@@ -499,6 +499,9 @@ if __name__ == "__main__":
 	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço.")
 	log.info('#######')
+	log.info('Inicializando Serviço de atualização da base de dados...')
+	sleep(15)
+	comando("python3 Databaseupdate.py")
 """ INICIAR SERVIÇO DO BANCO DE DADOS.... """
 
 
