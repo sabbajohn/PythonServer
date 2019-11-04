@@ -105,11 +105,11 @@ def update(result, cliente):
 
 if __name__ == "__main__":
 	logging.basicConfig(
-		#filename='/home/{0}/PythonServer/logs/sms.log'.format(USER),
-		#filemode='a+',
+		filename='/home/{0}/PythonServer/logs/sms.log'.format(USER),
+		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
-		stream=sys.stderr,
+		#stream=sys.stderr,
  	)
 	
 	log = logging.getLogger('Serviço de Envio de SMS')
