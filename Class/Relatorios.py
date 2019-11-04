@@ -14,7 +14,7 @@ class Relatorios(object):
 			
 			data = resp
 			
-			with open("/home/"+USER+"/PythonServer/querys/query_api.txt","a+") as f:
+			with open("/home/"+USER+"/PythonServer/querys/query.txt","a+") as f:
 				for item in data:
 					if item['status']==True:
 						message = 'Verificado via API através do codigo {0} em {1}'.format(item['result']['comprovante_emitido'], item['result']['comprovante_emitido_data'])
