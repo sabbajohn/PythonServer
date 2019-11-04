@@ -499,7 +499,7 @@ if __name__ == "__main__":
 	log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 	log.info("Encerrando serviço.")
 	log.info('#######')
-
+""" INICIAR SERVIÇO DO BANCO DE DADOS.... """
 
 
 
