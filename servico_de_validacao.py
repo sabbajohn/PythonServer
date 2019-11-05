@@ -189,7 +189,7 @@ async def query_generator(resp):
 			
 									if item['Status'] == True:
 										item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-										message = 'Verificado via API '
+										message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
 									if item['Status'] == False:
 										f.write("UPDATE cliente SET id_status='3' , motivo ='{0}', Cidade = '{2}', SgUF='{3}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
@@ -199,7 +199,7 @@ async def query_generator(resp):
 							else:
 								if item['Status'] == True:
 									item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-									message = 'Verificado via API '
+									message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 									f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
 								if item['Status'] == False:
 									f.write("UPDATE cliente SET id_status='3' , motivo ='{0}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
@@ -234,12 +234,12 @@ async def query_generator(resp):
 								err = endereco['erro']
 							except:
 
-								message = 'Verificado via API através do código {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+								message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
 
 						else:
 
-							message = 'Verificado via API através do código {0} em {1}'.format(item2['result']['comprovante_emitido'], item2['result']['comprovante_emitido_data'])
+							message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 							f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf']))#Gerar query caso o TRUE
 
 					elif item2['status']==False:
