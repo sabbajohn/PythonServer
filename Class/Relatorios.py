@@ -1,5 +1,6 @@
 
 import sys
+import datetime
 from db import DB
 import getpass
 USER = getpass.getuser()
@@ -98,7 +99,7 @@ class Relatorios(object):
 	def responses(responses):
 		with open("/home/"+USER+"/PythonServer/responses/response_api.json","a+") as f: 
 			for item in responses:
-				f.write("%s\n"%item)  
+				f.write("{0}:{1}\n".format(datetime.datetime.now() ,item))
 
 	def __init__(self):
 		self
