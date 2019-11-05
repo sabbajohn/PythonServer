@@ -501,6 +501,7 @@ if __name__ == "__main__":
 	log.info('#######')
 	log.info('Inicializando Serviço de atualização da base de dados...')
 	sleep(15)
+	comando = os.system
 	comando("python3 Databaseupdate.py")
 """ INICIAR SERVIÇO DO BANCO DE DADOS.... """
 
