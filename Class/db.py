@@ -4,7 +4,7 @@ import sys
 import os
 import mysql.connector
 import logging
-class DB(object):
+class db(object):
 	def __init__(self):
 		try:
 			log = logging.getLogger('Banco de Dados')
@@ -17,11 +17,12 @@ class DB(object):
     	    )
 			log.info('Conexão esstabelecida com Sucesso!')
 			self.mydb.autocommit = False
+			#getHandler()
 		except mysql.connector.Error as err:
 			log.info('Erro ao conecar com o Banco de Dados.')
 			sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
 		
-	def handler(self):
+	def getHandler(self):
 		return self.mydb
 
 	def getCursor(self):
