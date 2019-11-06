@@ -4,7 +4,7 @@ import sys
 import os
 import time
 import json
-import cpf
+from Class import CPF
 from time import sleep
 import datetime
 

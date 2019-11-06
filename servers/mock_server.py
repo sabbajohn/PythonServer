@@ -7,11 +7,9 @@ from time import sleep
 import json
 from json import dumps
 import getpass
+from Class import cpf
+from Class import Relatorios as log
 USER = getpass.getuser()
-sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
-import cpf
-from Relatorios import Relatorios as log
-
 if sys.version_info[0] < 3:
 
 	raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
@@ -109,11 +107,6 @@ class API(Resource):
 		}
 	   
 		
-
-
-
-
-
 
 
 

@@ -16,10 +16,19 @@ class DB(object):
 			database="megasorte"
     	    )
 			log.info('Conexão esstabelecida com Sucesso!')
-			self.handler()
+			self.mydb.autocommit = False
 		except mysql.connector.Error as err:
 			log.info('Erro ao conecar com o Banco de Dados.')
 			sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
 		
 	def handler(self):
 		return self.mydb
+
+	def getCursor(self):
+		return self.mydb.cursor
+	
+	
+
+
+
+		
