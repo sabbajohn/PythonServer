@@ -27,8 +27,16 @@ except:
 		else:
 			time.sleep(10)   
 			comando('python3 sms.py')
-class SMS(object):
+class SMS(Manager):
 	def __init__(self, *args, **kwargs):
+		self.feedback = {
+			"class":"SMS",
+			"metodo":"__init__",
+			"status":None,
+			"message":"",
+			"erro":False,
+			"comments":""
+		}
 		logging.basicConfig(
 		filename='/home/{0}/PythonServer/logs/sms.log'.format(USER),
 		filemode='a+',
@@ -40,7 +48,21 @@ class SMS(object):
 		log = logging.getLogger('Serviço de Envio de SMS')
 		log.info("Inicializando")
 		log.info( datetime.datetime.now())
-		db_monitor()
+		
+	def start(self):
+		feedback = self.feedback
+		feedback["metodo"] = "start"
+		try:
+			db_monitor()
+		except:
+
+			feedback["status"] = 4
+			feedback["message"] = "Oops!",sys.exc_info()[0],"occured."
+			feedback["erro"] = True
+			feedback["comments"] = "Algo não panejado"
+			with self._lock:
+				super().Exceptions(feedback)
+			
 
 
 	
@@ -89,11 +111,14 @@ class SMS(object):
 			
 			log.info("SMS:{0}".format(result['Message']))
 			update(result, cliente)
-			return
+			return 
 	
 	
 	
 	def update(self,result, cliente):
+		feedback = self.feedback
+		feedback["metodo"] = 'update'
+
 		with open("/home/"+USER+"/PythonServer/responses/response_sms.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 			agora = datetime.datetime.now()
 			f.write("{0}:{1}\n".format(agora ,result))
@@ -108,7 +133,11 @@ class SMS(object):
 			return
 		except :
 			log.info("Oops!",sys.exc_info()[0],"occured.")
-
 			log.info('#######')
+			feedback["status"] = 1
+			feedback["message"] = "Arquivo não encontrado!"
+			feedback["erro"] = True
+			with self._lock:
+				super().Exceptions(feedback)
 			sys.exit()
 

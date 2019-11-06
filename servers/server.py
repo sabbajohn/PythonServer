@@ -68,7 +68,7 @@ app = Flask(__name__)
 api = Api(app)
 
 
-class Clientes(Resource):
+class Clientes(Resource, Manager):
     """  def get(self):
         conn = db_connect.connect() # connect to database
         query = conn.execute("select * from employees") # This line performs query and returns json result

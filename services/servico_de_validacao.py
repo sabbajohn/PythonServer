@@ -87,9 +87,18 @@ except:
 			comando('python3 servico_de_validacao.py')	
 
 
-class servicoDeValidacao(object):
+class servicoDeValidacao( Manager):
 
 	def __init__(self):
+		self._lock = threading.Lock()
+		self.feedback = {
+			"class":"servicoDeValidacao",
+			"metodo":"__init__",
+			"status":None,
+			"message":"",
+			"erro":False,
+			"comments":""
+		}
 		self.failsafe_tasks=[]
 		self.failsafe_cpf = []
 		self.responses = []
@@ -179,6 +188,8 @@ class servicoDeValidacao(object):
 					await query_generator(response)
 
 	async def query_generator(self,resp):
+		feedback = self.feedback
+		feedback["metodo"] = 'query_generator'
 		
 		caracteres = ['.','-']
 		data=[]
@@ -337,7 +348,13 @@ class servicoDeValidacao(object):
 
 										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-										sys.exit(item2['message'])	
+										feedback["status"] = 2
+										feedback["message"] = "Token Inválido ou sem saldo para a consulta." in item['message']
+										feedback["erro"] = True
+										with self._lock:
+
+											super().Exceptions(feedback)
+											sys.exit(item2['message'])
 							else:
 								pass
 
@@ -361,7 +378,8 @@ class servicoDeValidacao(object):
 				log.info('exiting')
 
 	async def list_generator(self):
-	
+		feedback = self.feedback
+		feedback["metodo"] = 'list_generator'
 
 		log = logging.getLogger('list_generator')
 		log.info('Buscando registros pendentes na base de dados.')
@@ -374,7 +392,13 @@ class servicoDeValidacao(object):
 			log.info('Não há itens pendentes no momento!')
 			log.info("Encerrando serviço.")
 			log.info('#######')
-			sys.exit("")
+			feedback["status"] = 0
+			feedback["message"] = "Não há itens pendentes no momento!"
+			feedback["erro"] = False
+			with self._lock:
+
+				super().Exceptions(feedback)
+				sys.exit("")
 
 		log.info('Aguarde!')
 		lista = {}

@@ -2,6 +2,7 @@
 # coding: utf-8
 import sys
 import os
+import threading
 import os.path
 import getpass
 import logging
@@ -10,28 +11,23 @@ import datetime
 from datetime import date
 from time import sleep
 from Class import db
-try:
-	import mysql.connector
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install mysql')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-		if IOError:	
-			sys.exit("[!] Please install the mysql library: sudo pip3 install mysql")	
-		
-		else:
-			sleep(10)   
-			comando('python3 Databaseupdate.py')
 
 
 
-class DataUpdate(object):
+
+class DataUpdate(Manager):
 	
 
 	def __init__(self, *args, **kwargs):
-		
+		self._lock = threading.Lock()
+		self.feedback = {
+			"class":"DataUpdate",
+			"metodo":"__init__",
+			"status":None,
+			"message":"",
+			"erro":False,
+			"comments":""
+		}
 		self.USER =getpass.getuser()
 		self.database = db()
 		logging.basicConfig(
@@ -44,22 +40,34 @@ class DataUpdate(object):
 		
 		
 	def start(self):
+		feedback = self.feedback
+		feedback["metodo"] = 'start'
 		start_time = time.time()
 		log = logging.getLogger('DataUpdate')
 		result = self.QueryRunner(self.database)
 		log.info('Serviço de Atualização da Base de Dados Concluido')
 		duration = time.time() - start_time
 		log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
-	
 		agora = datetime.datetime.now()
 		if result['cont'] > 0:
 			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
 		log.info("Encerrando Serviço de Atuliazação.")
 		log.info('#######')
-		return result
+		
+		feedback["status"] = 0
+		feedback["message"] = "{0} registros foram Atualizados em {1} segundos".format(result,duration)
+		feedback["erro"] = False
+		feedback["comments"] = "Ao finalizar..."
+
+		with self._lock:
+			super().Exceptions(feedback)
+
+		return 0
 		
 	def QueryRunner(self):
+		feedback = self.feedback
+		feedback["metodo"] = "QueryRunner"
 		n_updates = 0
 		rest = 0
 		log = logging.getLogger('QueryRunner')
@@ -72,7 +80,12 @@ class DataUpdate(object):
 			if ( not len(infile)>0):
 				log.info("Não há registros a serem atualizados.")
 				log.info("Encerrando Serviço de Atuliazação.")
-				return {"erro":False,"message":"Não há registros a serem atualizados."}
+				feedback["status"] = 0
+				feedback["message"] = "Não há registros a serem atualizados."
+				feedback["erro"] = False
+				with self._lock:
+					super().Exceptions(feedback)
+				return
 			try:
 				for line in infile:
 					line = line.replace('\n','')
@@ -84,17 +97,31 @@ class DataUpdate(object):
 
 
 					log.info("Executando Querys n°{0}".format(n_updates))
-				database.mysql.commit()
-			except mysql.connector.Error as err:
+				self.database.mysql.commit()
+			except self.database.mysql.connector.Error as err:
 					log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
 					database.rollback()
+					
+				
+					feedback["status"] = 1
+					feedback["message"] = "Erro ao Atualiza o Banco de Dados! Erro {0}".format(err)
+					feedback["erro"] = True
 					log.info('#######')
-					return {"erro":True,"message":"Erro ao Atualiza o Banco de Dados! Erro {0}".format(err)}
-			return {"erro":False,"cont":n_updates} 
+					with self._lock:
+						super().Exceptions(feedback)
+
+			return n_updates
 
 		else:
 			log.info("Arquivo não encontrado!")
-			return {"erro":True,"message":"Arquivo não encontrado!"}
+			
+		
+			feedback["status"] = 0
+			feedback["message"] = "Arquivo não encontrado!"
+			feedback["erro"] = True
+			with self._lock:
+				super().Exceptions(feedback)
+			return 
 
 		pass
 
