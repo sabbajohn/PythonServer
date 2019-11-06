@@ -1,0 +1,132 @@
+PID  7885 Serviço de Atualização da Base de Dados: *******
+PID  7885 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID  7885 Serviço de Atualização da Base de Dados: 2019-11-05 14:00:01.618652
+PID  7885         db_handler: iniciando conexão com Banco de Dados.
+PID  7885         db_handler: Conexão estabelecida com Sucesso!
+PID  7885        QueryRunner: Procurando Por Arquivo de Querys.
+PID  7885        QueryRunner: Não há registros a serem atualizados.
+PID  7885        QueryRunner: Encerrando Serviço de Atuliazação.
+PID  7885 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID  7885 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 3.840785503387451 segundos
+PID  7885 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID  7885 Serviço de Atualização da Base de Dados: #######
+PID  9024 Serviço de Atualização da Base de Dados: *******
+PID  9024 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID  9024 Serviço de Atualização da Base de Dados: 2019-11-05 14:30:01.591421
+PID  9024         db_handler: iniciando conexão com Banco de Dados.
+PID  9024         db_handler: Conexão estabelecida com Sucesso!
+PID  9024        QueryRunner: Procurando Por Arquivo de Querys.
+PID  9024        QueryRunner: Não há registros a serem atualizados.
+PID  9024        QueryRunner: Encerrando Serviço de Atuliazação.
+PID  9024 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID  9024 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 1.3212225437164307 segundos
+PID  9024 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID  9024 Serviço de Atualização da Base de Dados: #######
+PID 11215 Serviço de Atualização da Base de Dados: *******
+PID 11215 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 11215 Serviço de Atualização da Base de Dados: 2019-11-05 15:00:02.017048
+PID 11215         db_handler: iniciando conexão com Banco de Dados.
+PID 11215         db_handler: Conexão estabelecida com Sucesso!
+PID 11215        QueryRunner: Procurando Por Arquivo de Querys.
+PID 11215        QueryRunner: Não há registros a serem atualizados.
+PID 11215        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 11215 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 11215 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 2.5501937866210938 segundos
+PID 11215 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 11215 Serviço de Atualização da Base de Dados: #######
+PID 12634 Serviço de Atualização da Base de Dados: *******
+PID 12634 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 12634 Serviço de Atualização da Base de Dados: 2019-11-05 15:30:01.644529
+PID 12634         db_handler: iniciando conexão com Banco de Dados.
+PID 12634         db_handler: Conexão estabelecida com Sucesso!
+PID 12634        QueryRunner: Procurando Por Arquivo de Querys.
+PID 12634        QueryRunner: Não há registros a serem atualizados.
+PID 12634        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 12634 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 12634 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 6.038329601287842 segundos
+PID 12634 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 12634 Serviço de Atualização da Base de Dados: #######
+PID 14331 Serviço de Atualização da Base de Dados: *******
+PID 14331 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 14331 Serviço de Atualização da Base de Dados: 2019-11-05 16:00:01.787876
+PID 14331         db_handler: iniciando conexão com Banco de Dados.
+PID 14331         db_handler: Conexão estabelecida com Sucesso!
+PID 14331        QueryRunner: Procurando Por Arquivo de Querys.
+PID 14331        QueryRunner: Não há registros a serem atualizados.
+PID 14331        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 14331 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 14331 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 2.800690174102783 segundos
+PID 14331 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 14331 Serviço de Atualização da Base de Dados: #######
+PID 16103 Serviço de Atualização da Base de Dados: *******
+PID 16103 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 16103 Serviço de Atualização da Base de Dados: 2019-11-05 16:30:01.706308
+PID 16103         db_handler: iniciando conexão com Banco de Dados.
+PID 16103         db_handler: Conexão estabelecida com Sucesso!
+PID 16103        QueryRunner: Procurando Por Arquivo de Querys.
+PID 16103        QueryRunner: Não há registros a serem atualizados.
+PID 16103        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 16103 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 16103 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 6.056259393692017 segundos
+PID 16103 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 16103 Serviço de Atualização da Base de Dados: #######
+PID 19602 Serviço de Atualização da Base de Dados: *******
+PID 19602 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 19602 Serviço de Atualização da Base de Dados: 2019-11-05 17:00:01.837785
+PID 19602         db_handler: iniciando conexão com Banco de Dados.
+PID 19602         db_handler: Conexão estabelecida com Sucesso!
+PID 19602        QueryRunner: Procurando Por Arquivo de Querys.
+PID 19602        QueryRunner: Não há registros a serem atualizados.
+PID 19602        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 19602 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 19602 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 7.9084086418151855 segundos
+PID 19602 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 19602 Serviço de Atualização da Base de Dados: #######
+PID 21299 Serviço de Atualização da Base de Dados: *******
+PID 21299 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 21299 Serviço de Atualização da Base de Dados: 2019-11-05 17:30:01.834320
+PID 21299         db_handler: iniciando conexão com Banco de Dados.
+PID 21299         db_handler: Conexão estabelecida com Sucesso!
+PID 21299        QueryRunner: Procurando Por Arquivo de Querys.
+PID 21299        QueryRunner: Não há registros a serem atualizados.
+PID 21299        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 21299 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 21299 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 1.6295676231384277 segundos
+PID 21299 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 21299 Serviço de Atualização da Base de Dados: #######
+PID 22491 Serviço de Atualização da Base de Dados: *******
+PID 22491 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 22491 Serviço de Atualização da Base de Dados: 2019-11-05 18:00:01.148627
+PID 22491         db_handler: iniciando conexão com Banco de Dados.
+PID 22491         db_handler: Conexão estabelecida com Sucesso!
+PID 22491        QueryRunner: Procurando Por Arquivo de Querys.
+PID 22491        QueryRunner: Não há registros a serem atualizados.
+PID 22491        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 22491 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 22491 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 1.9311439990997314 segundos
+PID 22491 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 22491 Serviço de Atualização da Base de Dados: #######
+PID  6818 Serviço de Atualização da Base de Dados: *******
+PID  6818 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID  6818 Serviço de Atualização da Base de Dados: 2019-11-06 09:00:01.302729
+PID  6818         db_handler: iniciando conexão com Banco de Dados.
+PID  6818         db_handler: Conexão estabelecida com Sucesso!
+PID  6818        QueryRunner: Procurando Por Arquivo de Querys.
+PID  6818        QueryRunner: Não há registros a serem atualizados.
+PID  6818        QueryRunner: Encerrando Serviço de Atuliazação.
+PID  6818 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID  6818 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 1.8031091690063477 segundos
+PID  6818 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID  6818 Serviço de Atualização da Base de Dados: #######
+PID 21767 Serviço de Atualização da Base de Dados: *******
+PID 21767 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 21767 Serviço de Atualização da Base de Dados: 2019-11-06 09:30:01.194699
+PID 21767         db_handler: iniciando conexão com Banco de Dados.
+PID 21767         db_handler: Conexão estabelecida com Sucesso!
+PID 21767        QueryRunner: Procurando Por Arquivo de Querys.
+PID 21767        QueryRunner: Não há registros a serem atualizados.
+PID 21767        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 21767 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 21767 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 1.9177424907684326 segundos
+PID 21767 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 21767 Serviço de Atualização da Base de Dados: #######
