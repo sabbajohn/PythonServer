@@ -18,7 +18,7 @@ from Class import db
 class DataUpdate(Manager):
 	
 
-	def __init__(self, *args, **kwargs):
+	def __init__(self):
 		self._lock = threading.Lock()
 		self.feedback = {
 			"class":"DataUpdate",

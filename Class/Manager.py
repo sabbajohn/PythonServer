@@ -16,7 +16,7 @@ import getpass
 USER = getpass.getuser()
 from Class import *
 from servers import *
-from services import SMS, DataUpdate, servico_de_validacao
+
 
 
 if sys.version_info[0] < 3:
@@ -87,61 +87,9 @@ except:
 			sleep(10)   
 			comando('python3 servico_de_validacao.py')	
 
-class Manager(object):
-	def __init__(self, *args, **kwargs):
-	 super().__init__(*args, **kwargs)
-	 logging.basicConfig(
-		filename='/home/{0}/PythonServer/logs/Manager.log'.format(self.USER),
-		filemode='a+',
-		level=logging.INFO,
-		format='PID %(process)5s %(name)18s: %(message)s',
-		#stream=sys.stderr,
- 		)
-
-	def Initialize(self):
+class Manager:
+	
 		
-		#Definindo objeto dos Serviços
-		self.SMS = SMS()
-		self.DataUpdate = DataUpdate()
-		self.servicoDeValidacao = servico_de_validacao()
-
-		#Definindo objeto das API's
-		
-		self.isFirstTme={
-			"servico_de_validacao":True,
-			"dataupdate":True
-		}
-		self.job_sms = threading.Thread(target=self.SMS.start)
-		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start)
-		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start)
-
-		# Inicializando
-		try:
-			self.job_sms.start()
-
-		except:
-			sys.exit("Oops!",sys.exc_info()[0],"occured.")
-
- 	def ValidacaoEUpdate(self):
-		 while True:
-			if self.isFirstTme['servico_de_validacao']:
-					self.job_servico_de_validacao.start()
-					self.isFirstTme['servico_de_validacao'] = False
-					self.job_servico_de_validacao.join()
-					if not self.job-servico_de_validacao.isAlive():
-						self.job_dataupdate.start()
-						self.job_dataupdate.join()
-
-
-			else:
-
-				if not self.job-servico_de_validacao.isAlive():
-					self.job_servico_de_validacao.start()
-					self.job_servico_de_validacao.join()
-					if not self.job_dataupdate.isAlive():
-						self.job_dataupdate.start()
-						self.job_dataupdate.join()
-						sleep(6000)
 
 	def Exceptions(self, e):
 		log = logging.getLogger('Exceptions')
@@ -254,6 +202,3 @@ class Manager(object):
 
 
 
-if __name__ == "__main__":
-	M = Manager()
-	M.Initialize()

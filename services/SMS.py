@@ -10,25 +10,11 @@ import json
 import getpass
 USER = getpass.getuser()
 from Class import db
+from comtele_sdk.textmessage_service import TextMessageService
 
-
-
-try:
-	from comtele_sdk.textmessage_service import TextMessageService
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install comtele_sdk')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-		if IOError:	
-			sys.exit("[!] Please install the mysql library: sudo pip3 install comtele_sdk")	
-		
-		else:
-			time.sleep(10)   
-			comando('python3 sms.py')
 class SMS(Manager):
-	def __init__(self, *args, **kwargs):
+
+	def __init__(self):
 		self.feedback = {
 			"class":"SMS",
 			"metodo":"__init__",

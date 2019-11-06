@@ -1,7 +1,7 @@
 
 import sys
 import datetime
-from Class import db
+
 import getpass
 USER = getpass.getuser()
 

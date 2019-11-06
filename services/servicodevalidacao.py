@@ -87,7 +87,7 @@ except:
 			comando('python3 servico_de_validacao.py')	
 
 
-class servicoDeValidacao( Manager):
+class servicoDeValidacao(Manager):
 
 	def __init__(self):
 		self._lock = threading.Lock()
@@ -354,7 +354,7 @@ class servicoDeValidacao( Manager):
 										with self._lock:
 
 											super().Exceptions(feedback)
-											sys.exit(item2['message'])
+										sys.exit(item2['message'])
 							else:
 								pass
 
