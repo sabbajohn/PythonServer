@@ -1,9 +1,9 @@
 asyncio
 aiohttp
-json
-mysql.connector
 aiofile
 flask
 flask_restful
 sqlalchemy
 concurrent
+subprocess
+comtele_sdk
