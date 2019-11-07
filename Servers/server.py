@@ -134,7 +134,7 @@ api.add_resource(Clientes, '/fila') # Route_1
 
 if __name__ == '__main__':
     logging.basicConfig(
-        filename='/home/{0}/PythonServer/logs/servico_de_validacao.log'.format(USER),
+        filename='/home/{0}/PythonServer/logs/API_server.log'.format(USER),
         filemode='a+',
         level=logging.INFO,
         format='PID %(process)5s %(name)18s: %(message)s',
