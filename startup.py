@@ -50,6 +50,7 @@ class Startup(object):
 					self.log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					os.system('nohup python3 servico_de_validacao.py &')
 				elif time.time()- self.start_time > self.delays['validacao']:
+					self.log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					self.start_time = time.time()
 					os.system('nohup python3 servico_de_validacao.py &')
 			else:
