@@ -16,7 +16,7 @@ class Startup(object):
 	def __init__(self, *args, **kwargs):
 		self.USER = getpass.getuser()
 		logging.basicConfig(
-			filename='/home/{0}/PythonServer/logs/StartUp.log'.format(USER),
+			filename='/home/{0}/PythonServer/logs/StartUp.log'.format(self.USER),
 			filemode='a+',
 			level=logging.INFO,
 			format='PID %(process)5s %(name)18s: %(message)s',
