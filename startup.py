@@ -33,13 +33,13 @@ class Startup(object):
 		
 		while True:
 			if not self.checkIfProcessRunning(self.procs[0]):
-					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
+					self.log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('python3 sms.py &')
 				
 			else:
 				pass
 			if not self.checkIfProcessRunning(self.procs[1]):
-					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
+					self.log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
 					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file Server/server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191 &')
 			
 			else:
@@ -47,7 +47,7 @@ class Startup(object):
 			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
 				if self.start_time ==0:
 					self.start_time = time.time()
-					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
+					self.log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					os.system('nohup python3 servico_de_validacao.py &')
 				elif time.time()- self.start_time > self.delays['validacao']:
 					self.start_time = time.time()
@@ -61,7 +61,7 @@ class Startup(object):
 					if modtime < self.start_time:
 						pass
 					else:
-						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
+						self.log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
 						os.system('python3 Databaseupdate.py &')
 			
 			else:
