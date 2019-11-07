@@ -76,8 +76,15 @@ class Clientes(Resource):
         conn = db_connect.connect() # connect to database
         query = conn.execute("select * from employees") # This line performs query and returns json result
         return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID """
-
+    logging.basicConfig(
+            filename='/home/{0}/PythonServer/logs/API_server.log'.format(USER),
+            filemode='a+',
+            level=logging.INFO,
+            format='PID %(process)5s %(name)18s: %(message)s',
+            #stream=sys.stderr,
+       )
     def post(self):
+        
         logs = logging.getLogger('API -Server')
         
         logs.info('Server - {0} : POST: {1}'.format(datetime.datetime.now(),request.json))
@@ -133,13 +140,7 @@ api.add_resource(Clientes, '/fila') # Route_1
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        filename='/home/{0}/PythonServer/logs/API_server.log'.format(USER),
-        filemode='a+',
-        level=logging.INFO,
-        format='PID %(process)5s %(name)18s: %(message)s',
-        #stream=sys.stderr,
-    )
+   
     logs = logging.getLogger('Server')
     app.run()
 
