@@ -78,6 +78,7 @@ class Clientes(Resource):
         return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID """
 
     def post(self):
+        logs = logging.getLogger('API -Server')
         
         logs.info('Server - {0} : POST: {1}'.format(datetime.datetime.now(),request.json))
         resp = []
