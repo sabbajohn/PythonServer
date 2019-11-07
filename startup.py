@@ -61,7 +61,7 @@ class Startup(object):
 					if modtime < self.start_time:
 						pass
 					else:
-						self.log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
+						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
 						os.system('python3 Databaseupdate.py &')
 			
 			else:
