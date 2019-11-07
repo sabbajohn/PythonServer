@@ -3,7 +3,9 @@
 import sys
 import os
 import time
+import datetime
 from time import sleep
+import logging
 import getpass
 USER = getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
@@ -76,6 +78,8 @@ class Clientes(Resource):
         return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID """
 
     def post(self):
+        
+        logs.info('Server - {0} : POST: {1}'.format(datetime.datetime.now(),request.json))
         resp = []
         print(request.json)
         Nome = request.json['Nome']
@@ -127,7 +131,14 @@ class Clientes(Resource):
 api.add_resource(Clientes, '/fila') # Route_1
 
 
-
 if __name__ == '__main__':
+    logging.basicConfig(
+        filename='/home/{0}/PythonServer/logs/servico_de_validacao.log'.format(USER),
+        filemode='a+',
+        level=logging.INFO,
+        format='PID %(process)5s %(name)18s: %(message)s',
+        #stream=sys.stderr,
+    )
+    logs = logging.getLogger('Server')
     app.run()
 

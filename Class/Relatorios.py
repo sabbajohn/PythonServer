@@ -2,6 +2,7 @@
 import sys
 import datetime
 from db import DB
+import logging
 import getpass
 USER = getpass.getuser()
 handler = DB()
@@ -9,7 +10,8 @@ db = handler.mydb.cursor()
 class Relatorios(object):
 
 	def query_generator(resp):
-		
+		logs = logging.getLogger('Atualizaçao de Dados!')
+		logs.info('iniciando conexão com Banco de Dados.')
 		if len(resp)>0:
 		
 			
@@ -24,7 +26,8 @@ class Relatorios(object):
 							
 							db.execute("UPDATE cliente SET id_status='1', nome = '{0}' , motivo ='{1}'  WHERE CPFCNPJ = '{2}';\n".format(item['result']['nome_da_pf'],message,item['result']['numero_de_cpf']))
 							handler.mydb.commit()
-						except:
+						except handler.mysql.connector.Error as err:
+							logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 							print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 							pass
 						
@@ -38,7 +41,8 @@ class Relatorios(object):
 									print("[!] Tentando atualizar a base de dados!")
 									db.execute("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
 									handler.mydb.commit()
-								except:
+								except handler.mysql.connector.Error as err:
+									logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 									print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 									pass
 								
@@ -49,7 +53,8 @@ class Relatorios(object):
 									print("[!] Tentando atualizar a base de dados!")
 									db.execute("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
 									handler.mydb.commit()
-								except:
+								except handler.mysql.connector.Error as err:
+									logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 									print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 									pass
 								
@@ -60,7 +65,8 @@ class Relatorios(object):
 									print("[!] Tentando atualizar a base de dados!")
 									db.execute("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item['message'],item['id']))
 									handler.mydb.commit()
-								except:
+								except handler.mysql.connector.Error as err:
+									logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 									print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 									pass
 								
@@ -74,7 +80,8 @@ class Relatorios(object):
 										print("[!] Tentando atualizar a base de dados!")
 										db.execute("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 										handler.mydb.commit()
-									except:
+									except handler.mysql.connector.Error as err:
+										logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 										print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 										pass
 
@@ -84,7 +91,8 @@ class Relatorios(object):
 										print("[!] Tentando atualizar a base de dados!")
 										db.execute("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 										handler.mydb.commit()
-									except:
+									except handler.mysql.connector.Error as err:
+										logs.info('{0}erro: {} '.format(datetime.datetime.now(),err))
 										print("[!][!][!] Não foi possivel, mas voce pode efutar a atualização manualmente através do arquivo query.txt!")
 										pass
 									
@@ -102,5 +110,6 @@ class Relatorios(object):
 				f.write("{0}:{1}\n".format(datetime.datetime.now() ,item))
 
 	def __init__(self):
+		
 		self
 	   
