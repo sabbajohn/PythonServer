@@ -70,7 +70,7 @@ class Startup(object):
 			
 
 			
-		sleep(5)
+			sleep(5)
 
 	def checkIfProcessRunning(self,processName):
 		'''
