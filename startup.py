@@ -24,7 +24,7 @@ class Startup(object):
  		)
 		self.log = logging.getLogger('Serviço de Atualização da Base de Dados')
 		self.procs = ['sms.py','uwsgi','servico_de_validacao.py','Databaseupdate.py']
-		self.delays={'validacao':600}
+		self.delays={'validacao':300}
 		self.start_time = 0
 		self.i()
 	
@@ -70,7 +70,7 @@ class Startup(object):
 			
 
 			
-		sleep(3)
+		sleep(5)
 
 	def checkIfProcessRunning(self,processName):
 		'''
