@@ -40,7 +40,7 @@ class Startup(object):
 				pass
 			if not self.checkIfProcessRunning(self.procs[1]):
 					self.log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
-					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191 &'.format(self.USER))
+					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER))
 			
 			else:
 				pass
