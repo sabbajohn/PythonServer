@@ -35,7 +35,7 @@ class Startup(object):
 			else:
 				pass
 			if not self.checkIfProcessRunning(self.procs[1]):
-					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191 &')
+					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file Server/server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191 &')
 			
 			else:
 				pass
