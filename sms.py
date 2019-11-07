@@ -10,7 +10,7 @@ import json
 import getpass
 USER = getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
-from db import DB
+from Class.db import DB
 
 
 
@@ -29,23 +29,25 @@ except:
 			time.sleep(10)   
 			comando('python3 sms.py')
 
-handler = DB()
-def get_cursor():
-	return handler.mydb.cursor()
+database = DB()
+
+
 
 def db_monitor():
 	escreveu = False
 	log = logging.getLogger('Monitor')
 	log.info("Inicializando monitoramento do Banco de Dados")
+	handler_r=database.getConn("R")
 	
 	
 	while True:
 		result = None
-		cursor =get_cursor()
-	
-		cursor.execute("SELECT * FROM sms WHERE sent_at is NULL")
-		result = cursor.fetchall()
-		handler.mydb.commit()
+		
+		cursor_r =database.getCursor("R")
+		cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
+		result = cursor_r.fetchall()
+		handler_r.commit()
+		
 		if len(result)>0:
 
 			log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result)))
@@ -53,7 +55,7 @@ def db_monitor():
 			for x in result:
 				send(x)
 			
-
+			
 		else: 
 			if(escreveu == False):
 				
@@ -62,7 +64,7 @@ def db_monitor():
 			else:
 				pass
 			time.sleep(5)
-	
+		
 		
 def send(cliente):
 	log = logging.getLogger('Envio de SMS')
@@ -89,11 +91,13 @@ def update(result, cliente):
 	log = logging.getLogger('UPDATE')
 	log.info("Atualizando infromações na base de dados.")
 	agora = datetime.datetime.now()
-	db = handler.mydb.cursor()
+	handler_w = database.getConn("W")
+	cursor_w = database.getCursor("W")
 	query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
 	try:
-		db.execute(query)
-		handler.mydb.commit()
+		cursor_w.execute(query)
+		handler_w.commit()
+		
 		return
 	except :
 		log.info("Oops!",sys.exc_info()[0],"occured.")
