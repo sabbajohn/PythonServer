@@ -18,9 +18,15 @@ import subprocess
 class Startup(object):
 	def __init__(self, *args, **kwargs):
 		self.USER = getpass.getuser()
-		
-		
-		self.procs = ['sms.py','server.py','servico_de_validacao.py','Databaseupdate.py']
+		logging.basicConfig(
+			filename='/home/{0}/PythonServer/logs/StartUp.log'.format(USER),
+			filemode='a+',
+			level=logging.INFO,
+			format='PID %(process)5s %(name)18s: %(message)s',
+			#stream=sys.stderr,
+ 		)
+		self.log = logging.getLogger('Serviço de Atualização da Base de Dados')
+		self.procs = ['sms.py','uwsgi','servico_de_validacao.py','Databaseupdate.py']
 		self.delays={'validacao':600}
 		self.start_time = 0
 		self.i()
@@ -30,18 +36,21 @@ class Startup(object):
 		
 		while True:
 			if not self.checkIfProcessRunning(self.procs[0]):
+					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('python3 sms.py &')
 				
 			else:
 				pass
 			if not self.checkIfProcessRunning(self.procs[1]):
+					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
 					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file Server/server.py --callable app --processes 4 --threads 2 --stats 127.0.0.1:9191 &')
 			
 			else:
 				pass
-			if not self.checkIfProcessRunning(self.procs[2]):
+			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
 				if self.start_time ==0:
 					self.start_time = time.time()
+					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					os.system('nohup python3 servico_de_validacao.py &')
 				elif time.time()- self.start_time > self.delays['validacao']:
 					self.start_time = time.time()
@@ -55,7 +64,7 @@ class Startup(object):
 					if modtime < self.start_time:
 						pass
 					else:
-
+						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
 						os.system('python3 Databaseupdate.py &')
 			
 			else:
@@ -94,5 +103,6 @@ class Startup(object):
 
 		
 	
+
 	
 Startup()
