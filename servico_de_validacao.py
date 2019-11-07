@@ -13,6 +13,7 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
+from Class.db import DB
 USER = getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
 from Class import cpf
@@ -358,10 +359,10 @@ async def runner(executor):
 
 async def list_generator(database):
 	global result, contador_dispensadas
-
+	executor = database.getCursor("R")
+	
 	log = logging.getLogger('list_generator')
 	log.info('Buscando registros pendentes na base de dados.')
-	executor= database.cursor()
 	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status =0 order by Nome asc ,id desc LIMIT 100")
 	result = executor.fetchall()
 	if len(result) > 0:
@@ -481,10 +482,10 @@ if __name__ == "__main__":
 	log.info('*******')
 	log.info('Inicializando serviço de Validação de cadastros...')
 	log.info(datetime.datetime.now())
-	db = db_handler()
+	database = DB()
 	
 	loop = asyncio.get_event_loop()
-	pendentes=loop.run_until_complete(list_generator(db))
+	pendentes=loop.run_until_complete(list_generator(database))
  
 	
 

@@ -10,6 +10,7 @@ import datetime
 from datetime import date
 from time import sleep
 from itertools import islice
+from Class.db import DB
 try:
 	import mysql.connector
 except:
@@ -33,7 +34,8 @@ def QueryRunner(database):
 	log = logging.getLogger('QueryRunner')
 	log.info("Procurando Por Arquivo de Querys.")
 	fname = "/home/{0}/PythonServer/queries/query.txt".format(USER)
-	executor= database.cursor()
+	H = database.getConn("W")
+	executor= database.getCursor("W")
 	if os.path.isfile(fname):
 		infile = open(fname, 'r').readlines()
 		if ( not len(infile)>0):
@@ -47,7 +49,7 @@ def QueryRunner(database):
 					log.info("Standy by 1s")
 					sleep(1)
 				executor.execute(line)
-				database.commit()
+				H.commit()
 				executor.rowcount
 				n_updates = n_updates +1
 				rest = rest +1
@@ -58,8 +60,9 @@ def QueryRunner(database):
 				log.info('#######')
 				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
 	
-		
+		database.closeConn("W")
 		return n_updates
+
 	
 	else:
 		log.info("Arquivo não encontrado!")
@@ -99,8 +102,8 @@ if __name__ == "__main__":
 	log.info('*******')
 	log.info('Inicializando serviço  de Atualização da Base de Dados')
 	log.info(datetime.datetime.now())
-	db = db_handler()
-	result = QueryRunner(db)
+	database = DB()
+	result = QueryRunner(database)
 	log.info('Serviço de Atualização da Base de Dados Concluido')
 	duration = time.time() - start_time
 	log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
