@@ -4,15 +4,12 @@
 
 import os
 import sys
-import psutil
 import time
 from time import sleep
 import datetime
 from datetime import date
 import logging
 import getpass
-import re
-
 import subprocess
 
 class Startup(object):
