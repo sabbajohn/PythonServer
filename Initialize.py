@@ -13,13 +13,13 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
+from utils.Manager import Manager
+from servers import server
+from services.servicodevalidacao import servicoDeValidacao
+from services.DataUpdate import DataUpdate
+from services.SMS import SMS
+
 USER = getpass.getuser()
-from Class import *
-from servers import *
-from services import SMS, DataUpdate,servico_de_validacao
-import Manager
-
-
 
 class Initialize(object):
 	
@@ -27,8 +27,8 @@ class Initialize(object):
 		
 		#Definindo objeto dos Serviços
 		self.SMS = SMS()
-		self.DataUpdate = DataUpdate(self.Manager)
-		self.servicoDeValidacao = servico_de_validacao(self.Manager)
+		self.DataUpdate = DataUpdate()
+		self.servicoDeValidacao = servicoDeValidacao()
 
 		#Definindo objeto das API's
 		
@@ -36,17 +36,17 @@ class Initialize(object):
 			"servico_de_validacao":True,
 			"dataupdate":True
 		}
-		self.job_sms = threading.Thread(target=self.SMS.start)
-		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start)
-		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start)
+		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS")
+		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 
 		# Inicializando
 		try:
 			self.job_sms.start()
-			ValidacaoEUpdate()
+			self.ValidacaoEUpdate()
 
 		except:
-			sys.exit("Oops!",sys.exc_info()[0],"occured.")
+			sys.exit("Oops!{0} occured.".format(sys.exc_info()[0]))
 
 	def ValidacaoEUpdate(self):
 		while True:
@@ -54,20 +54,21 @@ class Initialize(object):
 					self.job_servico_de_validacao.start()
 					self.isFirstTme['servico_de_validacao'] = False
 					self.job_servico_de_validacao.join()
-					if not self.job-servico_de_validacao.isAlive():
+					if not self.job_servico_de_validacao.isAlive():
 						self.job_dataupdate.start()
 						self.job_dataupdate.join()
 
 
 			else:
 
-				if not self.job-servico_de_validacao.isAlive():
+				if not self.job_servico_de_validacao.isAlive():
 					self.job_servico_de_validacao.start()
 					self.job_servico_de_validacao.join()
 					if not self.job_dataupdate.isAlive():
 						self.job_dataupdate.start()
 						self.job_dataupdate.join()
 						sleep(6000)
-	
+
 if __name__ == "__main__":
-	pass
+	i = Initialize()
+	i.Initialize()

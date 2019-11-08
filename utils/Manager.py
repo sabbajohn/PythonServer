@@ -13,83 +13,12 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
-USER = getpass.getuser()
-from Class import *
+from utils.db import DB
 from servers import *
 
-
-
-if sys.version_info[0] < 3:
-
-	raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
-try:
-   import asyncio
+class Manager(object):
 	
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install asyncio')
-		print('[!] Tentando Instalar as Dependencias')	
-	except:
-		if IOError:	
-			sys.exit("[!] Please install the asyncio library: sudo pip3 install asyncio")
-		else:
-			sleep(7) 
-			comando('python3 servico_de_validacao.py')
-
-try:
-   import aiohttp
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install aiohttp')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-
-		if IOError:	
-			sys.exit("[!] Please install the aiohttp library: sudo pip3 install aiohttp")	
-		
-		else:  
-			sleep(10)   
-			comando('python3 servico_de_validacao.py')	
-			
-try:
-   import mysql.connector
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install mysql')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-		if IOError:	
-			sys.exit("[!] Please install the mysql library: sudo pip3 install mysql")	
-		
-		else:  
-			sleep(10)   
-			comando('python3 servico_de_validacao.py')	
-			
-
-try:
-  from aiofile import AIOFile, LineReader, Writer
-
-except:
-	try:
-			
-		comando = os.system
-		comando('sudo pip3 install aiofile')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-
-		if IOError:	
-			sys.exit("[!] Please install the aiofile library: sudo pip3 install aiofile")	
-		
-		else:  
-			sleep(10)   
-			comando('python3 servico_de_validacao.py')	
-
-class Manager:
 	
-		
 
 	def Exceptions(self, e):
 		log = logging.getLogger('Exceptions')
@@ -108,6 +37,7 @@ class Manager:
 			elif self.exception['status']== 3:
 				pass
 			elif self.exception['status']== 4:
+				log.info("SEJA O QUE DEUS QUISER! \n{0}".format(e))
 				pass
 			pass
 		elif self.exception['class'] == 'Validacao':

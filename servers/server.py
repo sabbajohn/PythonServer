@@ -6,11 +6,11 @@ import time
 from time import sleep
 import getpass
 USER = getpass.getuser()
-from Class import cpf
+from utils import CPF as cpf
 import json
 from json import dumps
-from Class import Relatorios as log
-
+from utils import Relatorios as log
+import utils.Manager
 
 
 if sys.version_info[0] < 3:
@@ -68,7 +68,7 @@ app = Flask(__name__)
 api = Api(app)
 
 
-class Clientes(Resource, Manager):
+class Clientes(Resource, object):
     """  def get(self):
         conn = db_connect.connect() # connect to database
         query = conn.execute("select * from employees") # This line performs query and returns json result

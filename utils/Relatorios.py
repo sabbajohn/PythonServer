@@ -1,16 +1,17 @@
 
 import sys
 import datetime
-from Class.db import DB
+from utils.db import DB
 import logging
 import getpass
+
 USER = getpass.getuser()
 database = DB()
 handler = database.getConn("W")
 db = database.getCursor("W")
 class Relatorios(object):
 
-	def query_generator(resp):
+	def query_generator(self,resp):
 		logs = logging.getLogger('Atualizaçao de Dados!')
 		logs.info('iniciando conexão com Banco de Dados.')
 		if len(resp)>0:
@@ -105,7 +106,7 @@ class Relatorios(object):
 							handler.commit()
 							pass
 
-	def responses(responses):
+	def responses(self,responses):
 		with open("/home/"+USER+"/PythonServer/responses/response_api.json","a+") as f: 
 			for item in responses:
 				f.write("{0}:{1}\n".format(datetime.datetime.now() ,item))
@@ -113,4 +114,3 @@ class Relatorios(object):
 	def __init__(self):
 		
 		self
-	   
