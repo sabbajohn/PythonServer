@@ -10,7 +10,7 @@ import datetime
 from datetime import date
 from time import sleep
 from itertools import islice
-from Class.db import DB
+from utils.db import DB
 try:
 	import mysql.connector
 except:

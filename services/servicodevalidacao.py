@@ -13,10 +13,11 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
-from Class.db import DB
+from utils.db import DB
+from utils import cpf
 USER = getpass.getuser()
-sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
-from Class import cpf
+
+
 
 if sys.version_info[0] < 3:
 

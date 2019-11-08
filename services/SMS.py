@@ -9,8 +9,7 @@ from datetime import date
 import json
 import getpass
 USER = getpass.getuser()
-sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
-from Class.db import DB
+from utils.db import DB
 
 
 
