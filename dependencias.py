@@ -81,6 +81,7 @@ except:
 	cache.open()
 	try:
 		cache['python3-mysql.connector'].is_installed
+		import mysql.connector
 	except KeyError:
 		print('[!!!] MYSQL  Indisponivel')
 		print("[*] Tentarei instala-lo para você ")
