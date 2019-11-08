@@ -76,7 +76,8 @@ try:
 except:
 	try:
 		print('[!] Verificando MYSQL\n')
-		result = subprocess.check_output(['sudo pip3 install mysql'], stderr=subprocess.STDOUT,text=True)
+		result = subprocess.check_output(['sudo pip3 install mysql -y'], stderr=subprocess.STDOUT,text=True)
+		print(result)
 		if "erro code 1" in result:
 			print("[!] mysql Não esta disponivel ")
 			print("[*] Tentarei instala-lo para você ")
@@ -90,7 +91,7 @@ except:
 					pass
 	
 	except:
-		print("[!] Please install the mysql library: sudo pip3 install mysql\n")
+		print("[!]{0}".format(result))
 
 
 try:
