@@ -77,7 +77,9 @@ def send(cliente):
 
 		result = textmessage_service.send('MS_.{}'.format(cliente[3]), cliente[4], Receivers)
 	except :
-		log.info("Oops!",sys.exc_info()[0],"occured.")
+		log.info("Oops!{0}occured.".format(sys.exc_info()[0]))
+		print("Oops!{0}occured.".format(sys.exc_info()[0]))
+		return
 	log.info("SMS:{0}".format(result['Message']))
 	update(result, cliente)
 	return
