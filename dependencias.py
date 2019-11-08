@@ -3,6 +3,7 @@
 import sys
 import os
 import subprocess
+import apt
 
 if sys.version_info[0] < 3:
 	print("[!] Versão Requerida: Python3")
@@ -71,27 +72,28 @@ except:
 			pass
 			
 try:
+	print('[!] Verificando MYSQL\n')
 	import mysql.connector
 	print('[OK] MYSQL Disponivel')
 except:
+	print('[!!!] MYSQL  Indisponivel')
+	cache = apt.Cache()
+	cache.open()
 	try:
-		print('[!] Verificando MYSQL\n')
-		result = subprocess.check_output(['sudo pip3 install mysql -y'], stderr=subprocess.STDOUT,text=True)
-		print(result)
-		if "No module named" in result:
-			print("[!] mysql Não esta disponivel ")
-			print("[*] Tentarei instala-lo para você ")
-			print('[!] Tentando Instalar as Dependencias\n')
-			try:
-				os.system('sudo apt-get install python3-mysql -y')
-			except:
-				if IOError:
-					print("[!] Please install the mysql library: sudo pip3 install mysql\n")
-				else:
-					pass
+		cache['python3-mysql.connector'].is_installed
+	except KeyError:
+		print('[!!!] MYSQL  Indisponivel')
+		print("[*] Tentarei instala-lo para você ")
+		print('[...] Tentando Instalar as Dependencias\n')
+		try:
+			os.system('sudo apt-get install python3-mysql* -y')
+		except:
+			if IOError:
+				print("[!] Please install the mysql library: sudo pip3 install mysql\n")
+		
+		
 	
-	except :
-		print(sys.exc_info()[0])
+
 
 
 try:
