@@ -43,7 +43,7 @@ except:
 				print("Não foi Possivel instalar algumas das dependencias!")
 
 try:
-   import asyncio
+	import asyncio
 	
 except:
 	try:
@@ -56,7 +56,7 @@ except:
 	
 
 try:
-   import aiohttp
+	import aiohttp
 except:
 	try:
 		comando = os.system
@@ -72,30 +72,32 @@ except:
 			
 try:
 	import mysql.connector
-	print('[OK] MYSQL Disponivel')		
+	print('[OK] MYSQL Disponivel')
 except:
 	try:
 		print('[!] Verificando MYSQL\n')
 		result = subprocess.check_output(['sudo pip3 install mysql'], stderr=subprocess.STDOUT,text=True)
-		if  "erro code 1" in result:
+		if "erro code 1" in result:
 			print("[!] mysql Não esta disponivel ")
 			print("[*] Tentarei instala-lo para você ")
 			print('[!] Tentando Instalar as Dependencias\n')
 			try:
 				os.system('sudo apt-get install python3-mysql -y')
-			except :
-				if IOError:	
-					print("[!] Please install the mysql library: sudo pip3 install mysql\n")	
+			except:
+				if IOError:
+					print("[!] Please install the mysql library: sudo pip3 install mysql\n")
+				else:
+					pass
 	
+	except:
+		print("[!] Please install the mysql library: sudo pip3 install mysql\n")
 
-	
 
 try:
-  from aiofile import AIOFile, LineReader, Writer
-
+	from aiofile import AIOFile, LineReader, Writer
 except:
 	try:
-			
+		
 		comando = os.system
 		comando('sudo pip3 install aiofile')
 		print('[!] Tentando Instalar as Dependencias\n')
@@ -118,7 +120,7 @@ except:
 	
 	
 try:
-   from flask_restful import Resource, Api
+	from flask_restful import Resource, Api
 except:
 	try:
 		comando = os.system
@@ -131,7 +133,7 @@ except:
 		
 		
 try:
-  import urllib.request
+	import urllib.request
 except:
 	try:
 		comando = os.system
@@ -142,4 +144,4 @@ except:
 			print("[!] Please install the urllib library: pip3 install urllib\n")
 
 
-	print('[***] Concluido')
+print('[***] Concluido')
