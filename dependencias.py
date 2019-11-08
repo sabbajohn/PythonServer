@@ -4,29 +4,39 @@ import sys
 import os
 
 if sys.version_info[0] < 3:
+	print("[!] Versão Requerida: Python3")
+	print("[!] Versão Disponivel: {0}".format(sys.version_info[0]))
 	try:
 		comando = os.system
 		comando( 'sudo apt-get install python3')
 	except :
 		if IOError:	
 			raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
+else:
+	print("[OK] Versão Requerida: Python3")
+	pass
+
+
 try:
-	os.system("pip3 install -r req.txt")
+	print("[!] Verificando Disponibilidade PIP3 ")
+	comando = os.system
+	t=comando( 'sudo pip3 -V')
 except:
 	if IOError:	
+		comando = os.system
+		comando( 'sudo apt-get install python3-pip') 
+		
+try:
+	os.system("pip3 install -r req.txt")
+
+except:
+	if OSError:	
 		try:
 			os.system("sudo apt-get install python3-pip")
 		except :
 			if IOError:
 				print("Não foi Possivel instalar algumas das dependencias!")
-			
-	""" try:
-		comando = os.system
-		comando( 'sudo pip3 -V')
-	except:
-		if IOError:	
-			comando = os.system
-			comando( 'sudo apt-get install python3-pip') """
+
 try:
    import asyncio
 	
