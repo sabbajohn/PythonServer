@@ -2,6 +2,7 @@
 # coding: utf-8
 import sys
 import os
+import subprocess
 
 if sys.version_info[0] < 3:
 	print("[!] Versão Requerida: Python3")
@@ -19,15 +20,17 @@ else:
 
 try:
 	print("[!] Verificando Disponibilidade PIP3 ")
-	comando = os.system
-	t=comando( 'sudo pip3 -V')
+	result = subprocess.check_output(['sudo pip3 -V'], stderr=subprocess.STDOUT,text=True)
+	if  "pip3: not found" in result:
+		os.system( 'sudo apt-get install python3-pip') 
 except:
 	if IOError:	
-		comando = os.system
-		comando( 'sudo apt-get install python3-pip') 
+		 os.system( 'sudo apt-get install python3-pip') 
 		
 try:
-	os.system("pip3 install -r req.txt")
+	result = subprocess.check_output(["pip3 install -r req.txt"], stderr=subprocess.STDOUT,text=True)
+	if "Exception:" in result:
+		print("[!] Erro ao instalar Pacotes")
 
 except:
 	if OSError:	
