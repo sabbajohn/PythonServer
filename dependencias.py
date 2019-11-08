@@ -71,21 +71,23 @@ except:
 			pass
 			
 try:
-   import mysql.connector
-
+	import mysql.connector
+	print('[OK] MYSQL Disponivel')		
 except:
 	try:
-		comando = os.system
-		comando('sudo pip3 install mysql')
-		print('[!] Tentando Instalar as Dependencias\n')
-	except:
-		if IOError:
+		print('[!] Verificando MYSQL\n')
+		result = subprocess.check_output(['sudo pip3 install mysql'], stderr=subprocess.STDOUT,text=True)
+		if  "erro code 1" in result:
+			print("[!] mysql Não esta disponivel ")
+			print("[*] Tentarei instala-lo para você ")
+			print('[!] Tentando Instalar as Dependencias\n')
 			try:
-				comando('sudo apt-get install python3-mysql\n')
+				os.system('sudo apt-get install python3-mysql -y')
 			except :
 				if IOError:	
 					print("[!] Please install the mysql library: sudo pip3 install mysql\n")	
-		
+	
+
 	
 
 try:
