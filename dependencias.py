@@ -11,6 +11,23 @@ if sys.version_info[0] < 3:
 		if IOError:	
 			raise Exception("[!]Must be using Python 3, You can install it using: # apt-get install python3")
 try:
+	os.system("pip3 install -r req.txt")
+except:
+	if IOError:	
+		try:
+			os.system("sudo apt-get install python3-pip")
+		except :
+			if IOError:
+				print("Não foi Possivel instalar algumas das dependencias!")
+			
+	""" try:
+		comando = os.system
+		comando( 'sudo pip3 -V')
+	except:
+		if IOError:	
+			comando = os.system
+			comando( 'sudo apt-get install python3-pip') """
+try:
    import asyncio
 	
 except:
@@ -108,14 +125,5 @@ except:
 			print("[!] Please install the urllib library: pip3 install urllib\n")
 
 
-try:
-	os.system("pip3 install -r req.txt")
-except:
-	if IOError:	
-		try:
-			os.system("sudo apt-get install python3-pip")
-		except :
-			if IOError:
-				print("Não foi Possivel instalar algumas das dependencias!")
-			
+
 	
