@@ -90,8 +90,8 @@ except:
 				else:
 					pass
 	
-	except:
-		pass
+	except :
+		print(sys.exc_info()[0])
 
 
 try:
