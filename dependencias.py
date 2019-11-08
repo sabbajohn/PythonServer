@@ -76,7 +76,7 @@ try:
 except:
 	try:
 		print('[!] Verificando MYSQL\n')
-		result = subprocess.check_output(['sudo pip3 install mysql -y'], stderr=subprocess.STDOUT)
+		result = subprocess.check_output(['sudo pip3 install mysql -y'], stderr=subprocess.STDOUT,text=True)
 		print(result)
 		if "No module named" in result:
 			print("[!] mysql Não esta disponivel ")
