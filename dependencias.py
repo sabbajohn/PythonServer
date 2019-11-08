@@ -22,7 +22,9 @@ try:
 	print("[!] Verificando Disponibilidade PIP3 ")
 	result = subprocess.check_output(['sudo pip3 -V'], stderr=subprocess.STDOUT,text=True)
 	if  "pip3: not found" in result:
-		os.system( 'sudo apt-get install python3-pip') 
+		print("[!] PIP3 Não esta disponivel ")
+		print("[*] Tentarei instala-lo para você ")
+		os.system( 'sudo apt-get install python3-pip -y') 
 except:
 	if IOError:	
 		 os.system( 'sudo apt-get install python3-pip') 
@@ -138,5 +140,4 @@ except:
 			print("[!] Please install the urllib library: pip3 install urllib\n")
 
 
-
-	
+	print('[***] Concluido')
