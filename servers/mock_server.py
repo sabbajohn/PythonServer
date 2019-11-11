@@ -7,8 +7,8 @@ from time import sleep
 import json
 from json import dumps
 import getpass
-from Class import cpf
-from Class import Relatorios as log
+from utils import cpf
+from utils.Relatorios import Relatorios as log
 USER = getpass.getuser()
 if sys.version_info[0] < 3:
 
