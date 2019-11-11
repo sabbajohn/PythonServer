@@ -20,7 +20,7 @@ class Startup(object):
 			format='PID %(process)5s %(name)18s: %(message)s',
 			#stream=sys.stderr,
  		)
-		self.log = logging.getLogger('Serviço de Atualização da Base de Dados')
+		log = logging.getLogger('Serviço de Inicilização ')
 		self.procs = ['sms.py','uwsgi','servico_de_validacao.py','Databaseupdate.py']
 		self.delays={'validacao':300}
 		self.start_time = 0
@@ -28,16 +28,16 @@ class Startup(object):
 	
 	def i(self):
 
-		
+		log = logging.getLogger('Serviço de Inicilização ')
 		while True:
 			if not self.checkIfProcessRunning(self.procs[0]):
-					self.log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
+					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('python3 sms.py &')
 				
 			else:
 				pass
 			if not self.checkIfProcessRunning(self.procs[1]):
-					self.log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
+					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
 					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER))
 			
 			else:
@@ -45,10 +45,10 @@ class Startup(object):
 			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
 				if self.start_time ==0:
 					self.start_time = time.time()
-					self.log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
+					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					os.system('python3 servico_de_validacao.py &')
 				elif time.time()- self.start_time > self.delays['validacao']:
-					self.log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
+					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					self.start_time = time.time()
 					os.system('python3 servico_de_validacao.py &')
 			else:
