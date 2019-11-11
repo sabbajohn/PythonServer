@@ -68,7 +68,15 @@ class Initialize(object):
 						self.job_dataupdate.start()
 						self.job_dataupdate.join()
 						sleep(6000)
-
+	def Jobs(self):
+		jobs = {
+			"SMS":self.job_sms,
+			"SVC":self.job_servico_de_validacao,
+			"SDU":self.job_dataupdate
+		}
+		return jobs
+		
+		
 if __name__ == "__main__":
 	i = Initialize()
 	i.Initialize()

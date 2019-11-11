@@ -30,21 +30,18 @@ class SMS(Manager):
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
 		self.database = DB()
-		logging.basicConfig(
-			filename='/home/{0}/PythonServer/logs/sms.log'.format(self.USER),
-			filemode='a+',
-			level=logging.INFO,
-			format='PID %(process)5s %(name)18s: %(message)s',
-			#stream=sys.stderr,
-		)
+		""" TODO FIXME
+			! Não Preciso iniciar uma conexão com o DB toda vez ja existem prontas!
+
+
+		 """
+		
 		
 		
 	def start(self):
 		feedback = self.feedback
 		feedback['metodo'] = 'start'
-		log = logging.getLogger('Serviço de Envio de SMS')
-		log.info("Inicializando")
-		log.info( datetime.datetime.now())
+		
 		try:
 			self.db_monitor()
 		except:
@@ -54,12 +51,19 @@ class SMS(Manager):
 			feedback["erro"] = True
 			feedback["comments"] = "Algo não panejado"
 			with self._lock:
-				super().Exceptions(feedback)
+				super().callback(feedback)
 
 	def db_monitor(self):
+		feedback = self.feedback
+		feedback['metodo'] = 'Monitor'
+		feedback["status"] = 5
+		feedback["message"] = "Inicializando o Monitoramento do Banco de Dados"
+		feedback["comments"] = ""
 		escreveu = False
-		log = logging.getLogger('Monitor')
-		log.info("Inicializando monitoramento do Banco de Dados")
+		#TODO Reportar Step
+		with self._lock:
+				super().callback(feedback)
+		
 		handler_r=self.database.getConn("R")
 		
 		
@@ -73,7 +77,7 @@ class SMS(Manager):
 			
 			if len(result)>0:
 
-				log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result)))
+				""" 	log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result))) """
 				
 				for x in result:
 					self.send(x)
@@ -82,7 +86,7 @@ class SMS(Manager):
 			else: 
 				if(escreveu == False):
 					
-					log.info("Nenhum sms pendete, tentaremos novamente em 5 segundos!")
+					""" log.info("Nenhum sms pendete, tentaremos novamente em 5 segundos!") """
 					escreveu= True
 				else:
 					pass
@@ -92,8 +96,8 @@ class SMS(Manager):
 	def send(self,cliente):
 		feedback = self.feedback
 		feedback['metodo']='send'
-		log = logging.getLogger('Envio de SMS')
-		log.info("Enviando sms à:{0}".format(cliente[2]))
+		#log = logging.getLogger('Envio de SMS')
+		#log.info("Enviando sms à:{0}".format(cliente[2]))
 		__api_key = '3aa20522-7c0a-4562-b25d-70ffc3f27f8e'
 		textmessage_service = TextMessageService(__api_key)
 		Receivers = []
@@ -109,9 +113,9 @@ class SMS(Manager):
 			feedback["comments"] = "Algo não panejado"
 			with self._lock:
 				super().Exceptions(feedback)
-				log.info("Oops!{0}occured.".format(sys.exc_info()[0]))
+				""" log.info("Oops!{0}occured.".format(sys.exc_info()[0])) """
 			return
-		log.info("SMS:{0}".format(result['Message']))
+		""" log.info("SMS:{0}".format(result['Message'])) """
 		self.update(result, cliente)
 		return
 
@@ -123,8 +127,8 @@ class SMS(Manager):
 		with open("/home/"+self.USER+"/PythonServer/responses/response_sms.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 			agora = datetime.datetime.now()
 			f.write("{0}:{1}\n".format(agora ,result))
-		log = logging.getLogger('UPDATE')
-		log.info("Atualizando infromações na base de dados.")
+		""" log = logging.getLogger('UPDATE') """
+		""" log.info("Atualizando infromações na base de dados.") """
 		agora = datetime.datetime.now()
 		handler_w = self.database.getConn("W")
 		cursor_w = self.database.getCursor("W")
@@ -135,8 +139,8 @@ class SMS(Manager):
 			
 			return
 		except :
-			log.info("Oops!",sys.exc_info()[0],"occured.")
-			log.info('#######')
+			""" log.info("Oops!",sys.exc_info()[0],"occured.") """
+			""" log.info('#######') """
 			feedback["status"] = 1
 			feedback["message"] = "Arquivo não encontrado!"
 			feedback["erro"] = True
