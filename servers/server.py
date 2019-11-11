@@ -10,7 +10,7 @@ from utils import CPF as cpf
 import json
 from json import dumps
 from utils import Relatorios as log
-import utils.Manager
+from Manager import Manager
 
 
 if sys.version_info[0] < 3:

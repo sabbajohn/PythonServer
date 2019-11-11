@@ -13,8 +13,8 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
-from utils.Manager import Manager
-from servers import server
+
+#from servers import server
 from services.servicodevalidacao import servicoDeValidacao
 from services.DataUpdate import DataUpdate
 from services.SMS import SMS
@@ -23,7 +23,7 @@ USER = getpass.getuser()
 
 class Initialize(object):
 	
-	def Initialize(self):
+	def __init__(self):
 		
 		#Definindo objeto dos Serviços
 		self.SMS = SMS()
@@ -77,6 +77,3 @@ class Initialize(object):
 		return jobs
 		
 		
-if __name__ == "__main__":
-	i = Initialize()
-	i.Initialize()

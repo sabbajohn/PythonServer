@@ -8,7 +8,7 @@ import datetime
 from datetime import date
 import json
 import getpass
-from utils.Manager import Manager
+from Manager import Manager
 from utils.db import DB
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
@@ -32,10 +32,13 @@ class SMS(Manager):
 		
 		
 		try:
+			message = []
+			message.append( "Algo não panejado")
+			self.feedback(metodo="Start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			self.db_monitor()
 		except:
 			#O metodo é o start, mas o pau veio de dentro do db_monitor
-			print("Oops!{0} occured.".format(sys.exc_info()[0]))
+		#	print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			message = []
 			message.append( "{0}".format(sys.exc_info()[0]))
 			self.feedback(metodo="failsafe_api_validation_request", status =4, message = message, erro = True, comments = "Algo não panejado" )
@@ -100,12 +103,8 @@ class SMS(Manager):
 		try:
 			result = textmessage_service.send('MS_.{}'.format(cliente[3]), cliente[4], Receivers)
 		except :
-			print("Oops!{0} occured.".format(sys.exc_info()[0]))
-			
-			feedback["message"] = "[!!!]:Oops!{0}occured.".format(sys.exc_info()[0])
 			
 			
-		
 			message = []
 			message.append( "[!!!]:Oops!{0}occured.".format(sys.exc_info()[0]))
 			self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
@@ -157,7 +156,7 @@ class SMS(Manager):
 		
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
-		comment = kwargst.get('comments')
+		comments = kwargst.get('comments')
 		metodo =kwargst.get('metodo')
 		status =kwargst.get('status')
 		try:
@@ -197,9 +196,9 @@ class SMS(Manager):
 				feedback["message"].append('[INFO].{0}'.format(msg)) 
 		
 		try: 
-			feedback["comment"] = comment
+			feedback["comments"] = comments
 		except:
-			feedback["comment"] = ""
+			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
 		with self._lock:
@@ -207,3 +206,5 @@ class SMS(Manager):
 
 	
 
+	def end(self):
+		raise Exception("Encerra Tr")

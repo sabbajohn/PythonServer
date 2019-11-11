@@ -18,6 +18,7 @@ from utils import CPF as cpf
 import asyncio
 import aiohttp
 from aiofile import AIOFile, LineReader, Writer
+from Manager import Manager
 
 
 class servicoDeValidacao(Manager):
@@ -270,6 +271,7 @@ class servicoDeValidacao(Manager):
 		message = []
 		message.append('[INFO]:Iniciando Solicitações a API hubdodesenvolvedor ')
 		self.feedback(metodo="Runner",status=5,message = message)
+		self.feedback(metodo="Runner",status=4,message = message)
 		message = None
 		index = 0
 		tasks=[]
@@ -314,7 +316,7 @@ class servicoDeValidacao(Manager):
 			message = None
 		
 			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
-			sys.exit("")
+			#sys.exit("")
 
 		
 		lista = {}
@@ -405,7 +407,7 @@ class servicoDeValidacao(Manager):
 
 		loop = asyncio.new_event_loop()
 		
-		pendentes=loop.run_until_complete(self.list_generator(self.database))
+		self.pendentes=loop.run_until_complete(self.list_generator(self.database))
 		try:
 			self.event_loop.run_until_complete(
 				self.runner(executor)
@@ -417,11 +419,11 @@ class servicoDeValidacao(Manager):
 			
 			
 			message = []
-			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(contador_failsafe))
-			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
-			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
-			message.append("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
-			message.append(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
+			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(self.contador_failsafe))
+			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.contador_hd))
+			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
+			message.append("Foram realizadas {0} ao Via Cep".format(self.contador_ViaCep))
+			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds")
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
@@ -432,7 +434,7 @@ class servicoDeValidacao(Manager):
 	
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
-		comment = kwargst.get('comments')
+		comments = kwargst.get('comments')
 		metodo =kwargst.get('metodo')
 		status =kwargst.get('status')
 		try:
@@ -472,9 +474,9 @@ class servicoDeValidacao(Manager):
 				feedback["message"].append('[INFO].{0}'.format(msg)) 
 		
 		try: 
-			feedback["comment"] = comment
+			feedback["comments"] = comments
 		except:
-			feedback["comment"] = ""
+			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
 		with self._lock:
@@ -482,7 +484,7 @@ class servicoDeValidacao(Manager):
 
 	
 	def __init__(self):
-	
+		self._lock =threading.Lock()
 		self.USER = getpass.getuser()
 		self.failsafe_tasks=[]
 		self.failsafe_cpf = []
@@ -494,3 +496,7 @@ class servicoDeValidacao(Manager):
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = 0
 		self.database = DB()
+
+
+	def end(self):
+		raise Exception("Encerra Tr")

@@ -14,8 +14,8 @@ import concurrent.futures
 import asyncio.coroutines
 import getpass
 from utils.db import DB
-from servers import *
-import Initialize
+#from servers import server
+import Initialize 
 class Manager(object):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
@@ -39,8 +39,9 @@ class Manager(object):
 	
 
 
-	def __init__(self):
-
+	def __init__(self, *args, **kwargs):
+	 
+		self.USER = getpass.getuser()
 		log = logging.getLogger('Modulo de Gerenciamento')
 
 		logging.basicConfig(
@@ -50,8 +51,12 @@ class Manager(object):
 			format='PID %(process)5s %(name)18s: %(message)s',
 			#stream=sys.stderr,
 		)
-		Jobs = Initialize.Jobs()
-		pass
+	def start(self):
+		I =Initialize.Initialize()
+		#I =Initialize.Initialize.__init__()
+
+		self.Jobs = I.Jobs()
+		
 
 	def callback(self,e):
 		
@@ -61,13 +66,13 @@ class Manager(object):
 			elif e['status']== 0:
 				self.Logs(e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
@@ -77,13 +82,13 @@ class Manager(object):
 			elif e['status']== 0:
 				self.Logs(e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptionse(e)
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
@@ -94,13 +99,13 @@ class Manager(object):
 			elif e['status']== 0:
 				self.Logs(e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
@@ -111,13 +116,13 @@ class Manager(object):
 			elif e['status']== 0:
 				self.Logs(e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
@@ -127,13 +132,13 @@ class Manager(object):
 			elif e['status']== 0:
 				self.Logs(e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(e)
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
@@ -198,12 +203,14 @@ class Manager(object):
 			
 			if e['status']== 1:
 				self.Logs(e)
+
 			elif e['status']== 2:
 				self.Logs(e)
 			elif e['status']== 3:
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.end()
 			pass
 		elif e['class'] == 'Validacao':
 			if e['status']== 1:
@@ -214,6 +221,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.end()
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
@@ -286,8 +294,13 @@ class Manager(object):
 		log = logging.getLogger("{0}.{1}".format(e['class'], e['metodo']))
 		log.info(e['status'])
 		for msg in e['message']:
-			log.info("{0}: {1}".format(e.time, msg))
-		if e['comment']!="":
-			log.info("{0}: {1}".format(e.time, e['comment']))
+			log.info("{0}: {1}".format(e['time'], msg))
+		if e['comments']!="":
+			log.info("{0}: {1}".format(e['time'], e['comments']))
 
-
+	""" def Threads(self):
+		self.Jobs """
+if __name__ == "__main__":
+	pass
+	M = Manager()
+	M.start()

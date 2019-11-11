@@ -10,8 +10,8 @@ import datetime
 from datetime import date
 from time import sleep
 from utils.db import DB
-from utils.Manager import Manager
-
+from Manager import Manager
+import threading
 class DataUpdate(Manager):
 	
 	
@@ -74,6 +74,8 @@ class DataUpdate(Manager):
 
 
 	def start(self):
+		self._lock =threading.Lock()
+		self._stop_event = threading.Event()
 		self.USER =getpass.getuser()
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
@@ -108,7 +110,7 @@ class DataUpdate(Manager):
 
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
-		comment = kwargst.get('comments')
+		comments = kwargst.get('comments')
 		metodo =kwargst.get('metodo')
 		status =kwargst.get('status')
 		try:
@@ -148,15 +150,16 @@ class DataUpdate(Manager):
 				feedback["message"].append('[INFO].{0}'.format(msg)) 
 		
 		try: 
-			feedback["comment"] = comment
+			feedback["comments"] = comments
 		except:
-			feedback["comment"] = ""
+			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
 		with self._lock:
 			super().callback(feedback)
 
-	
+	def end(self):
+		raise Exception("Encerra Tr")
 
 
 	
