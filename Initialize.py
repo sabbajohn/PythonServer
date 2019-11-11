@@ -64,10 +64,12 @@ class Initialize(object):
 			else:
 
 				if not self.job_servico_de_validacao.isAlive():
+					self.job_servico_de_validacao = self.job_servico_de_validacao.clone()
 					self.job_servico_de_validacao.start()
 					self.job_servico_de_validacao.join()
 					if not self.job_dataupdate.isAlive():
 						try:
+							self.job_dataupdate = self.job_dataupdate.clone()
 							self.job_dataupdate.start()
 							self.job_dataupdate.join()
 							sleep(6000)

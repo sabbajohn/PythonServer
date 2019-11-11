@@ -104,7 +104,7 @@ class DataUpdate(Manager):
 		if result > 0:
 			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
-		
+		result(self.emd())
 		
 		
 
@@ -159,7 +159,8 @@ class DataUpdate(Manager):
 		super().callback(feedback)
 
 	def end(self):
-		raise Exception("kill-me")
+		return 0
+		#raise Exception("kill-me")
 	def restart(self):
 		raise Exception("restart")
 

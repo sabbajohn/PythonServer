@@ -208,6 +208,7 @@ class SMS(Manager):
 	
 
 	def end(self):
+		""" return 0 """
 		raise Exception("kill-me")
 
 	def restart(self):

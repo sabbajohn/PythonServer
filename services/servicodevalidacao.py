@@ -427,10 +427,7 @@ class servicoDeValidacao(Manager):
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
 			sleep(15)
-			""" comando = os.system
-			comando("python3 Databaseupdate.py") """
-			""" INICIAR SERVIÇO DO BANCO DE DADOS.... """
-	
+			return self.end()
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
 		comments = kwargst.get('comments')
@@ -499,6 +496,7 @@ class servicoDeValidacao(Manager):
 
 
 	def end(self):
-		raise Exception("kill-me")
+		return 0
+		#raise Exception("kill-me")
 	def restart(self):
 		raise Exception("restart")
