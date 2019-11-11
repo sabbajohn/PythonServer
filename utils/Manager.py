@@ -18,18 +18,19 @@ from servers import *
 import Initialize
 class Manager(object):
 	# Status
-	# -1 - NIVEL LOG INICIALIZANDO
-	#  0 - NIVEL LOG TAREFA CONCLUIDA
-	#  1 - NIVEL EXCEPT - ERRO
-	#  2 - NIVEL EXCEPT - WARNING
-	#  3 - NIVEL EXCEPT - DIE 
-	#  4 - NIVEL EXCEPT - ATTETION (Erro não tratado) 
-	#  5 - NIVEL INFO - ""
+	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
+	#  0 - NIVEL LOG 				TAREFA CONCLUIDA'				[OK]
+	#  1 - NIVEL EXCEPT - 			ERRO							[X]
+	#  2 - NIVEL EXCEPT - 			WARNING							[!]
+	#  3 - NIVEL EXCEPT - 			DIE 							[DIE]
+	#  4 - NIVEL EXCEPT - 			ATTETION (Erro não tratado) 	[!!!]
+	#  5 - NIVEL INFO - 			""								[INFO]
 	#	
 	# e = {
 	#	"class": "Nome da Class ou Módulo"
 	#	"metodo": "Nome do metodo que retornou a mensagem"
 	#	"status":-1 - 5
+	#	"message": []
 	#	"erro":	True or False
 	#	"comments":"Comentarios livre do programador"
 	#	"time": datetime.datetime.now()
@@ -158,7 +159,6 @@ class Manager(object):
 				pass
 			pass
 
-	
 	def Exceptions(self, e):
 	
 

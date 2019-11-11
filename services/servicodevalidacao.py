@@ -20,7 +20,7 @@ import aiohttp
 from aiofile import AIOFile, LineReader, Writer
 
 
-class servicoDeValidacao(object):
+class servicoDeValidacao(Manager):
 
 	
 
@@ -46,7 +46,6 @@ class servicoDeValidacao(object):
 				response['CEP'] =  result[index][6]
 			else:
 				response['viaCep'] = False
-			""" print(response_fix) """
 			if len(response)>0:
 				self.contador_hd = self.contador_hd+1 
 				await self.query_generator(response)
@@ -56,12 +55,13 @@ class servicoDeValidacao(object):
 
 
 	async def failsafe_api_validation_request(self,params):
-		
-			
-	
+		message = []
+		message.append('[INFO]:Realizando requisição à API soawebservices')
+		self.feedback(metodo="failsafe_api_validation_request", status =5, message = message )
+		message = None
+
 		self.contador_failsafe = self.contador_failsafe+1
-		log = logging.getLogger('failsafe_api_validation_request')
-		log.info('Realizando requisição à API soawebservices')
+		
 		
 		url = "http://www.soawebservices.com.br/restservices/producao/cdc/pessoafisicaestendida.ashx"
 		data={
@@ -72,14 +72,10 @@ class servicoDeValidacao(object):
 		"Documento": str(params['CPF'])
 		}
 			
-
 		body = json.dumps(data).encode('utf8')
 		async with aiohttp.ClientSession() as s:
 			async with s.post(url, data=body) as r:
 
-				""" req =  request.Request(url, data=params,headers={'content-type': 'application/json'} ) # this will make the method "POST"
-				response = request.urlopen(req) """
-			
 				response =  await r.read()
 				response=json.loads(response)
 				response['failsafe'] = True
@@ -92,6 +88,8 @@ class servicoDeValidacao(object):
 					await self.query_generator(response)
 
 	async def query_generator(self,resp):
+	
+
 		self.result
 		caracteres = ['.','-']
 		data=[]
@@ -261,16 +259,20 @@ class servicoDeValidacao(object):
 
 										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-										sys.exit(item2['message'])	
+										message = []
+										message.append("[!]:{0}".format(item['message']) )
+										self.feedback(metodo='query_generator',status=2, message = message, comments="Provavelmente acabou o credito ou algo inexperado na API")
+										#sys.exit(item2['message'])	Não matar a execuçao
 							else:
 								pass
 
 	async def runner(self,executor):
+		message = []
+		message.append('[INFO]:Iniciando Solicitações a API hubdodesenvolvedor ')
+		self.feedback(metodo="Runner",status=5,message = message)
+		message = None
 		index = 0
-		log = logging.getLogger('Iniciando Solicitações a API hubdodesenvolvedor ')
-		log.info('starting')
 		tasks=[]
-		log.info('Criando tarefas')
 		loop = asyncio.new_event_loop()
 		async with aiohttp.ClientSession() as session:
 			with concurrent.futures.ThreadPoolExecutor() as pool:
@@ -282,26 +284,39 @@ class servicoDeValidacao(object):
 
 				await asyncio.gather(*tasks, return_exceptions=True)
 			
-				log.info('exiting')
+				message = []
+				message.append( '[INFO]:	Exiting ')
+				self.feedback(metodo="Runner",status=0,message = message)
+					
 
 	async def list_generator(self,database):
+		message = []
+
 		self.result, self.contador_dispensadas
 		executor = database.getCursor("R")
 		
-		log = logging.getLogger('list_generator')
-		log.info('Buscando registros pendentes na base de dados.')
+		message.append("Buscando registros pendentes na base de dados.\n Aguarde!")
+		self.feedback(metodo ='list_generator', status =5, message=message)
+		message = None
+		
 		executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status =0 order by Nome asc ,id desc LIMIT 100")
 		self.result = executor.fetchall()
 		if len(self.result) > 0:
-			log.info('{0} itens serão analisados.'.format(len(self.result)))
+			message = []
+			message.append('{0} itens serão analisados.'.format(len(self.result)))
+			self.feedback(metodo ='list_generator', status =5, message=message)
+			message = None
 		else:
-			log.info('Não há itens pendentes no momento!')
-			log.info("Encerrando serviço.")
-			log.info('#######')
+			message = []
+			message.append('Não há itens pendentes no momento!')
+			message.append("Encerrando serviço.")
+			self.feedback(metodo ='list_generator', status =0, message=message)
+			message = None
+		
 			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
 			sys.exit("")
 
-		log.info('Aguarde!')
+		
 		lista = {}
 		lista['pendentes']={}
 		i = 0
@@ -378,35 +393,16 @@ class servicoDeValidacao(object):
 		return lista 	
 
 	def start(self):
-		self.USER = getpass.getuser()
-		self.failsafe_tasks=[]
-		self.failsafe_cpf = []
-		self.responses = []
-		self.pendentes_f = []
-		self.result=None	
-		self.contador_failsafe = 0
-		self.contador_hd = 0
-		self.contador_dispensadas = 0
-		self.contador_ViaCep = 0
-		self.database = DB()
+		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		
-		logging.basicConfig(
-		filename='/home/{0}/PythonServer/logs/servico_de_validacao.log'.format(self.USER),
-		filemode='a+',
-		level=logging.INFO,
-		format='PID %(process)5s %(name)18s: %(message)s',
-		#stream=sys.stderr,
- 		)
+		
 		executor = concurrent.futures.ThreadPoolExecutor(
 		max_workers=1,
 		)
 		self.event_loop = asyncio.new_event_loop()
 
 		start_time = time.time()
-		log = logging.getLogger('main')
-		log.info('*******')
-		log.info('Inicializando serviço de Validação de cadastros...')
-		log.info(datetime.datetime.now())
+
 		loop = asyncio.new_event_loop()
 		
 		pendentes=loop.run_until_complete(self.list_generator(self.database))
@@ -418,16 +414,83 @@ class servicoDeValidacao(object):
 			self.event_loop.close()
 
 			duration = time.time() - start_time
-			log.info("Foram efetuadas {0} requisições à API Soawebservices".format(contador_failsafe))
-			log.info("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
-			log.info("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
-			log.info("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
-			log.info(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
-			log.info("Encerrando serviço.")
-			log.info('#######')
-			log.info('Inicializando Serviço de atualização da base de dados...')
+			
+			
+			message = []
+			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(contador_failsafe))
+			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(contador_hd))
+			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(contador_dispensadas))
+			message.append("Foram realizadas {0} ao Via Cep".format(contador_ViaCep))
+			message.append(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
+			message.append("Encerrando serviço.")
+			self.feedback(metodo="start",status=0,message = message)
+			
 			sleep(15)
-			comando = os.system
-			comando("python3 Databaseupdate.py")
+			""" comando = os.system
+			comando("python3 Databaseupdate.py") """
 			""" INICIAR SERVIÇO DO BANCO DE DADOS.... """
 	
+	def feedback(self,*args, **kwargst):
+		message = kwargst.get('message')
+		comment = kwargst.get('comments')
+		metodo =kwargst.get('metodo')
+		status =kwargst.get('status')
+		try:
+			erro =kwargst.get('erro')
+		except:
+			erro = False
+		feedback = {
+			"class":"servicoDeValidacao",
+			"metodo":kwargst.get('metodo'),
+			"status":kwargst.get('status'),
+			"message":[],
+			"erro":False,
+			"comments":"",
+			"time":None
+		}
+		feedback["metodo"] = metodo
+		feedback["status"] = status
+		feedback["erro"]=erro
+		if feedback['status']== 0:
+			for msg in message:
+				feedback["message"].append( '[OK].{0}'.format(msg)) 
+			
+		elif feedback['status']== 1:
+			for msg in message:
+				feedback["message"].append('[X].{0}'.format(msg))
+		elif feedback['status']== 2:
+			for msg in message:
+				feedback["message"].append('[!].{0}'.format(msg))
+		elif feedback['status']== 3:
+			for msg in message:
+				feedback["message"].append( '[DIE].{0}'.format(msg))
+		elif feedback['status']== 4:
+			for msg in message:
+				feedback["message"].append('[!!!].{0}'.format(msg))
+		elif feedback['status']== 5:
+			for msg in message:
+				feedback["message"].append('[INFO].{0}'.format(msg)) 
+		
+		try: 
+			feedback["comment"] = comment
+		except:
+			feedback["comment"] = ""
+		
+		feedback['time'] = datetime.datetime.now()
+		with self._lock:
+			super().callback(feedback)
+
+	
+	def __init__(self):
+	
+		self.USER = getpass.getuser()
+		self.failsafe_tasks=[]
+		self.failsafe_cpf = []
+		self.responses = []
+		self.pendentes_f = []
+		self.result=None	
+		self.contador_failsafe = 0
+		self.contador_hd = 0
+		self.contador_dispensadas = 0
+		self.contador_ViaCep = 0
+		self.database = DB()
