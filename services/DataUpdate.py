@@ -20,40 +20,54 @@ class DataUpdate(Manager):
 		n_updates = 0
 		rest = 0
 		log = logging.getLogger('QueryRunner')
-		log.info("Procurando Por Arquivo de Querys.")
+		message = []
+		message.append("Procurando Por Arquivo de Querys.")
+		self.feedback(metodo ='start', status =5, message=message, erro = False)
+		message = None
 		fname = "/home/{0}/PythonServer/queries/query.txt".format(self.USER)
 		H = database.getConn("W")
 		executor= database.getCursor("W")
 		if os.path.isfile(fname):
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
-				log.info("Não há registros a serem atualizados.")
-				log.info("Encerrando Serviço de Atuliazação.")
+				message = []
+				message.append("Não há registros a serem atualizados.")
+				message.append("Encerrando Serviço de Atuliazação.")
+				self.feedback(metodo ='start', status =5, message=message, erro = False)
+				message = None
 			for line in infile:
 				line = line.replace('\n','')
 				try:
 					if(rest == 30):
 						rest = 0
-						log.info("Standy by 1s")
+						message.append("Standy by 1s")
+						self.feedback(metodo ='start', status =5, message=message, erro = False)
+						message = None
 						sleep(1)
 					executor.execute(line)
 					H.commit()
 					executor.rowcount
 					n_updates = n_updates +1
 					rest = rest +1
-
-					log.info("Executando Querys n°{0}".format(n_updates))
+					message = []
+					message.append("Executando Querys n°{0}".format(n_updates))
+					self.feedback(metodo ='start', status =5, message=message, erro = False)
+					message = None
 				except database.connector.Error as err:
-					log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
-					log.info('#######')
-					sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
-
+					message = []
+					message.append('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+					#sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err)) Não matar
+					self.feedback(metodo ='start', status =3, message=message, erro = True)
+					message = None
 			database.closeConn("W")
 			return n_updates
 
 
 		else:
-			self.log.info("Arquivo não encontrado!")
+			message = []
+			message.append("Arquivo não encontrado!")
+			self.feedback(metodo ='start', status =3, message=message, erro = True)
+			message = None
 			return 0
 
 
@@ -61,30 +75,88 @@ class DataUpdate(Manager):
 
 	def start(self):
 		self.USER =getpass.getuser()
-		logging.basicConfig(
-			filename='/home/{0}/PythonServer/logs/Databaseupdate.log'.format(self.USER),
-			filemode='a+',
-			level=logging.INFO,
-			format='PID %(process)5s %(name)18s: %(message)s',
-			#stream=sys.stderr,
-	 	)
-		log = logging.getLogger('Serviço de Atualização da Base de Dados')
+		message = []
+		message.append("Inicializando serviço  de Atualização da Base de Dados")
+		self.feedback(metodo ='start', status =-1, message=message, erro = False)
+		message = None
+		
 		self.database = DB()
 		start_time = time.time()
-		log = logging.getLogger('Serviço de Atualização da Base de Dados')
-		log.info('*******')
-		log.info('Inicializando serviço  de Atualização da Base de Dados')
-		log.info(datetime.datetime.now())
+		
+		
+		
+	
 		result = self.QueryRunner(self.database)
-		log.info('Serviço de Atualização da Base de Dados Concluido')
 		duration = time.time() - start_time
-		log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
+		message = []
+		message.append("Serviço de Atualização da Base de Dados Concluido")
+		message.append('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
+		message.append("Encerrando Serviço de Atuliazação.")
+		self.feedback(metodo ='list_generator', status =0, message=message, erro = False)
+		message = None
+		
+	
+	
 
 		agora = datetime.datetime.now()
 		if result > 0:
 			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
-		log.info("Encerrando Serviço de Atuliazação.")
-		log.info('#######')
+		
+		
+		
+
+	def feedback(self,*args, **kwargst):
+		message = kwargst.get('message')
+		comment = kwargst.get('comments')
+		metodo =kwargst.get('metodo')
+		status =kwargst.get('status')
+		try:
+			erro =kwargst.get('erro')
+		except:
+			erro = False
+		feedback = {
+			"class":"DataUpdate",
+			"metodo":kwargst.get('metodo'),
+			"status":kwargst.get('status'),
+			"message":[],
+			"erro":False,
+			"comments":"",
+			"time":None
+		}
+		feedback["metodo"] = metodo
+		feedback["status"] = status
+		feedback["erro"]=erro
+		if feedback['status']== 0:
+			for msg in message:
+				feedback["message"].append( '[OK].{0}'.format(msg)) 
+			
+		elif feedback['status']== 1:
+			for msg in message:
+				feedback["message"].append('[X].{0}'.format(msg))
+		elif feedback['status']== 2:
+			for msg in message:
+				feedback["message"].append('[!].{0}'.format(msg))
+		elif feedback['status']== 3:
+			for msg in message:
+				feedback["message"].append( '[DIE].{0}'.format(msg))
+		elif feedback['status']== 4:
+			for msg in message:
+				feedback["message"].append('[!!!].{0}'.format(msg))
+		elif feedback['status']== 5:
+			for msg in message:
+				feedback["message"].append('[INFO].{0}'.format(msg)) 
+		
+		try: 
+			feedback["comment"] = comment
+		except:
+			feedback["comment"] = ""
+		
+		feedback['time'] = datetime.datetime.now()
+		with self._lock:
+			super().callback(feedback)
+
+	
+
 
 	

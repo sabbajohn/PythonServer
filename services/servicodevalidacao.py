@@ -424,7 +424,7 @@ class servicoDeValidacao(Manager):
 			message.append(f"Total de {len(pendentes['pendentes'])} dados consultados em {duration} seconds")
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
-			
+			message = None
 			sleep(15)
 			""" comando = os.system
 			comando("python3 Databaseupdate.py") """
