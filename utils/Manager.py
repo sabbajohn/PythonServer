@@ -20,10 +20,10 @@ class Manager(object):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
 	#  0 - NIVEL LOG 				TAREFA CONCLUIDA'				[OK]
-	#  1 - NIVEL EXCEPT - 			ERRO							[X]
+	#  1 - NIVEL EXCEPT - 			ERRO							[X]				Notificar-me	->	Pausar Thread
 	#  2 - NIVEL EXCEPT - 			WARNING							[!]
-	#  3 - NIVEL EXCEPT - 			DIE 							[DIE]
-	#  4 - NIVEL EXCEPT - 			ATTETION (Erro não tratado) 	[!!!]
+	#  3 - NIVEL EXCEPT - 			DIE 							[DIE]			Notificar-me	->	Pausar Thread
+	#  4 - NIVEL EXCEPT - 			ATTETION (Erro não tratado) 	[!!!]			Notificar-me	->	Pausar Thread
 	#  5 - NIVEL INFO - 			""								[INFO]
 	#	
 	# e = {
@@ -54,223 +54,240 @@ class Manager(object):
 		pass
 
 	def callback(self,e):
-		if self.exception['class'] == 'SMS':
+		
+		if e['class'] == 'SMS':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
+			pass
+		elif e['class'] == 'Validacao':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
+			pass
 			
-			if self.exception['status']== 0:
-
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				""" SEJA O QUE DEUS QUISER! """
-				pass
+		elif e['class'] == 'DataUpdate':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'Validacao':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
-			pass
-		elif self.exception['class'] == 'DataUpdate':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
-			pass
-
 		#DAS API'S	
-		elif self.exception['class'] == 'Server':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'Server':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'MockServer':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'MockServer':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
 		
 
 		#DOS MODULOS
-		elif self.exception['class'] == 'CPF':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'CPF':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'db':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'db':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'Relatorios':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'Relatorios':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				e(e)
+			elif e['status']== 2:
+				e(e)
+			elif e['status']== 3:
+				e(e)
+			elif e['status']== 4:
+				e(e)
+			elif e['status']== 5:
+				self.Logs(e)
 			pass
 
 	def Exceptions(self, e):
 	
-
-		self.exception = e
-
 		
 		#DOS SERVIÇOS
-		if self.exception['class'] == 'SMS':
+		if e['class'] == 'SMS':
 			
-			if self.exception['status']== 0:
-
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				""" SEJA O QUE DEUS QUISER! """
-				pass
+			
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'Validacao':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'Validacao':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'DataUpdate':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'DataUpdate':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
 
 		#DAS API'S	
-		elif self.exception['class'] == 'Server':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'Server':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'MockServer':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'MockServer':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
 		
 
 		#DOS MODULOS
-		elif self.exception['class'] == 'CPF':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'CPF':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'db':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'db':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
-		elif self.exception['class'] == 'Relatorios':
-			if self.exception['status']== 0:
-				pass
-			elif self.exception['status']== 1:
-				pass
-			elif self.exception['status']== 2:
-				pass
-			elif self.exception['status']== 3:
-				pass
-			elif self.exception['status']== 4:
-				pass
+		elif e['class'] == 'Relatorios':
+			if e['status']== 1:
+				self.Logs(e)
+			elif e['status']== 2:
+				self.Logs(e)
+			elif e['status']== 3:
+				self.Logs(e)
+			elif e['status']== 4:
+				self.Logs(e)
 			pass
 
 	def Logs(self, e):
 
-		pass
+		log = logging.getLogger("{0}.{1}".format(e['class'], e['metodo']))
+		log.info(e['status'])
+		for msg in e['message']:
+			log.info("{0}: {1}".format(e.time, msg))
+		if e['comment']!="":
+			log.info("{0}: {1}".format(e.time, e['comment']))
+
+
