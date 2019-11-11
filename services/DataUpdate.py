@@ -131,23 +131,23 @@ class DataUpdate(Manager):
 		feedback["erro"]=erro
 		if feedback['status']== 0:
 			for msg in message:
-				feedback["message"].append( '[OK].{0}'.format(msg)) 
+				feedback["message"].append( '[OK]:{0}'.format(msg)) 
 			
 		elif feedback['status']== 1:
 			for msg in message:
-				feedback["message"].append('[X].{0}'.format(msg))
+				feedback["message"].append('[X]:{0}'.format(msg))
 		elif feedback['status']== 2:
 			for msg in message:
-				feedback["message"].append('[!].{0}'.format(msg))
+				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE].{0}'.format(msg))
+				feedback["message"].append( '[DIE]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
-				feedback["message"].append('[!!!].{0}'.format(msg))
+				feedback["message"].append('[!!!]:{0}'.format(msg))
 		elif feedback['status']== 5:
 			for msg in message:
-				feedback["message"].append('[INFO].{0}'.format(msg)) 
+				feedback["message"].append('[INFO]:{0}'.format(msg)) 
 		
 		try: 
 			feedback["comments"] = comments
@@ -155,11 +155,14 @@ class DataUpdate(Manager):
 			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
-		with self._lock:
-			super().callback(feedback)
+		#with self._lock:
+		super().callback(feedback)
 
 	def end(self):
-		raise Exception("Encerra Tr")
+		raise Exception("kill-me")
+	def restart(self):
+		raise Exception("restart")
+
 
 
 	

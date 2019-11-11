@@ -47,7 +47,7 @@ class Initialize(object):
 
 		except:
 
-			print("Oops!{0} occured.".format(sys.exc_info()[0]))
+			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 
 	def ValidacaoEUpdate(self):
 		while True:
@@ -56,26 +56,24 @@ class Initialize(object):
 					self.isFirstTme['servico_de_validacao'] = False
 					self.job_servico_de_validacao.join()
 					if not self.job_servico_de_validacao.isAlive():
-						self.job_dataupdate.start()
-						self.job_dataupdate.join()
-
-
+						try:
+							self.job_dataupdate.start()
+							self.job_dataupdate.join()
+						except:
+							print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			else:
 
 				if not self.job_servico_de_validacao.isAlive():
 					self.job_servico_de_validacao.start()
 					self.job_servico_de_validacao.join()
 					if not self.job_dataupdate.isAlive():
-						self.job_dataupdate.start()
-						self.job_dataupdate.join()
-						sleep(6000)
+						try:
+							self.job_dataupdate.start()
+							self.job_dataupdate.join()
+							sleep(6000)
+						except:
+							print("Oops!{0} occured.".format(sys.exc_info()[0]))
 	
-	def Jobs(self):
-		jobs = {
-			"SMS":self.job_sms,
-			"SVC":self.job_servico_de_validacao,
-			"SDU":self.job_dataupdate
-		}
-		return jobs
+	
 		
 		

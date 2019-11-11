@@ -241,7 +241,7 @@ class servicoDeValidacao(Manager):
 													params['CPF'] = item2['CPF']
 													params['viaCep'] =item2['viaCep']
 
-												await failsafe_api_validation_request(params)
+												await self.failsafe_api_validation_request(params)
 											
 											else:
 												if item2['viaCep'] is True:
@@ -271,7 +271,6 @@ class servicoDeValidacao(Manager):
 		message = []
 		message.append('[INFO]:Iniciando Solicitações a API hubdodesenvolvedor ')
 		self.feedback(metodo="Runner",status=5,message = message)
-		self.feedback(metodo="Runner",status=4,message = message)
 		message = None
 		index = 0
 		tasks=[]
@@ -280,7 +279,7 @@ class servicoDeValidacao(Manager):
 			with concurrent.futures.ThreadPoolExecutor() as pool:
 				for i in self.pendentes['pendentes']:
 					url = self.pendentes['pendentes'][i]
-					task = asyncio.ensure_future(api_validation_request(session, url, i))
+					task = asyncio.ensure_future(self.api_validation_request(session, url, i))
 					tasks.append(task)
 				
 
@@ -455,23 +454,23 @@ class servicoDeValidacao(Manager):
 		feedback["erro"]=erro
 		if feedback['status']== 0:
 			for msg in message:
-				feedback["message"].append( '[OK].{0}'.format(msg)) 
+				feedback["message"].append( '[OK]:{0}'.format(msg)) 
 			
 		elif feedback['status']== 1:
 			for msg in message:
-				feedback["message"].append('[X].{0}'.format(msg))
+				feedback["message"].append('[X]:{0}'.format(msg))
 		elif feedback['status']== 2:
 			for msg in message:
-				feedback["message"].append('[!].{0}'.format(msg))
+				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE].{0}'.format(msg))
+				feedback["message"].append( '[DIE]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
-				feedback["message"].append('[!!!].{0}'.format(msg))
+				feedback["message"].append('[!!!]:{0}'.format(msg))
 		elif feedback['status']== 5:
 			for msg in message:
-				feedback["message"].append('[INFO].{0}'.format(msg)) 
+				feedback["message"].append('[INFO]:{0}'.format(msg)) 
 		
 		try: 
 			feedback["comments"] = comments
@@ -479,11 +478,12 @@ class servicoDeValidacao(Manager):
 			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
-		with self._lock:
-			super().callback(feedback)
+		#with self._lock:
+		super().callback(feedback)
 
 	
 	def __init__(self):
+		self._stop_event = threading.Event()
 		self._lock =threading.Lock()
 		self.USER = getpass.getuser()
 		self.failsafe_tasks=[]
@@ -499,4 +499,6 @@ class servicoDeValidacao(Manager):
 
 
 	def end(self):
-		raise Exception("Encerra Tr")
+		raise Exception("kill-me")
+	def restart(self):
+		raise Exception("restart")

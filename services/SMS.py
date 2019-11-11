@@ -19,7 +19,7 @@ import threading
 class SMS(Manager):
 	
 	def __init__(self, *args, **kwargs):
-		
+		self._stop_event = threading.Event()
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
 		self.database = DB()
@@ -33,15 +33,16 @@ class SMS(Manager):
 		
 		try:
 			message = []
-			message.append( "Algo não panejado")
-			self.feedback(metodo="Start", status =4, message = message, erro = True, comments = "Algo não panejado" )
+			message.append( "Inicializando SMS")
+			self.feedback(metodo="start", status =-1, message = message, erro = False )
+			message = None
 			self.db_monitor()
 		except:
 			#O metodo é o start, mas o pau veio de dentro do db_monitor
 		#	print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			message = []
 			message.append( "{0}".format(sys.exc_info()[0]))
-			self.feedback(metodo="failsafe_api_validation_request", status =4, message = message, erro = True, comments = "Algo não panejado" )
+			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
 
 	def db_monitor(self):
@@ -114,7 +115,7 @@ class SMS(Manager):
 		else:
 			message = []
 			message.append( "[INFO]:SMS:{0}".format(result['Message']))
-			self.feedback(metodo="send", status =5, message = message, erro = False, comments = "Algo não panejado" )
+			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
 			self.update(result, cliente)
 			return
@@ -177,23 +178,23 @@ class SMS(Manager):
 		feedback["erro"]=erro
 		if feedback['status']== 0:
 			for msg in message:
-				feedback["message"].append( '[OK].{0}'.format(msg)) 
+				feedback["message"].append( '[OK]:{0}'.format(msg)) 
 			
 		elif feedback['status']== 1:
 			for msg in message:
-				feedback["message"].append('[X].{0}'.format(msg))
+				feedback["message"].append('[X]:{0}'.format(msg))
 		elif feedback['status']== 2:
 			for msg in message:
-				feedback["message"].append('[!].{0}'.format(msg))
+				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE].{0}'.format(msg))
+				feedback["message"].append( '[DIE]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
-				feedback["message"].append('[!!!].{0}'.format(msg))
+				feedback["message"].append('[!!!]:{0}'.format(msg))
 		elif feedback['status']== 5:
 			for msg in message:
-				feedback["message"].append('[INFO].{0}'.format(msg)) 
+				feedback["message"].append('[INFO]:{0}'.format(msg)) 
 		
 		try: 
 			feedback["comments"] = comments
@@ -201,10 +202,13 @@ class SMS(Manager):
 			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
-		with self._lock:
-			super().callback(feedback)
+		#with self._lock:
+		super().callback(feedback)
 
 	
 
 	def end(self):
-		raise Exception("Encerra Tr")
+		raise Exception("kill-me")
+
+	def restart(self):
+		raise Exception("restart")

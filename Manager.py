@@ -55,7 +55,7 @@ class Manager(object):
 		I =Initialize.Initialize()
 		#I =Initialize.Initialize.__init__()
 
-		self.Jobs = I.Jobs()
+	
 		
 	def callback(self,e):
 		
@@ -64,6 +64,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
+				self.Kill()
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -80,6 +81,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
+				self.Kill()
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -97,6 +99,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
+				self.Kill()
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -114,6 +117,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
+				self.Kill()
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -209,7 +213,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.end()
+				self.Kill()
 			pass
 		elif e['class'] == 'Validacao':
 			if e['status']== 1:
@@ -220,7 +224,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.end()
+				self.Kill()
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
@@ -231,6 +235,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 
 		#DAS API'S	
@@ -243,6 +248,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 		elif e['class'] == 'MockServer':
 			if e['status']== 1:
@@ -253,6 +259,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 		
 
@@ -266,6 +273,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 		elif e['class'] == 'db':
 			if e['status']== 1:
@@ -276,6 +284,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 		elif e['class'] == 'Relatorios':
 			if e['status']== 1:
@@ -286,6 +295,7 @@ class Manager(object):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
+				self.Kill()
 			pass
 
 	def Logs(self, e):
@@ -297,9 +307,10 @@ class Manager(object):
 		if e['comments']!="":
 			log.info("{0}: {1}".format(e['time'], e['comments']))
 
-	def Threads(self):
-		self.Jobs
+	def Kill(self):
+		self.end()
 if __name__ == "__main__":
 	pass
 	M = Manager()
 	M.start()
+	sys.exit(0)
