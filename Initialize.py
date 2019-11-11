@@ -46,7 +46,8 @@ class Initialize(object):
 			self.ValidacaoEUpdate()
 
 		except:
-			sys.exit("Oops!{0} occured.".format(sys.exc_info()[0]))
+
+			print("Oops!{0} occured.".format(sys.exc_info()[0]))
 
 	def ValidacaoEUpdate(self):
 		while True:
@@ -68,6 +69,7 @@ class Initialize(object):
 						self.job_dataupdate.start()
 						self.job_dataupdate.join()
 						sleep(6000)
+	
 	def Jobs(self):
 		jobs = {
 			"SMS":self.job_sms,

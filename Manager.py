@@ -57,7 +57,6 @@ class Manager(object):
 
 		self.Jobs = I.Jobs()
 		
-
 	def callback(self,e):
 		
 		if e['class'] == 'SMS':
@@ -298,8 +297,8 @@ class Manager(object):
 		if e['comments']!="":
 			log.info("{0}: {1}".format(e['time'], e['comments']))
 
-	""" def Threads(self):
-		self.Jobs """
+	def Threads(self):
+		self.Jobs
 if __name__ == "__main__":
 	pass
 	M = Manager()
