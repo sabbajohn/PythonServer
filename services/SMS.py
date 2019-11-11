@@ -165,7 +165,7 @@ class SMS(Manager):
 		except:
 			erro = False
 		feedback = {
-			"class":"servicoDeValidacao",
+			"class":"SMS",
 			"metodo":kwargst.get('metodo'),
 			"status":kwargst.get('status'),
 			"message":[],
