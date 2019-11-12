@@ -242,7 +242,7 @@ async def query_generator(resp):
 										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
 										if d1 != d2:
 											hoje =  date.today()
-											idade = hoje.year - d1.year
+											idade = hoje.year - d2.year
 									except:
 										pass
 									if idade > 16:
@@ -258,7 +258,7 @@ async def query_generator(resp):
 										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
 										if d1 != d2:
 											hoje =  date.today()
-											idade = hoje.year - d1.year
+											idade = hoje.year - d2.year
 									except:
 										pass
 									if idade > 16:
@@ -277,7 +277,7 @@ async def query_generator(resp):
 										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
 										if d1 != d2:
 											hoje =  date.today()
-											idade = hoje.year - d1.year
+											idade = hoje.year - d2.year
 								except:
 									pass
 								if idade > 16:
@@ -292,7 +292,7 @@ async def query_generator(resp):
 										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
 										if d1 != d2:
 											hoje =  date.today()
-											idade = hoje.year - d1.year
+											idade = hoje.year - d2.year
 								except:
 									pass
 								if idade > 16:
