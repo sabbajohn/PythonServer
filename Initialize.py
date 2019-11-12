@@ -19,6 +19,7 @@ from services.servicodevalidacao import servicoDeValidacao
 from services.DataUpdate import DataUpdate
 from services.SMS import SMS
 
+
 USER = getpass.getuser()
 
 class Initialize(object):

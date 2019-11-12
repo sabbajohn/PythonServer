@@ -313,7 +313,7 @@ class servicoDeValidacao(Manager):
 			message.append("Encerrando serviço.")
 			self.feedback(metodo ='list_generator', status =0, message=message)
 			message = None
-		
+			return
 			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
 			#sys.exit("")
 
@@ -407,6 +407,12 @@ class servicoDeValidacao(Manager):
 		loop = asyncio.new_event_loop()
 		
 		self.pendentes=loop.run_until_complete(self.list_generator(self.database))
+		if not len(self.pendentes)>0:
+			message = []
+			message.append("Finalizando raciosamente")
+			self.feedback(metodo="start",status=0,message = message)
+			message = None
+			return
 		try:
 			self.event_loop.run_until_complete(
 				self.runner(executor)
