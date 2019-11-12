@@ -103,9 +103,8 @@ def update(result, cliente):
 		return
 	except :
 		log.info("Oops!{0}occured.".format(sys.exc_info()[0]))
-		
 		log.info('#######')
-		sys.exit()
+		return
 
 
 
