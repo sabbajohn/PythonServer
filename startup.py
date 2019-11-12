@@ -30,17 +30,19 @@ class Startup(object):
 
 		log = logging.getLogger('Serviço de Inicilização ')
 		while True:
+			log.info('{0} . Verificando SMS'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[0]):
 					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('python3 sms.py &')
 				
-			
+			log.info('{0} . Verificando API'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[1]):
 					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
 					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER))
 			
-		
+			log.info('{0} . Verificando SVC'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
+				
 				if self.start_time ==0:
 					self.start_time = time.time()
 					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
@@ -51,7 +53,7 @@ class Startup(object):
 					os.system('python3 servico_de_validacao.py &')
 				else:
 					pass
-			
+			log.info('{0} . Verificando SDU'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[3]) and not self.checkIfProcessRunning(self.procs[2]):
 				
 					modtime =os.path.getmtime("/home/"+self.USER+"/PythonServer/queries/query.txt")
