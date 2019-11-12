@@ -10,10 +10,11 @@ import datetime
 from datetime import date
 from time import sleep
 from utils.db import DB
-from Manager import Manager
+#from Manager import Manager
 import threading
-class DataUpdate(Manager):
-	
+class DataUpdate(object):
+	def __init__(self, M):
+		self.Manager = M
 	
 
 	def QueryRunner(self, database):
@@ -82,7 +83,7 @@ class DataUpdate(Manager):
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
 		message = None
 		
-		self.database = DB()
+		self.database = M.database
 		start_time = time.time()
 		
 		
@@ -104,7 +105,7 @@ class DataUpdate(Manager):
 		if result > 0:
 			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
-		return self.end()
+		return 
 		
 		
 
@@ -156,7 +157,7 @@ class DataUpdate(Manager):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		super().callback(feedback)
+		self.Manager.callback(self.Manager,feedback)
 
 	def end(self):
 		return 0

@@ -18,10 +18,10 @@ from utils import CPF as cpf
 import asyncio
 import aiohttp
 from aiofile import AIOFile, LineReader, Writer
-from Manager import Manager
+#from Manager import Manager
 
 
-class servicoDeValidacao(Manager):
+class servicoDeValidacao(object):
 
 	
 
@@ -409,7 +409,7 @@ class servicoDeValidacao(Manager):
 		self.pendentes=loop.run_until_complete(self.list_generator(self.database))
 		if not len(self.pendentes)>0:
 			message = []
-			message.append("Finalizando raciosamente")
+			message.append("Finalizando graciosamente")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
 			return
@@ -482,10 +482,10 @@ class servicoDeValidacao(Manager):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		super().callback(feedback)
+		self.Manager.callback(self.Manager,feedback)
 
 	
-	def __init__(self):
+	def __init__(self, M):
 		self._stop_event = threading.Event()
 		self._lock =threading.Lock()
 		self.USER = getpass.getuser()
@@ -498,8 +498,8 @@ class servicoDeValidacao(Manager):
 		self.contador_hd = 0
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = 0
-		self.database = DB()
-
+		self.database = M.database
+		self.Manager = M
 
 	def end(self):
 		return 0

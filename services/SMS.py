@@ -8,7 +8,7 @@ import datetime
 from datetime import date
 import json
 import getpass
-from Manager import Manager
+#from Manager import Manager
 from utils.db import DB
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
@@ -16,13 +16,14 @@ import threading
 
 
 
-class SMS(Manager):
+class SMS(object):
 	
-	def __init__(self, *args, **kwargs):
+	def __init__(self, M):
+		self.Manager = M
 		self._stop_event = threading.Event()
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
-		self.database = DB()
+		self.database = M.database
 		""" TODO FIXME
 			! Não Preciso iniciar uma conexão com o DB toda vez ja existem prontas!
 		 """
@@ -203,7 +204,7 @@ class SMS(Manager):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		super().callback(feedback)
+		self.Manager.callback(self.Manager,feedback)
 
 	
 

@@ -15,8 +15,8 @@ import asyncio.coroutines
 import getpass
 from utils.db import DB
 #from servers import server
-import Initialize 
-class Manager(object):
+from Initialize import Initialize
+class Manager(Initialize):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
 	#  0 - NIVEL LOG 				TAREFA CONCLUIDA'				[OK]
@@ -38,163 +38,159 @@ class Manager(object):
 	#
 	
 
-
-	def __init__(self, *args, **kwargs):
 	 
+	def __init__(self):
+		
+		self.database = DB()
+		super().__init__(self)
 		self.USER = getpass.getuser()
 		log = logging.getLogger('Modulo de Gerenciamento')
-
-		logging.basicConfig(
-			filename='/home/{0}/PythonServer/logs/Manager.log'.format(self.USER),
-			filemode='a+',
-			level=logging.INFO,
-			format='PID %(process)5s %(name)18s: %(message)s',
-			#stream=sys.stderr,
-		)
-	def start(self):
+		self.jobs = super().Jobs()
+	
+	
+	
+	""" def start(self):
 		I =Initialize.Initialize()
 		#I =Initialize.Initialize.__init__()
-
-	
-		
+ """
 	def callback(self,e):
-		
+		self = self
 		if e['class'] == 'SMS':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
-				self.Kill()
+				self.Logs(self,e)
+				self.Kill(self)
 			elif e['status']== 1:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
-		elif e['class'] == 'Validacao':
+		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
-				self.Kill()
+				self.Logs(self,e)
+				return 
 			elif e['status']== 1:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
 				self.Exceptionse(e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 			
 		elif e['class'] == 'DataUpdate':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
-				self.Kill()
+				self.Logs(self,e)
+				return
 			elif e['status']== 1:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 		#DAS API'S	
 		elif e['class'] == 'Server':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			elif e['status']== 1:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 		elif e['class'] == 'MockServer':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 1:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				self.Exceptions(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 		
 
 		#DOS MODULOS
 		elif e['class'] == 'CPF':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 		elif e['class'] == 'db':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 		elif e['class'] == 'Relatorios':
 			if e['status']== -1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 0:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 1:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 2:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 3:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 4:
-				e(e)
+				self.Exceptions(self, e)
 			elif e['status']== 5:
-				self.Logs(e)
+				self.Logs(self,e)
 			pass
 
 	def Exceptions(self, e):
@@ -205,60 +201,60 @@ class Manager(object):
 			
 			
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
-		elif e['class'] == 'Validacao':
+		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
-				self.Kill()
+				self.Logs(self,e)
+				self.Kill(self)
 			pass
 
 		#DAS API'S	
 		elif e['class'] == 'Server':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 		elif e['class'] == 'MockServer':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 		
@@ -266,35 +262,35 @@ class Manager(object):
 		#DOS MODULOS
 		elif e['class'] == 'CPF':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 		elif e['class'] == 'db':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 		elif e['class'] == 'Relatorios':
 			if e['status']== 1:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 2:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 3:
-				self.Logs(e)
+				self.Logs(self,e)
 			elif e['status']== 4:
-				self.Logs(e)
+				self.Logs(self,e)
 				self.Kill()
 			pass
 
@@ -312,5 +308,5 @@ class Manager(object):
 if __name__ == "__main__":
 	pass
 	M = Manager()
-	M.start()
-	sys.exit(0)
+	
+	

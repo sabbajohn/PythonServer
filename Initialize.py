@@ -20,16 +20,23 @@ from services.DataUpdate import DataUpdate
 from services.SMS import SMS
 
 
-USER = getpass.getuser()
 
-class Initialize(object):
+
+class Initialize:
 	
-	def __init__(self):
-		
+	def __init__(self,M):
+		self.USER = getpass.getuser()
+		logging.basicConfig(
+			filename='/home/{0}/PythonServer/logs/Manager.log'.format(self.USER),
+			filemode='a+',
+			level=logging.INFO,
+			format='PID %(process)5s %(name)18s: %(message)s',
+			#stream=sys.stderr,
+		)
 		#Definindo objeto dos Serviços
-		self.SMS = SMS()
-		self.DataUpdate = DataUpdate()
-		self.servicoDeValidacao = servicoDeValidacao()
+		self.SMS = SMS(M)
+		self.DataUpdate = DataUpdate(M)
+		self.servicoDeValidacao = servicoDeValidacao(M)
 
 		#Definindo objeto das API's
 		
@@ -42,6 +49,9 @@ class Initialize(object):
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 
 		# Inicializando
+		
+
+	def inicializando(self):
 		try:
 			self.job_sms.start()
 			self.ValidacaoEUpdate()
@@ -49,7 +59,7 @@ class Initialize(object):
 		except:
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
-
+	
 	def ValidacaoEUpdate(self):
 		while True:
 			if self.isFirstTme['servico_de_validacao']:
@@ -77,6 +87,13 @@ class Initialize(object):
 						except:
 							print("Oops!{0} occured.".format(sys.exc_info()[0]))
 	
+	def Jobs(self):
+		jobs = {
+			'SMS': self.job_sms,
+			'SVC': self.job_servico_de_validacao,
+			'SDU:':self.job_dataupdate
+		}
+		return jobs
 	
 		
 		
