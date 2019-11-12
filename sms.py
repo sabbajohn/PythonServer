@@ -61,8 +61,7 @@ def db_monitor():
 				
 				log.info("Nenhum sms pendete, tentaremos novamente em 5 segundos!")
 				escreveu= True
-			else:
-				pass
+			
 			time.sleep(5)
 		
 		
