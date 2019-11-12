@@ -9,7 +9,8 @@ query_api.txt
 Class/__pycache__/Relatorios.cpython-36.pyc
 Class/__pycache__/db.cpython-36.pyc
 
-
-
-
 *.pyc
+responses/response.json
+queries/query.txt
+logs/*.log
+logs/*
