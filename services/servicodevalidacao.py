@@ -313,7 +313,7 @@ class servicoDeValidacao(Manager):
 			message.append("Encerrando serviço.")
 			self.feedback(metodo ='list_generator', status =0, message=message)
 			message = None
-			return
+			return []
 			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
 			#sys.exit("")
 

@@ -47,7 +47,7 @@ class Initialize(object):
 			self.ValidacaoEUpdate()
 
 		except:
-
+			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 
 	def ValidacaoEUpdate(self):
@@ -59,18 +59,18 @@ class Initialize(object):
 					if not self.job_servico_de_validacao.isAlive():
 						try:
 							self.job_dataupdate.start()
-							self.job_dataupdate.join()
+							self.job_dataupdate.join() #Quando a função termina com return o fluxo volta para o join 
 						except:
 							print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			else:
 
 				if not self.job_servico_de_validacao.isAlive():
-					self.job_servico_de_validacao = self.job_servico_de_validacao.clone()
+					self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 					self.job_servico_de_validacao.start()
 					self.job_servico_de_validacao.join()
 					if not self.job_dataupdate.isAlive():
 						try:
-							self.job_dataupdate = self.job_dataupdate.clone()
+							self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 							self.job_dataupdate.start()
 							self.job_dataupdate.join()
 							sleep(6000)

@@ -104,7 +104,7 @@ class DataUpdate(Manager):
 		if result > 0:
 			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
 			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
-		result(self.emd())
+		return self.end()
 		
 		
 
