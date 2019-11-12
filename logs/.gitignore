@@ -1,2 +1,1 @@
-Databaseupdate.log
-*.log
+logs/*.log
