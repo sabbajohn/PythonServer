@@ -41,6 +41,8 @@ def db_monitor():
 	
 	
 	while True:
+		if(escreveu == True):
+			log.info("Novo sms encontrado!")
 		result = None
 		
 		cursor_r =database.getCursor("R")
