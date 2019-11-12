@@ -23,7 +23,7 @@ class SMS(object):
 		self._stop_event = threading.Event()
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
-		self.database = M.database
+		self.database = DB()
 		""" TODO FIXME
 			! Não Preciso iniciar uma conexão com o DB toda vez ja existem prontas!
 		 """
@@ -204,7 +204,7 @@ class SMS(object):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		self.Manager.callback(self.Manager,feedback)
+		self.Manager.callback(feedback)
 
 	
 

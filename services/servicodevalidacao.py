@@ -102,11 +102,11 @@ class servicoDeValidacao(object):
 					if(resp['failsafe']==True):
 						failsafe.append(resp)
 
-						with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+						with open("/home/"+self.USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 							for item in failsafe:
 								agora = datetime.datetime.now()
 								f.write("{0}:{1}\n".format(agora ,item))
-						with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
+						with open("/home/"+self.USER+"/PythonServer/queries/query.txt","a+") as f:
 							for item in failsafe:
 								if item['viaCep'] == True:
 									endereco =  await viaCEP(item["CEP"])
@@ -140,12 +140,12 @@ class servicoDeValidacao(object):
 					
 				
 				data.append(resp)
-				with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+				with open("/home/"+self.USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
 					for item2 in data:
 						agora = datetime.datetime.now()
 						f.write("{0}:{1}\n".format(agora ,item2))
 				
-				with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
+				with open("/home/"+self.USER+"/PythonServer/queries/query.txt","a+") as f:
 					for item2 in data:
 						try:
 							r = item2['result']['numero_de_cpf']
@@ -482,7 +482,7 @@ class servicoDeValidacao(object):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		self.Manager.callback(self.Manager,feedback)
+		self.Manager.callback(feedback)
 
 	
 	def __init__(self, M):
@@ -498,7 +498,7 @@ class servicoDeValidacao(object):
 		self.contador_hd = 0
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = 0
-		self.database = M.database
+		self.database = DB()
 		self.Manager = M
 
 	def end(self):

@@ -83,7 +83,7 @@ class DataUpdate(object):
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
 		message = None
 		
-		self.database = M.database
+		self.database = DB()
 		start_time = time.time()
 		
 		
