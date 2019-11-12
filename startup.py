@@ -22,7 +22,7 @@ class Startup(object):
  		)
 		log = logging.getLogger('Serviço de Inicilização ')
 		self.procs = ['sms.py','uwsgi','servico_de_validacao.py','Databaseupdate.py']
-		self.delays={'validacao':300}
+		self.delays={'validacao':200}
 		self.start_time = 0
 		self.i()
 	
@@ -34,25 +34,24 @@ class Startup(object):
 					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('python3 sms.py &')
 				
-			else:
-				pass
+			
 			if not self.checkIfProcessRunning(self.procs[1]):
 					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
 					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER))
 			
-			else:
-				pass
+		
 			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
 				if self.start_time ==0:
 					self.start_time = time.time()
 					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					os.system('python3 servico_de_validacao.py &')
-				elif time.time()- self.start_time > self.delays['validacao']:
+				elif (time.time() - self.start_time) > self.delays['validacao']:
 					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					self.start_time = time.time()
 					os.system('python3 servico_de_validacao.py &')
-			else:
-				pass
+				else:
+					pass
+			
 			if not self.checkIfProcessRunning(self.procs[3]) and not self.checkIfProcessRunning(self.procs[2]):
 				
 					modtime =os.path.getmtime("/home/"+self.USER+"/PythonServer/queries/query.txt")
@@ -69,7 +68,7 @@ class Startup(object):
 			
 
 			
-			sleep(5)
+			sleep(2)
 
 	def checkIfProcessRunning(self,processName):
 		'''
