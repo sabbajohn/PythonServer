@@ -31,9 +31,10 @@ class Startup(object):
 		log = logging.getLogger('Serviço de Inicilização ')
 		while True:
 			log.info('{0} . Verificando SMS'.format(datetime.datetime.now()))
+			
 			if not self.checkIfProcessRunning(self.procs[0]):
 					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
-					os.system('python3 sms.py &')
+					os.system('nohup python3 sms.py &')
 				
 			log.info('{0} . Verificando API'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[1]):
