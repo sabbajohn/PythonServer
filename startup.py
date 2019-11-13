@@ -35,11 +35,11 @@ class Startup(object):
 			if not self.checkIfProcessRunning(self.procs[0]):
 					log.info('{0} . Inicializando serviço de SMS'.format(datetime.datetime.now()))
 					os.system('nohup python3 sms.py &')
-				
+			""" 	
 			log.info('{0} . Verificando API'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[1]):
 					log.info('{0} . Inicializando Servidor API'.format(datetime.datetime.now()))
-					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER))
+					os.system('uwsgi --http 10.255.237.29:5000 --wsgi-file /home/{0}/PythonServer/Server/server.py --callable app --processes 4 --threads 2 --stats 10.255.237.29:9191 &'.format(self.USER)) """
 			
 			log.info('{0} . Verificando SVC'.format(datetime.datetime.now()))
 			if not self.checkIfProcessRunning(self.procs[2]) and not self.checkIfProcessRunning(self.procs[3]):
