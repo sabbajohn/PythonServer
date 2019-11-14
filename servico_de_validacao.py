@@ -465,7 +465,6 @@ async def list_generator(database):
 	log.info('Buscando registros pendentes na base de dados.')
 	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100")
 	
-	
 	result = executor.fetchall()
 	if len(result) > 0:
 		log.info('{0} itens serão analisados.'.format(len(result)))
