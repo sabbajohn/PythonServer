@@ -14,3 +14,5 @@ responses/response.json
 queries/query.txt
 logs/*.log
 logs/*
+logs/Databaseupdate.log
+Class/__pycache__/__init__.cpython-36.pyc
