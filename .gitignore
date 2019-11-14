@@ -12,3 +12,4 @@ query_*.txt
 
 
 Class/__pycache__/db.cpython-36.pyc
+config.py
