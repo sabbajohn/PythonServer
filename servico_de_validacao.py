@@ -201,7 +201,7 @@ async def query_generator(resp):
 											
 											
 										except :
-											print(sys.exc_info()[0])
+										
 											pass
 										if data_api < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 											item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
@@ -249,7 +249,7 @@ async def query_generator(resp):
 				pass
 				
 		except:
-			print(sys.exc_info()[0])
+			
 			pass
 				
 			
