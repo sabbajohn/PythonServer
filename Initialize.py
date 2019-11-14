@@ -15,7 +15,6 @@ import asyncio.coroutines
 import getpass
 import socket
 import config
-#from servers import server
 from services.servicodevalidacao import servicoDeValidacao
 from services.DataUpdate import DataUpdate
 from services.SMS import SMS
@@ -28,13 +27,7 @@ class Initialize:
 	def __init__(self,M):
 		
 		self.USER = getpass.getuser()
-		logging.basicConfig(
-			filename='/home/{0}/PythonServer/logs/Manager.log'.format(self.USER),
-			filemode='a+',
-			level=logging.INFO,
-			format='PID %(process)5s %(name)18s: %(message)s',
-			#stream=sys.stderr,
-		)
+		
 		#Definindo objeto dos Serviços
 		self.SMS = SMS(M)
 		self.DataUpdate = DataUpdate(M)

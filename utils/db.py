@@ -6,27 +6,40 @@ import mysql.connector
 from mysql.connector import Error
 from mysql.connector import pooling
 import logging
+import configparser
+import config
+import datetime
 
 class DB(object):
 	""" TODO: Definir execute e commit dentro desta classe """
 	def __init__(self):
 		self.log = logging.getLogger('Banco de Dados')
+		self.log.info(datetime.datetime.now())
 		self.log.info('iniciando conexão com Banco de Dados.')
+		self.Config =   configparser.ConfigParser()
+		self.Config.read("config/DEFAULT.ini")
+		self.Config_ENV =   configparser.ConfigParser()
+		self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+
+		
+	
+	
+	
 		db_W ={ 
-					"host":"10.255.237.4",
-					"user":"bwadmin",
-					"passwd":"8bNmFLiIPhVRrM",
-					"database":"megasorte",
-					'raise_on_warnings': True
-					}
-		db_R ={ 
-					"host":"megasorte-homol-read.cwixh7j3qfsl.us-east-1.rds.amazonaws.com",
-					"user":"bwadmin",
-					"passwd":"8bNmFLiIPhVRrM",
-					"database":"megasorte",
-					'raise_on_warnings': True
+			"host":self.Config_ENV.get("MYSQL_W","host"),
+			"user":self.Config_ENV.get("MYSQL_W","user"),
+			"passwd":self.Config_ENV.get("MYSQL_W","passwd"),
+			"database":self.Config_ENV.get("MYSQL_W","database"),
+			'raise_on_warnings': self.Config_ENV.getboolean("MYSQL_W", "raise_on_warnings")
+		}
+		db_R ={
+			"host":self.Config_ENV.get("MYSQL_R","host"),
+			"user":self.Config_ENV.get("MYSQL_R","user"),
+			"passwd":self.Config_ENV.get("MYSQL_R","passwd"),
+			"database":self.Config_ENV.get("MYSQL_R","database"),
+			'raise_on_warnings': self.Config_ENV.getboolean("MYSQL_R", "raise_on_warnings")
 					
-					}
+		}
 		try:
 		
 			self.connection_pool={}

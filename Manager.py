@@ -4,6 +4,8 @@ import sys
 import os
 import logging
 import time
+import configparser
+import socket
 from datetime import date
 import json
 import threading
@@ -14,6 +16,7 @@ import concurrent.futures
 import asyncio.coroutines
 import getpass
 from utils.db import DB
+
 #from servers import server
 from Initialize import Initialize
 class Manager(Initialize):
@@ -40,14 +43,73 @@ class Manager(Initialize):
 
 	 
 	def __init__(self):
-		
+	
+		self.cfg()
+		logging.basicConfig(
+			filename=self.Config.get("LOGS","manager_log"),
+			filemode='a+',
+			level=logging.INFO,
+			format='PID %(process)5s %(name)18s: %(message)s',
+			#stream=sys.stderr,
+		)
 		self.database = DB()
 		super().__init__(self)
 		self.USER = getpass.getuser()
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
 		self.inicializando()
+	
+	def cfg(self):
+		self.Config =   configparser.ConfigParser()
+		self.Config._interpolation = configparser.ExtendedInterpolation()
+		DIR = os.getcwd()
+		USER =getpass.getuser()
+		self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
+		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		s.connect(("8.8.8.8", 80))
+		IP = s.getsockname()[0]
+		s.close()
+		try:
+			self.Config.set("KEY", "root", DIR)
+			self.Config.set("KEY", "user",USER)
+		except:
+			print(sys.exc_info()[0])
+		try:	
+			if "237.29" in IP:
+				self.Config.set("KEY", "env", "BETA")
 
+			elif "242.11" in IP or "242.52" in IP:
+				self.Config.set("KEY", "env", "PROD")
+			else:
+				print("Não foi Possivel identivicar o ambiente!")
+				try:
+					print("Defina o tipo de Ambiente:")
+					print("(1) BETA\n(2) PRODUCAO\n")
+					""" env = input() """
+					env='1'
+					if env == '1':
+						self.Config.set("KEY", "env", "BETA")
+					elif env == '2':
+						self.Config.set("KEY", "env", "PROD")
+					else:
+						sys.exit("Opção invalida!")
+				except:
+					raise Exception("Não foi Possivel identivicar o ambiente!")
+					print(sys.exc_info()[0])
+					sys.exit("Erro ao definir env")
+				""" self.Config_ENV.read("{0}/config/DEFAULT.ini".format(DIR)) """
+	
+		except:
+			print(sys.exc_info()[0])
+		
+		with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
+			self.Config.write(configfile)
+		
+		
+		
+
+		
+	
 
 	def inicializando(self):
 		try:
