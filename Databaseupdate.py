@@ -110,10 +110,10 @@ if __name__ == "__main__":
 	duration = time.time() - start_time
 	log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
 	
-	
+	agora = datetime.datetime.now()
 
 	if result > 0:
-		os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-{0}.txt ".format(datetime.datetime.now()))
+		os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-{0}-{1}-{2}_{3}:{4}:{5}.txt ".format(agora.day, agora.month, agora.year, agora.hour, agora.minute , agora.second))
 		os.system("touch /home/{0}/PythonServer/queries/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
 	log.info('#######')
