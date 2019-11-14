@@ -270,3 +270,26 @@ PID  6179 Serviço de Atualização da Base de Dados: Serviço de Atualização 
 PID  6179 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 13.59871792793274 segundos
 PID  6179 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
 PID  6179 Serviço de Atualização da Base de Dados: #######
+PID 22659 Serviço de Atualização da Base de Dados: *******
+PID 22659 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 22659 Serviço de Atualização da Base de Dados: 2019-11-14 09:30:01.706214
+PID 22659     Banco de Dados: iniciando conexão com Banco de Dados.
+PID 22659     Banco de Dados: Conexões esstabelecida com Sucesso!
+PID 22659        QueryRunner: Procurando Por Arquivo de Querys.
+PID 22659        QueryRunner: Executando Querys n°1
+PID 22659 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 22659 Serviço de Atualização da Base de Dados: 1 registros foram Atualizados em 13.10533094406128 segundos
+PID 22659 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 22659 Serviço de Atualização da Base de Dados: #######
+PID 24037 Serviço de Atualização da Base de Dados: *******
+PID 24037 Serviço de Atualização da Base de Dados: Inicializando serviço  de Atualização da Base de Dados
+PID 24037 Serviço de Atualização da Base de Dados: 2019-11-14 10:00:01.925836
+PID 24037     Banco de Dados: iniciando conexão com Banco de Dados.
+PID 24037     Banco de Dados: Conexões esstabelecida com Sucesso!
+PID 24037        QueryRunner: Procurando Por Arquivo de Querys.
+PID 24037        QueryRunner: Não há registros a serem atualizados.
+PID 24037        QueryRunner: Encerrando Serviço de Atuliazação.
+PID 24037 Serviço de Atualização da Base de Dados: Serviço de Atualização da Base de Dados Concluido
+PID 24037 Serviço de Atualização da Base de Dados: 0 registros foram Atualizados em 11.803435564041138 segundos
+PID 24037 Serviço de Atualização da Base de Dados: Encerrando Serviço de Atuliazação.
+PID 24037 Serviço de Atualização da Base de Dados: #######

@@ -16,3 +16,6 @@ logs/*.log
 logs/*
 logs/Databaseupdate.log
 Class/__pycache__/__init__.cpython-36.pyc
+queries/query_old-9:30.txt
+logs/servico_de_validacao.log
+logs/Databaseupdate.log
