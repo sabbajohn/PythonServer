@@ -71,7 +71,8 @@ class Startup(object):
 					pass
 			else:
 				sleep(2)
-				
+			
+			sleep(5)
 
 			
 			
