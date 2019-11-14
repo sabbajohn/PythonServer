@@ -571,7 +571,7 @@ def db_handler():
 	
 if __name__ == "__main__":
 	logging.basicConfig(
-		filename='/home/{0}/PythonServer/logs/servico_de_validacao.log'.format(USER),
+		filename='/home/{0}/PythonServer/logs/svc.log'.format(USER),
 		filemode='a+',
 		level=logging.INFO,
 		format='PID %(process)5s %(name)18s: %(message)s',
