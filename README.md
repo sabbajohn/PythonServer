@@ -18,6 +18,9 @@ e por fim gera querys para serem executadas no banco de dados
 
 algumas coisas ainda por fazer...
 TODO
+	* Configurar "Get started quickly"
+		- https://bitbucket.org/objetiva/python-services/src
+		
 	* Capturar execeções e gerenciar as threads!
 		- Em andamento, ainda ha varias exceções a serem tratadas e conhecidas
 
