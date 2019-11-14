@@ -1,18 +1,28 @@
-[DEFAULT]
-ENV : 
-ROOT :
-USER :
+[KEY]
+env = BETA
+root = /home/objetiva/PythonServer
+user = objetiva
 
 [LOGS]
-Manager_log : ${DEFAULT:ROOT}/logs/manager.log
-SDU_log :${DEFAULT:ROOT}/logs/sdu.log
-SVC_log :${DEFAULT:ROOT}/logs/svc.log
-SMS_log :${DEFAULT:ROOT}/logs/sms.log
-API_log :${DEFAULT:ROOT}/logs/API.log
-STARTUP_log:${DEFAULT:ROOT}/logs/startup.log
+manager_log = ${KEY:root}/logs/manager.log
+sdu_log = ${KEY:root}/logs/sdu.log
+svc_log = ${KEY:root}/logs/svc.log
+sms_log = ${KEY:root}/logs/sms.log
+api_log = ${KEY:root}/logs/API.log
+startup_log = ${KEY:root}/logs/startup.log
+
+[FILES]
+query = ${KEY:root}/queries/query.txt
+responses = ${KEY:root}/responses/response.json
+responses_api = ${KEY:root}/responses/response_api.json
+responses_sms = ${KEY:root}/responses/response-sms.json
 
 [CONSULTAS]
+hd = 0
+soa = 0
+viacep = 0
 
-HD : 0
-SOA : 0
-ViaCep : 0
+[QUERIES]
+1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100
+2 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100
+
