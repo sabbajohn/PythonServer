@@ -63,7 +63,7 @@ class Startup(object):
 					
 					modtime =os.path.getmtime("/home/"+self.USER+"/PythonServer/queries/query.txt")
 					
-					if modtime < self.start_time:
+					if modtime > self.start_time:
 						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
 						os.system('python3 Databaseupdate.py &')
 					else:
