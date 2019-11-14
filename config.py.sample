@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+# coding: utf-8
+
+PROD = {
+	"mysql_read" : {
+		"host":"10.0.0.1",
+		"user":"root",
+		"passwd":"toor",
+		"database":"databasename",
+		'raise_on_warnings': True
+
+	},
+	"mysql_write" : {
+		"host":"10.0.0.2",
+		"user":"root",
+		"passwd":"toor",
+		"database":"databasename",
+		'raise_on_warnings': True
+	},
+	"API":{
+			"socket":"10.0.0.1:1234",
+			"uwsgitop":"127.0.0.1:9191" 
+
+		}
+}
+
+BETA = {
+	"mysql_read" : {
+		"host":"10.0.0.1",
+		"user":"root",
+		"passwd":"toor",
+		"database":"databasename",
+		'raise_on_warnings': True
+
+	},
+	"mysql_write" : {
+		"host":"10.0.0.2",
+		"user":"root",
+		"passwd":"toor",
+		"database":"databasename",
+		'raise_on_warnings': True
+	},
+	"API":{
+			"socket":"10.0.0.1:1234",
+			"uwsgitop":"127.0.0.1:9191" 
+
+		}
+}

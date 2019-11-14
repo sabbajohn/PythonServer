@@ -12,14 +12,14 @@ class DB(object):
 	def __init__(self):
 		self.log = logging.getLogger('Banco de Dados')
 		self.log.info('iniciando conexão com Banco de Dados.')
-		dbconfig1 ={ 
+		db_W ={ 
 					"host":"10.255.237.4",
 					"user":"bwadmin",
 					"passwd":"8bNmFLiIPhVRrM",
 					"database":"megasorte",
 					'raise_on_warnings': True
 					}
-		dbconfig2 ={ 
+		db_R ={ 
 					"host":"megasorte-homol-read.cwixh7j3qfsl.us-east-1.rds.amazonaws.com",
 					"user":"bwadmin",
 					"passwd":"8bNmFLiIPhVRrM",
@@ -30,8 +30,8 @@ class DB(object):
 		try:
 		
 			self.connection_pool={}
-			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **dbconfig1)
-			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **dbconfig2)
+			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
+			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
 			#self.connection_pool['W'].autocommit = True
 			self.log.info('Conexões esstabelecida com Sucesso!')
 		
