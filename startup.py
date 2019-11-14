@@ -60,14 +60,13 @@ class Startup(object):
 			
 					log.info(' Serviço de Validação de Cadastro em stand by... por {0}s'.format((self.delays['validacao'] - (time.time() - self.start_time))))
 					log.info('{0} . Verificando SDU'.format(datetime.datetime.now()))
-					
-					modtime =os.path.getmtime("/home/"+self.USER+"/PythonServer/queries/query.txt")
-					
-					if modtime > self.start_time:
+					with open("/home/"+self.USER+"/PythonServer/queries/query.txt","r") as f:
+						linhas =f.readlines()
+					if len(linhas) > 0:
 						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
 						os.system('python3 Databaseupdate.py &')
 					else:
-							log.info('{0} . Não há novos registros a serem atualizados!'.format(datetime.datetime.now()))
+						log.info('{0} . Não há novos registros a serem atualizados!'.format(datetime.datetime.now()))
 					pass
 			else:
 				sleep(2)
