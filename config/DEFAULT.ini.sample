@@ -1,0 +1,18 @@
+DEFAULT]
+ENV : 
+ROOT :
+USER :
+
+[LOGS]
+Manager_log : ${DEFAULT:ROOT}/logs/manager.log
+SDU_log :${DEFAULT:ROOT}/logs/sdu.log
+SVC_log :${DEFAULT:ROOT}/logs/svc.log
+SMS_log :${DEFAULT:ROOT}/logs/sms.log
+API_log :${DEFAULT:ROOT}/logs/API.log
+STARTUP_log:${DEFAULT:ROOT}/logs/startup.log
+
+[CONSULTAS]
+
+HD : 0
+SOA : 0
+ViaCep : 0
