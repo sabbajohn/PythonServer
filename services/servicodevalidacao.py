@@ -546,9 +546,9 @@ class servicoDeValidacao(object):
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
 			message.append("Foram realizadas {0} ao Via Cep".format(self.contador_ViaCep))
 			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds")
-			self.Config.set("CONSULTAS", "hd", (int(self.Config.get("CONSULTAS", "hd")) +self.contador_hd))
-			self.Config.set("CONSULTAS", "soa", (int(self.Config.get("CONSULTAS", "soa")) +self.contador_failsafe))
-			self.Config.set("CONSULTAS", "viacep", (int(self.Config.get("CONSULTAS", "viacep")) +self.contador_ViaCep)) 
+			self.Config.set("CONSULTAS", "hd", str(int(self.Config.get("CONSULTAS", "hd")) +self.contador_hd))
+			self.Config.set("CONSULTAS", "soa", str(int(self.Config.get("CONSULTAS", "soa")) +self.contador_failsafe))
+			self.Config.set("CONSULTAS", "viacep", str(int(self.Config.get("CONSULTAS", "viacep")) +self.contador_ViaCep)) 
 			with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
 				self.Config.write(configfile)
 			message.append("Encerrando serviço.")
