@@ -100,19 +100,20 @@ if __name__ == "__main__":
  	)
 	log = logging.getLogger('Serviço de Atualização da Base de Dados')
 	log.info('*******')
+	
 	log.info('Inicializando serviço  de Atualização da Base de Dados')
 	log.info(datetime.datetime.now())
 	database = DB()
 	result = QueryRunner(database)
+	log.info(datetime.datetime.now())
 	log.info('Serviço de Atualização da Base de Dados Concluido')
 	duration = time.time() - start_time
 	log.info('{0} registros foram Atualizados em {1} segundos'.format(result,duration))
 	
-	agora = datetime.datetime.now()
 	
 
 	if result > 0:
-		os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
+		os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-{0}.txt ".format(datetime.datetime.now()))
 		os.system("touch /home/{0}/PythonServer/queries/query.txt".format(USER))
 	log.info("Encerrando Serviço de Atuliazação.")
 	log.info('#######')
