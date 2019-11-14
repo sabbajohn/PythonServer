@@ -130,7 +130,7 @@ class Manager(Initialize):
 			"time":datetime.datetime.now()
 		}
 			
-			self.callback(self,e)
+			self.callback(e)
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 	
@@ -145,7 +145,7 @@ class Manager(Initialize):
 							self.Jobs['SDU'].start()
 							self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
 						except:
-							print("Oops!{0} occured.".format(sys.exc_info()[0]))
+							print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
 			else:
 
 				if not self.Jobs['SVC'].isAlive():
@@ -159,7 +159,7 @@ class Manager(Initialize):
 							self.Jobs['SDU'].join()
 							sleep(6000)
 						except:
-							print("Oops!{0} occured.".format(sys.exc_info()[0]))
+							print("Oops!{0} occured -- VEU :148".format(sys.exc_info()))
 	
 	
 	

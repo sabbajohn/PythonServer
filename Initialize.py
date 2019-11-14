@@ -86,7 +86,7 @@ class Initialize:
 		jobs = {
 			'SMS': self.job_sms,
 			'SVC': self.job_servico_de_validacao,
-			'SDU:':self.job_dataupdate
+			'SDU':self.job_dataupdate
 		}
 		return jobs
 	
