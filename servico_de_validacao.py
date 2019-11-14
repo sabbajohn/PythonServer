@@ -156,6 +156,7 @@ async def failsafe_api_validation_request(params):
 			response =  await r.read()
 			response=json.loads(response)
 			response['failsafe'] = True
+			response['index'] = params['index']
 			if  params['viaCep']:
 				response['viaCep'] = params['viaCep']
 				response['CEP'] = params['CEP']
@@ -192,22 +193,24 @@ async def query_generator(resp):
 										try:
 									
 											
-											data_api = time.mktime(datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+											data_api = time.mktime(datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").timetuple())
 
 											sixteenyearsago  = date.today()
 											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
 											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
 											
 											
-										except:
+										except :
+											print(sys.exc_info()[0])
 											pass
 										if data_api < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-											item['result']['data_nascimento'] = datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+											item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
 										else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-											item['result']['data_nascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
+											item
+											item['DataNascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
 									
 								
-										#item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										
 										message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
 									if item['Status'] == False:
@@ -221,7 +224,7 @@ async def query_generator(resp):
 									try:
 									
 										
-										d2 = time.mktime(datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+										d2 = time.mktime(datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").timetuple())
 										
 										sixteenyearsago  = date.today()
 										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
@@ -231,9 +234,9 @@ async def query_generator(resp):
 									except:
 										pass
 									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-										item['result']['data_nascimento'] = datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
 									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-										item['result']['data_nascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
+										item['DataNascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
 
 									#item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
 									message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
@@ -246,6 +249,7 @@ async def query_generator(resp):
 				pass
 				
 		except:
+			print(sys.exc_info()[0])
 			pass
 				
 			
@@ -409,6 +413,7 @@ async def query_generator(resp):
 											if item2['viaCep']:
 											
 												params['CPF'] = item2['CPF']
+												params['index'] = item2['index']
 												params['viaCep'] =item2['viaCep']
 												params['CEP'] = item2['CEP']
 											else:
@@ -526,6 +531,7 @@ async def list_generator(database):
 					
 					params={}
 					params['CPF']=x[0]
+					params['index'] = i
 					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
 						params['viaCep']=True
 						params['CEP'] = x[6]
