@@ -41,8 +41,7 @@ def db_monitor():
 	
 	
 	while True:
-		if(escreveu == True):
-			log.info("Novo sms encontrado!")
+		
 		result = None
 		
 		cursor_r =database.getCursor("R")
@@ -51,6 +50,8 @@ def db_monitor():
 		handler_r.commit()
 		
 		if len(result)>0:
+			if(escreveu == True):
+				log.info("Novo sms encontrado!")
 
 			log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result)))
 			
