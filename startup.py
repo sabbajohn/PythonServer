@@ -47,13 +47,13 @@ class Startup(object):
 				if self.start_time ==0:
 					self.start_time = time.time()
 					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
-					os.system('python3 servico_de_validacao.py &')
+					os.system('nohup python3 servico_de_validacao.py &')
 					sleep(60)
 				elif (time.time() - self.start_time) > self.delays['validacao']:
 
 					log.info('{0} . Inicializando serviço de Validação de Cadastros'.format(datetime.datetime.now()))
 					self.start_time = time.time()
-					os.system('python3 servico_de_validacao.py &')
+					os.system('nohup python3 servico_de_validacao.py &')
 				
 				
 				elif (self.delays['validacao'] - (time.time() - self.start_time)) > 0 : 
@@ -64,7 +64,7 @@ class Startup(object):
 						linhas =f.readlines()
 					if len(linhas) > 0:
 						log.info('{0} . Inicializando serviço de Atualização de Dados'.format(datetime.datetime.now()))
-						os.system('python3 Databaseupdate.py &')
+						os.system('nohup python3 Databaseupdate.py &')
 					else:
 						log.info('{0} . Não há novos registros a serem atualizados!'.format(datetime.datetime.now()))
 					pass
