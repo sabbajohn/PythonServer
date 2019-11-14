@@ -189,8 +189,25 @@ async def query_generator(resp):
 								except:
 			
 									if item['Status'] == True:
+										try:
+									
+											
+											data_api = time.mktime(datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+
+											sixteenyearsago  = date.today()
+											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+											
+										except:
+											pass
+										if data_api < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+											item['result']['data_nascimento'] = datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+											item['result']['data_nascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
+									
 								
-										item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										#item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
 										message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf']))#Gerar query caso o TRUE
 									if item['Status'] == False:
@@ -200,7 +217,25 @@ async def query_generator(resp):
 								
 							else:
 								if item['Status'] == True:
-									item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+
+									try:
+									
+										
+										d2 = time.mktime(datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+										
+										sixteenyearsago  = date.today()
+										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+											
+									except:
+										pass
+									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+										item['result']['data_nascimento'] = datetime.datetime.strptime(item['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+										item['result']['data_nascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
+
+									#item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
 									message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 									f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
 								if item['Status'] == False:
@@ -238,34 +273,41 @@ async def query_generator(resp):
 								if result[item2['index']][3] == None or result[item2['index']][3] == 'None':
 									
 									try:
-										d1 =  result[item2['index']][1]
-										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
-										if d1 != d2:
-											hoje =  date.today()
-											idade = hoje.year - d2.year
+									
+										
+										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+										
+										sixteenyearsago  = date.today()
+										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+											
 									except:
 										pass
-									if idade > 16:
+									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-									else:
+									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
 										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
 									
 									message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 									f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}',DtNascimento ='{5}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento']))#Gerar query caso o TRUE
 								else:
 									try:
-										d1 =  result[item2['index']][1]
-										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
-										if d1 != d2:
-											hoje =  date.today()
-											idade = hoje.year - d2.year
+									
+										
+										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+						
+										sixteenyearsago  = date.today()
+										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+											
 									except:
 										pass
-									if idade > 16:
+									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-									else:
+									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
 										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
-									
 									
 									message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 									f.write("UPDATE cliente SET id_status='1', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento']))#Gerar query caso o TRUE
@@ -273,32 +315,42 @@ async def query_generator(resp):
 							if result[item2['index']][3] == None or result[item2['index']][3] == '':
 							
 								try:
-										d1 =  result[item2['index']][1]
-										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
-										if d1 != d2:
-											hoje =  date.today()
-											idade = hoje.year - d2.year
+									
+									
+									d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+									
+									sixteenyearsago  = date.today()
+									sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+									sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+										
+											
 								except:
 									pass
-								if idade > 16:
+								if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 									item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-								else:
+								else:# SE NAO, È MENOR. FINJO QUE NÂO VI
 									item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+
 								message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 								f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento ='{3}' WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento']))#Gerar query caso o TRUE
 							else:
 								try:
-										d1 =  result[item2['index']][1]
-										d2 = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y")
-										if d1 != d2:
-											hoje =  date.today()
-											idade = hoje.year - d2.year
+									
+									
+										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+
+										sixteenyearsago  = date.today()
+										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+										
+											
 								except:
 									pass
-								if idade > 16:
+								if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 									item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-								else:
+								else:# SE NAO, È MENOR. FINJO QUE NÂO VI
 									item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+
 								message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
 								f.write("UPDATE cliente SET id_status='1', motivo ='{0}', DtNascimento ='{2}' WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento']))#Gerar query caso o TRUE
 
@@ -412,7 +464,8 @@ async def list_generator(database):
 	log = logging.getLogger('list_generator')
 	log.info('Buscando registros pendentes na base de dados.')
 	executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100")
-	#executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100")
+	
+	
 	result = executor.fetchall()
 	if len(result) > 0:
 		log.info('{0} itens serão analisados.'.format(len(result)))
