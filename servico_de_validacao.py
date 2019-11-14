@@ -212,7 +212,7 @@ async def query_generator(resp):
 											status = 2
 											message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
 											item['DataNascimento'] = result[item['index']][1].strftime("%Y-%m-%d")
-											f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))#Gerar query caso o TRUE
+											f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
 									if item['Status'] == False:
 										f.write("UPDATE cliente SET id_status='3' , motivo ='{0}', Cidade = '{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))#Gerar query caso o TRUE
 									else:
