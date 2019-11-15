@@ -9,7 +9,7 @@ from json import dumps
 import getpass
 USER = getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
-import cpf
+import Class.cpf
 from startup import Startup
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
