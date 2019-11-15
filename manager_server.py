@@ -35,7 +35,11 @@ class Command(Resource):
 		resp = []
 		print(request.json)
 		service = request.json['service']
-		action = request.json['action']
+		try:
+			action = request.json['action']
+		except:
+			pass
+
 		
 		if(service == 'sdu'):
 			return self.sdu(action)
@@ -45,8 +49,8 @@ class Command(Resource):
 			return self.sms(action)
 		elif(service == 'startup'):
 			return self.startup(action)
-		elif(service == 'help'):
-			self.help()
+		elif(service == 'nohup'):
+			self.tail('nohup.out')
 		else:
 			return {
 				'erro': 'servico nao definido!'
