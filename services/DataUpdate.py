@@ -9,13 +9,13 @@ import time
 import datetime
 from datetime import date
 from time import sleep
-from utils.db import DB
+
 #from Manager import Manager
 import threading
 class DataUpdate(object):
 	def __init__(self, M):
 		self.Manager = M
-	
+		self.database = self.Manager.database
 
 	def QueryRunner(self, database):
 		n_updates = 0
@@ -26,8 +26,8 @@ class DataUpdate(object):
 		self.feedback(metodo ='start', status =5, message=message, erro = False)
 		message = None
 		fname = "/home/{0}/PythonServer/queries/query.txt".format(self.USER)
-		H = database.getConn("W")
-		executor= database.getCursor("W")
+		""" H = database.getConn("W")
+		executor= database.getCursor("W") """
 		if os.path.isfile(fname):
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
@@ -45,9 +45,10 @@ class DataUpdate(object):
 						self.feedback(metodo ='start', status =5, message=message, erro = False)
 						message = None
 						sleep(1)
-					executor.execute(line)
+					database.execute("W", line, commit=True)
+					"""	executor.execute(line)
 					H.commit()
-					executor.rowcount
+					executor.rowcount """
 					n_updates = n_updates +1
 					rest = rest +1
 					message = []
@@ -60,7 +61,7 @@ class DataUpdate(object):
 					#sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err)) Não matar
 					self.feedback(metodo ='start', status =3, message=message, erro = True)
 					message = None
-			database.closeConn("W")
+			""" database.closeConn("W") """
 			return n_updates
 
 
@@ -83,7 +84,7 @@ class DataUpdate(object):
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
 		message = None
 		
-		self.database = DB()
+		""" self.database = DB() """
 		start_time = time.time()
 		
 		
@@ -157,7 +158,7 @@ class DataUpdate(object):
 		
 		feedback['time'] = datetime.datetime.now()
 		#with self._lock:
-		self.Manager.callback(self.Manager,feedback)
+		self.Manager.callback(feedback)
 
 	def end(self):
 		return 0

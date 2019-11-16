@@ -9,7 +9,7 @@ from datetime import date
 import json
 import getpass
 #from Manager import Manager
-from utils.db import DB
+""" from utils.db import DB """
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
 
@@ -23,7 +23,7 @@ class SMS(object):
 		self._stop_event = threading.Event()
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
-		self.database = DB()
+		self.database = self.Manager.database
 		""" TODO FIXME
 			! Não Preciso iniciar uma conexão com o DB toda vez ja existem prontas!
 		 """
@@ -42,7 +42,7 @@ class SMS(object):
 			#O metodo é o start, mas o pau veio de dentro do db_monitor
 		#	print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			message = []
-			message.append( "{0}".format(sys.exc_info()[0]))
+			message.append( "{0}".format(sys.exc_info()))
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
 
@@ -55,17 +55,20 @@ class SMS(object):
 		message = None
 		escreveu = False
 		#quem sabe botar isso dentro de um try
-		handler_r=self.database.getConn("R")
+		
 		
 		
 		while True:
 			result = None
 			
-			cursor_r =self.database.getCursor("R")
-			cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
+			""" cursor_r =self.database.getCursor("R") """
+			query = "SELECT * FROM sms WHERE sent_at is NULL"
+			
+			result = self.database.execute("R",query)
+			""" cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
 			result = cursor_r.fetchall()
 			handler_r.commit()
-			
+			 """
 			if len(result)>0:
 				#Preciso mesmo dar lock?
 				message = []
@@ -136,12 +139,12 @@ class SMS(object):
 
 			
 			agora = datetime.datetime.now()
-			handler_w = self.database.getConn("W")
-			cursor_w = self.database.getCursor("W")
+			""" handler_w = self.database.getConn("W")
+			cursor_w = self.database.getCursor("W") """
 			query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
 			try:
-				cursor_w.execute(query)
-				handler_w.commit()
+				self.database.execute("W",query, commit=True)
+				""" handler_w.commit() """
 				return
 			except :
 				message = []

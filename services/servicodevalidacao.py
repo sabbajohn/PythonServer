@@ -13,7 +13,6 @@ import datetime
 import concurrent.futures
 import asyncio.coroutines
 import getpass
-from utils.db import DB
 from utils import CPF as cpf
 import asyncio
 import aiohttp
@@ -410,15 +409,15 @@ class servicoDeValidacao(object):
 		message = []
 
 		self.result, self.contador_dispensadas
-		executor = database.getCursor("R")
+		
 		
 		message.append("Buscando registros pendentes na base de dados.\n Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
-		
-		executor.execute('SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100')
+		query= 'SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100'
+		self.result=database.execute("R", query)
 		#executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100")
-		self.result = executor.fetchall()
+		
 		if len(self.result) > 0:
 			message = []
 			message.append('{0} itens serão analisados.'.format(len(self.result)))
@@ -619,10 +618,9 @@ class servicoDeValidacao(object):
 		self.contador_hd = 0
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = 0
-		self.database = DB()
 		self.Manager = M
 		self.Config = self.Manager.Config
-
+		self.database = self.Manager.database
 	def end(self):
 		return 0
 		#raise Exception("kill-me")
