@@ -18,16 +18,6 @@ USER = getpass.getuser()
 app = Flask(__name__)
 api = Api(app)
 
-
-class Status(Resource):
-	"""  def get(self):
-		conn = db_connect.connect() # connect to database
-		query = conn.execute("select * from employees") # This line performs query and returns json result
-		return {'employees': [i[0] for i in query.cursor.fetchall()]} # Fetches first column that is Employee ID """
-
-	def post(self):
-		resp = []
-		print(request.json)
 	
 class Command(Resource):
 
