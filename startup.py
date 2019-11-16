@@ -69,9 +69,11 @@ class Startup(object):
 							os.system('nohup python3 Databaseupdate.py &')
 						else:
 							log.info('{0} . Não há novos registros a serem atualizados!'.format(datetime.datetime.now()))
-						pass
+						
 				else:
 					sleep(5)
+
+				sleep(5)
 			except:
 				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
 				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
