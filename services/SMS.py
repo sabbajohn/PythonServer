@@ -59,39 +59,48 @@ class SMS(object):
 		
 		
 		while True:
-			result = None
-			
-			""" cursor_r =self.database.getCursor("R") """
-			query = "SELECT * FROM sms WHERE sent_at is NULL"
-			
-			result = self.database.execute("R",query)
-			""" cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
-			result = cursor_r.fetchall()
-			handler_r.commit()
-			 """
-			if len(result)>0:
-				#Preciso mesmo dar lock?
-				message = []
-				message.append( "{0} sms's a serem enviados!".format(len(result)))
-				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
-				message = None
+			try:
+				result = None
 				
+				""" cursor_r =self.database.getCursor("R") """
+				query = "SELECT * FROM sms WHERE sent_at is NULL"
 				
-				
-				for x in result:
-					self.send(x)
-				
-				
-			else: 
-				if(escreveu == False):
+				result = self.database.execute("R",query)
+				""" cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
+				result = cursor_r.fetchall()
+				handler_r.commit()
+				"""
+				if len(result)>0:
+					#Preciso mesmo dar lock?
 					message = []
-					message.append( "Nenhum SMS Pendente no momento!")
-					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					message.append( "{0} sms's a serem enviados!".format(len(result)))
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 					message = None
-					escreveu= True
-				else:
-					pass
-				time.sleep(5)
+					
+					
+					
+					for x in result:
+						self.send(x)
+					
+					
+				else: 
+					if(escreveu == False):
+						message = []
+						message.append( "Nenhum SMS Pendente no momento!")
+						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+						message = None
+						escreveu= True
+					else:
+						pass
+					time.sleep(5)
+			except: 
+				message = []
+				message.append( sys.exc_info())
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+				message = None
+			finally:
+				pass
+
 
 	def send(self,cliente):
 

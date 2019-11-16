@@ -414,7 +414,8 @@ class servicoDeValidacao(object):
 		message.append("Buscando registros pendentes na base de dados.\n Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
-		query= 'SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100'
+		query= self.Manager.Config.get("QUERIES","2")
+		'SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100'
 		self.result=database.execute("R", query)
 		#executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100")
 		

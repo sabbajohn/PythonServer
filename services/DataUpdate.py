@@ -55,9 +55,9 @@ class DataUpdate(object):
 					message.append("Executando Querys n°{0}".format(n_updates))
 					self.feedback(metodo ='start', status =5, message=message, erro = False)
 					message = None
-				except database.connector.Error as err:
+				except:
 					message = []
-					message.append('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
+					message.append('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(sys.exc_info()))
 					#sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err)) Não matar
 					self.feedback(metodo ='start', status =3, message=message, erro = True)
 					message = None

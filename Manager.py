@@ -170,7 +170,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
-				self.Kill(self)
+				
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -319,7 +319,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+				
 			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
@@ -341,7 +341,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill(self)
+				
 			pass
 
 		#DAS API'S	
@@ -354,7 +354,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+				
 			pass
 		elif e['class'] == 'MockServer':
 			if e['status']== 1:
@@ -365,7 +365,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+			
 			pass
 		
 
@@ -379,7 +379,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+				
 			pass
 		elif e['class'] == 'db':
 			if e['status']== 1:
@@ -390,7 +390,7 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+				
 			pass
 		elif e['class'] == 'Relatorios':
 			if e['status']== 1:
