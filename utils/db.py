@@ -43,8 +43,8 @@ class DB(object):
 		try:
 		
 			self.connection_pool={}
-			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
-			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
+			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W,pool_reset_session=True,)
+			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R,pool_reset_session=True,)
 			#self.connection_pool['W'].autocommit = True
 			self.log.info('Conexões esstabelecida com Sucesso!')
 		
@@ -94,7 +94,7 @@ class DB(object):
 		cursor.close()
 		conn.close()
 
-	def execute(self, sql, args=None, commit=False):
+	def execute(self,mode, sql, args=None, commit=False):
 		"""
 		Execute a sql, it could be with args and with out args. The usage is 
 		similar with execute() function in module pymysql.
@@ -104,8 +104,14 @@ class DB(object):
 		:return: if commit, return None, else, return result
 		"""
 		# get connection form connection pool instead of create one.
-		conn = self.pool.get_connection()
-		cursor = conn.cursor()
+		
+		try:
+			conn = self.getConn(mode)
+			cursor = conn.cursor()
+			
+		except:
+			
+			cursor = self.getCursor(mode)
 		if args:
 			cursor.execute(sql, args)
 		else:
@@ -116,7 +122,7 @@ class DB(object):
 			return None
 		else:
 			res = cursor.fetchall()
-			self.close(conn, cursor)
+			self.closeConn(mode)
 			return res
 
 	def executemany(self, sql, args, commit=False):
