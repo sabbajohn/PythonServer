@@ -201,7 +201,8 @@ async def query_generator(resp):
 											
 											
 										except :
-										
+											log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+											log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
 											pass
 										if data_api < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
 											status = 1
@@ -253,209 +254,216 @@ async def query_generator(resp):
 				pass
 				
 		except:
-			
-			data.append(resp)
-			with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
-				for item2 in data:
-					agora = datetime.datetime.now()
-					f.write("{0}:{1}\n".format(agora ,item2))
-			
-			with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
-				for item2 in data:
-					try:
-						r = item2['result']['numero_de_cpf']
-						if r:
-							item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')	
-					except :
-						pass
-
-					if item2['status']==True:
-						if item2['viaCep'] is True:
-							endereco = await viaCEP(item2["CEP"])
-							try:
-								err = endereco['erro']
-							except:
-								if result[item2['index']][3] == None or result[item2['index']][3] == 'None':
-									
-									try:
-									
-										
-										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
-										
-										sixteenyearsago  = date.today()
-										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
-										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
-											
-											
-									except:
-										pass
-									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-										status = 1
-										message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
-										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-										f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}',DtNascimento ='{5}', Endereco='{6}', Bairro='{7}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
-									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-										status = 2
-										message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
-										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
-									
-										f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}',DtNascimento ='{5}', Endereco='{6}', Bairro='{7}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
-								else:
-									try:
-									
-										
-										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
-						
-										sixteenyearsago  = date.today()
-										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
-										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
-											
-											
-									except:
-										pass
-									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-										status = 1
-										message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
-										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-										f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
-									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-										status = 2
-										message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
-										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
-										f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
-						else:
-							if result[item2['index']][3] == None or result[item2['index']][3] == '':
-							
-								try:
-									
-									
-									d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
-									
-									sixteenyearsago  = date.today()
-									sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
-									sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
-										
-											
-								except:
-									pass
-								if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-									status = 1
-									message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
-									item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-									f.write("UPDATE cliente SET id_status='{4}', Nome = '{0}' , motivo ='{1}', DtNascimento ='{3}' WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
-								else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-									status = 2
-									message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
-									item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
-									f.write("UPDATE cliente SET id_status='{4}', Nome = '{0}' , motivo ='{1}', DtNascimento ='{3}' WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
-							else:
-								try:
-									
-									
-										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
-
-										sixteenyearsago  = date.today()
-										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
-										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
-										
-											
-								except:
-									pass
-								if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
-									status = 1
-									message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
-									item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-									f.write("UPDATE cliente SET id_status='{3}', motivo ='{0}', DtNascimento ='{2}' WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
-								else:# SE NAO, È MENOR. FINJO QUE NÂO VI
-									status = 2
-									message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
-									item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
-									f.write("UPDATE cliente SET id_status='{3}', motivo ='{0}', DtNascimento ='{2}' WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
-
-					elif item2['status']==False:
-
+			try:
+				data.append(resp)
+				with open("/home/"+USER+"/PythonServer/responses/response.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+					for item2 in data:
+						agora = datetime.datetime.now()
+						f.write("{0}:{1}\n".format(agora ,item2))
+				
+				with open("/home/"+USER+"/PythonServer/queries/query.txt","a+") as f:
+					for item2 in data:
 						try:
-							item2['code']
-							if item2['code'] == 1:
+							r = item2['result']['numero_de_cpf']
+							if r:
+								item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')	
+						except :
+							pass
 
-								if item2['viaCep'] is True:
-									endereco = await viaCEP(item2["CEP"])
-									try:
-										err = endereco['erro']
-									except:
-										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
-								else:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-							elif item2['code'] == 2:
-								if item2['viaCep'] is True:
-									endereco = await viaCEP(item2["CEP"])
-									try:
-										err = endereco['erro']
-									except:
-										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco ='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
-								else:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-							elif item2['code'] == 3:
-								if item2['viaCep'] is True:
-									endereco = await viaCEP(item2["CEP"])
-									try:
-										err = endereco['erro']
-									except:
-										f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
-								else:
-									f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
-						except:
-
-							if item2['return']=='NOK':
+						if item2['status']==True:
+							if item2['viaCep'] is True:
+								endereco = await viaCEP(item2["CEP"])
+								try:
+									err = endereco['erro']
+								except:
+									if result[item2['index']][3] == None or result[item2['index']][3] == 'None':
+										
+										try:
+										
+											
+											d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+											
+											sixteenyearsago  = date.today()
+											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+												
+												
+										except:
+											pass
+										if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+											status = 1
+											message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
+											item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+											f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}',DtNascimento ='{5}', Endereco='{6}', Bairro='{7}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
+										else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+											status = 2
+											message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
+											item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+										
+											f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', Cidade='{3}', SgUF='{4}',DtNascimento ='{5}', Endereco='{6}', Bairro='{7}'  WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
+									else:
+										try:
+										
+											
+											d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+							
+											sixteenyearsago  = date.today()
+											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+												
+												
+										except:
+											pass
+										if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+											status = 1
+											message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
+											item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+											f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
+										else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+											status = 2
+											message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
+											item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+											f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
+							else:
+								if result[item2['index']][3] == None or result[item2['index']][3] == '':
 								
-								if "CPF Nao Encontrado na Base de Dados Federal." in item2['message'] or  "CPF não existe na base até o momento!" in item2['message']:
+									try:
+										
+										
+										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+										
+										sixteenyearsago  = date.today()
+										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+												
+									except:
+										pass
+									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+										status = 1
+										message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
+										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										f.write("UPDATE cliente SET id_status='{4}', Nome = '{0}' , motivo ='{1}', DtNascimento ='{3}' WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
+									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+										status = 2
+										message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
+										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+										f.write("UPDATE cliente SET id_status='{4}', Nome = '{0}' , motivo ='{1}', DtNascimento ='{3}' WHERE CPFCNPJ = '{2}';\n".format(item2['result']['nome_da_pf'],message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
+								else:
+									try:
+										
+										
+											d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
+
+											sixteenyearsago  = date.today()
+											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
+											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
+											
+												
+									except:
+										pass
+									if d2 < sixteenyearsago: #OU SEJA, MAIOR DE 16 ATUALIZO COM O RESULTADO DA API
+										status = 1
+										message = '{0} verificado via API em {1}'.format(item2['result']['nome_da_pf'], item2['result']['comprovante_emitido_data'])
+										item2['result']['data_nascimento'] = datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
+										f.write("UPDATE cliente SET id_status='{3}', motivo ='{0}', DtNascimento ='{2}' WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
+									else:# SE NAO, È MENOR. FINJO QUE NÂO VI
+										status = 2
+										message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
+										item2['result']['data_nascimento'] = result[item2['index']][1].strftime("%Y-%m-%d")
+										f.write("UPDATE cliente SET id_status='{3}', motivo ='{0}', DtNascimento ='{2}' WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],item2['result']['data_nascimento'],status))#Gerar query caso o TRUE
+
+						elif item2['status']==False:
+
+							try:
+								item2['code']
+								if item2['code'] == 1:
+
 									if item2['viaCep'] is True:
 										endereco = await viaCEP(item2["CEP"])
 										try:
 											err = endereco['erro']
 										except:
-											f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
-											
+											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
 									else:
-										f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
-								elif "Data Nascimento invalida." in item2['message']:
-									try:
-										check = item2['CPF']
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+								elif item2['code'] == 2:
+									if item2['viaCep'] is True:
+										endereco = await viaCEP(item2["CEP"])
+										try:
+											err = endereco['erro']
+										except:
+											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco ='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
+									else:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+								elif item2['code'] == 3:
+									if item2['viaCep'] is True:
+										endereco = await viaCEP(item2["CEP"])
+										try:
+											err = endereco['erro']
+										except:
+											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))	
+									else:
+										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
+							except:
+
+								if item2['return']=='NOK':
 									
-										if check and (result[item2['index']][3] == None or result[item2['index']][3] == "" ):
-											params={}
-											if item2['viaCep']:
-											
-												params['CPF'] = item2['CPF']
-												params['index'] = item2['index']
-												params['viaCep'] =item2['viaCep']
-												params['CEP'] = item2['CEP']
-											else:
-												params['CPF'] = item2['CPF']
-												params['viaCep'] =item2['viaCep']
-
-											await failsafe_api_validation_request(params)
-										
+									if "CPF Nao Encontrado na Base de Dados Federal." in item2['message'] or  "CPF não existe na base até o momento!" in item2['message']:
+										if item2['viaCep'] is True:
+											endereco = await viaCEP(item2["CEP"])
+											try:
+												err = endereco['erro']
+											except:
+												f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
+												
 										else:
-											if item2['viaCep'] is True:
-												endereco = await viaCEP(item2["CEP"])
-												try:
-													err = endereco['erro']
-												except:
-													f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
-											else:
-												f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
-											
-									except:
-										pass
+											f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
+									elif "Data Nascimento invalida." in item2['message']:
+										try:
+											check = item2['CPF']
 										
-							
+											if check and (result[item2['index']][3] == None or result[item2['index']][3] == "" ):
+												params={}
+												if item2['viaCep']:
+												
+													params['CPF'] = item2['CPF']
+													params['index'] = item2['index']
+													params['viaCep'] =item2['viaCep']
+													params['CEP'] = item2['CEP']
+												else:
+													params['CPF'] = item2['CPF']
+													params['viaCep'] =item2['viaCep']
 
-									#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-								elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
-									sys.exit(item2['message'])	
-						else:
-							pass
+												await failsafe_api_validation_request(params)
+											
+											else:
+												if item2['viaCep'] is True:
+													endereco = await viaCEP(item2["CEP"])
+													try:
+														err = endereco['erro']
+													except:
+														f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+												else:
+													f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
+												
+										except:
+											pass
+											
+								
+
+										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
+										sys.exit(item2['message'])	
+							else:
+								log.info('{0}:Possibilidade nao tratada!'.format(datetime.datetime.now()))
+								log.info('API response:{0}'.format(item2))
+								log.info('DB info :{0}'.format(result[item2['index']]))
+
+
+			except:
+				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
 
 async def runner(executor):
 	index = 0
@@ -620,6 +628,10 @@ if __name__ == "__main__":
 		event_loop.run_until_complete(
 			runner(executor)
 		)
+	except:
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
+		pass
 	finally:
 		event_loop.close()
 

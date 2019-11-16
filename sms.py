@@ -13,21 +13,8 @@ sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
 from Class.db import DB
 
 
+from comtele_sdk.textmessage_service import TextMessageService
 
-try:
-	from comtele_sdk.textmessage_service import TextMessageService
-except:
-	try:
-		comando = os.system
-		comando('sudo pip3 install comtele_sdk')
-		print('[!] Tentando Instalar as Dependencias')
-	except:
-		if IOError:	
-			sys.exit("[!] Please install the mysql library: sudo pip3 install comtele_sdk")	
-		
-		else:
-			time.sleep(10)   
-			comando('python3 sms.py')
 
 database = DB()
 
@@ -41,32 +28,35 @@ def db_monitor():
 	
 	
 	while True:
-		
-		result = None
-		
-		cursor_r =database.getCursor("R")
-		cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
-		result = cursor_r.fetchall()
-		handler_r.commit()
-		
-		if len(result)>0:
-			if(escreveu == True):
-				log.info("Novo sms encontrado!")
+		try:	
+			result = None
+			
+			cursor_r =database.getCursor("R")
+			cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
+			result = cursor_r.fetchall()
+			handler_r.commit()
+			
+			if len(result)>0:
+				if(escreveu == True):
+					log.info("Novo sms encontrado!")
 
-			log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result)))
-			
-			for x in result:
-				send(x)
-			
-			
-		else: 
-			if(escreveu == False):
+				log.info("{0} -> {1} sms's a serem enviados!".format(datetime.datetime.now(),len(result)))
 				
-				log.info("Nenhum sms pendete, tentaremos novamente em 5 segundos!")
-				escreveu= True
-			
-			time.sleep(5)
-		
+				for x in result:
+					send(x)
+				
+				
+			else: 
+				if(escreveu == False):
+					
+					log.info("Nenhum sms pendete, tentaremos novamente em 5 segundos!")
+					escreveu= True
+				
+				time.sleep(5)
+		except:
+			log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+			log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))	
+			pass
 		
 def send(cliente):
 	log = logging.getLogger('Envio de SMS')
@@ -76,11 +66,10 @@ def send(cliente):
 	Receivers = []
 	Receivers.append(str(cliente[2]))
 	try:
-
 		result = textmessage_service.send('MS_.{}'.format(cliente[3]), cliente[4], Receivers)
 	except :
-		log.info("Oops!{0}occured.".format(sys.exc_info()[0]))
-		print("Oops!{0}occured.".format(sys.exc_info()[0]))
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
 		return
 	log.info("SMS:{0}".format(result['Message']))
 	update(result, cliente)
@@ -101,10 +90,15 @@ def update(result, cliente):
 	try:
 		cursor_w.execute(query)
 		handler_w.commit()
-		
 		return
-	except :
-		log.info("Oops!{0}occured.".format(sys.exc_info()[0]))
+	except database.connector.Error as err:
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
+		log.info('#######')
+		return
+	else:
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+		log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
 		log.info('#######')
 		return
 

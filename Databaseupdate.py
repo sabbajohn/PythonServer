@@ -28,6 +28,7 @@ except:
 
 USER =getpass.getuser()
 sys.path.insert(1,'/home/{0}/PythonServer/Class'.format(USER))
+
 def QueryRunner(database):
 	n_updates = 0
 	rest = 0
@@ -56,6 +57,8 @@ def QueryRunner(database):
 				
 				log.info("Executando Querys n°{0}".format(n_updates))
 			except mysql.connector.Error as err:
+				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+				log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
 				log.info('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(err))
 				log.info('#######')
 				sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err))
@@ -113,8 +116,13 @@ if __name__ == "__main__":
 	agora = datetime.datetime.now()
 
 	if result > 0:
-		os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-{0}-{1}-{2}_{3}:{4}:{5}.txt ".format(agora.day, agora.month, agora.year, agora.hour, agora.minute , agora.second))
-		os.system("touch /home/{0}/PythonServer/queries/query.txt".format(USER))
+		try:
+			os.system("mv  /home/"+USER+"/PythonServer/queries/query.txt /home/"+USER+"/PythonServer/queries/query_old-{0}-{1}-{2}_{3}:{4}:{5}.txt ".format(agora.day, agora.month, agora.year, agora.hour, agora.minute , agora.second))
+			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(USER))
+		except:
+			log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()[0]))
+			log.info('{0}:{1}'.format(datetime.datetime.now(),sys.exec_info()))
+		
 	log.info("Encerrando Serviço de Atuliazação.")
 	log.info('#######')
 	
