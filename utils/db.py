@@ -10,9 +10,10 @@ import configparser
 import config
 import datetime
 
-class DB(object):
+class DB:
 	""" TODO: Definir execute e commit dentro desta classe """
-	def __init__(self):
+	def __init__(self, M):
+		self.Manager = M
 		self.log = logging.getLogger('Banco de Dados')
 		self.log.info(datetime.datetime.now())
 		self.log.info('iniciando conexão com Banco de Dados.')
@@ -41,28 +42,30 @@ class DB(object):
 					
 		}
 		try:
-		
 			self.connection_pool={}
-			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W,pool_reset_session=True,)
-			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R,pool_reset_session=True,)
-			#self.connection_pool['W'].autocommit = True
+			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
+			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
 			self.log.info('Conexões esstabelecida com Sucesso!')
 		
-			self.Conns={}
-			self.Conns["W"]	= self.getConn("W")
-			self.Conns["R"] = self.getConn("R")
+			
 		except mysql.connector.Error as err:
 			self.log.info('Erro ao conecar com o Banco de Dados.')
-			sys.exit("[!]Não foi possivel conectar a base de dados! Erro {}".format(err))  
+			message = []
+			message.append( "{0}".format(sys.exc_info()[0]))
+			message.append("FALHA NO BANCO DE DADOS, TODAS AS TAREFAS SERÂO ENCERRADAS!")
+			self.feedback(metodo="__init__", status =4, message = message, erro = True, comments="KILL_ALL")
+			message = None
+			raise Exception("DB ERRO KILL_ALL")
+			sys.exit()
 	
 		
 	def getConn(self, mode):
 		try:
-			A = self.Conns[mode]
-			return self.Conns[mode]
+			conn = self.connection_pool[mode].get_connection()
+			return conn
 		except:
-			self.Conns[mode] = self.connection_pool[mode].get_connection()
-			return self.Conns[mode]
+			print('erro ao obter conexao')
+		
 	
 	def closeConn(self,mode):
 		try:
@@ -76,11 +79,18 @@ class DB(object):
 
 	def getCursor(self, mode):
 		try:
-			A = self.Conns[mode]
-			return self.Conns[mode].cursor()
+			conn =  self.connection_pool[mode].get_connection()
+			return conn.cursor()
 		except:	
-			self.Conns[mode] =  self.connection_pool[mode].get_connection()
-			return self.Conns[mode].cursor()
+			message = []
+			message.append( "{0}".format(sys.exc_info()[0]))
+			message.append("FALHA NO BANCO DE DADOS, TODAS AS TAREFAS SERÂO ENCERRADAS!")
+			self.feedback(metodo="getCursor", status =4, message = message, erro = True)
+			message = None
+			self.feedback()
+			raise Exception("DB ERRO KILL_ALL")
+			sys.exit()
+		
 
 
 
@@ -110,19 +120,25 @@ class DB(object):
 			cursor = conn.cursor()
 			
 		except:
+			try:
+				cursor = self.getCursor(mode)
+			except mysql.connector.Error as err:
+				print(err)
 			
-			cursor = self.getCursor(mode)
 		if args:
 			cursor.execute(sql, args)
 		else:
-			cursor.execute(sql)
+			try:
+				cursor.execute(sql)
+			except mysql.connector.Error as err:
+				print(err)
 		if commit is True:
 			conn.commit()
 			self.close(conn, cursor)
 			return None
 		else:
 			res = cursor.fetchall()
-			self.closeConn(mode)
+			self.close(conn, cursor)
 			return res
 
 	def executemany(self, sql, args, commit=False):
@@ -146,3 +162,54 @@ class DB(object):
 			res = cursor.fetchall()
 			self.close(conn, cursor)
 			return res
+	
+	#Se o banco der pau tem que parar tudo!
+	def feedback(self,*args, **kwargst):
+		message = kwargst.get('message')
+		comments = kwargst.get('comments')
+		metodo =kwargst.get('metodo')
+		status =kwargst.get('status')
+		try:
+			erro =kwargst.get('erro')
+		except:
+			erro = False
+		feedback = {
+			"class":"DB",
+			"metodo":kwargst.get('metodo'),
+			"status":kwargst.get('status'),
+			"message":[],
+			"erro":False,
+			"comments":"",
+			"time":None
+		}
+		feedback["metodo"] = metodo
+		feedback["status"] = status
+		feedback["erro"]=erro
+		if feedback['status']== 0:
+			for msg in message:
+				feedback["message"].append( '[OK]:{0}'.format(msg)) 
+			
+		elif feedback['status']== 1:
+			for msg in message:
+				feedback["message"].append('[X]:{0}'.format(msg))
+		elif feedback['status']== 2:
+			for msg in message:
+				feedback["message"].append('[!]:{0}'.format(msg))
+		elif feedback['status']== 3:
+			for msg in message:
+				feedback["message"].append( '[DIE]:{0}'.format(msg))
+		elif feedback['status']== 4:
+			for msg in message:
+				feedback["message"].append('[!!!]:{0}'.format(msg))
+		elif feedback['status']== 5:
+			for msg in message:
+				feedback["message"].append('[INFO]:{0}'.format(msg)) 
+		
+		try: 
+			feedback["comments"] = comments
+		except:
+			feedback["comments"] = ""
+		
+		feedback['time'] =str( datetime.datetime.now())
+		#with self._lock:
+		self.Manager.callback(feedback)
