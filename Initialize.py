@@ -18,7 +18,7 @@ import config
 from services.servicodevalidacao import servicoDeValidacao
 from services.DataUpdate import DataUpdate
 from services.SMS import SMS
-
+from services.watch import Watch
 
 
 
@@ -32,13 +32,13 @@ class Initialize:
 		self.SMS = SMS(M)
 		self.DataUpdate = DataUpdate(M)
 		self.servicoDeValidacao = servicoDeValidacao(M)
-
+		self.Watch = Watch(M)
 		#Definindo objeto das API's
 		
 		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS")
 		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
-
+		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
 		
 
@@ -82,7 +82,8 @@ class Initialize:
 		jobs = {
 			'SMS': self.job_sms,
 			'SVC': self.job_servico_de_validacao,
-			'SDU':self.job_dataupdate
+			'SDU': self.job_dataupdate,
+			'WATCH':self.job_watch
 		}
 		return jobs
 	

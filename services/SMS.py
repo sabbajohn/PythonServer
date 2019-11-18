@@ -8,8 +8,6 @@ import datetime
 from datetime import date
 import json
 import getpass
-#from Manager import Manager
-""" from utils.db import DB """
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
 

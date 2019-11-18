@@ -111,7 +111,7 @@ class Manager(Initialize):
 		except:
 			print(sys.exc_info()[0])
 		try:	
-			if "237.29" in IP:
+			if "237.29" in IP or "10.255.248" in IP :
 				self.Config.set("KEY", "env", "BETA")
 
 			elif "242.11" in IP or "242.52" in IP:
@@ -121,8 +121,8 @@ class Manager(Initialize):
 				try:
 					print("Defina o tipo de Ambiente:")
 					print("(1) BETA\n(2) PRODUCAO\n")
-					""" env = input() """
-					env='1'
+				 	env = input()
+					
 					if env == '1':
 						self.Config.set("KEY", "env", "BETA")
 					elif env == '2':
@@ -142,7 +142,10 @@ class Manager(Initialize):
 			self.Config.write(configfile)
 
 	def inicializando(self):
+
 		try:
+			self.Jobs['WATCH'].start()
+			
 			if self.Variaveis_de_controle['SMS']['init'] is True:
 				self.Jobs['SMS'].start()
 				self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
