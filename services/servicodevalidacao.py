@@ -377,6 +377,7 @@ class servicoDeValidacao(object):
 
 										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
 									elif  "Token Inválido ou sem saldo para a consulta." in item2['message'] :
+										self.contador_hd = self.contador_hd -1 
 										message = []
 										message.append('Token Inválido ou sem saldo para a consulta."')
 										self.feedback(metodo="Runner",status=2,message = message)
