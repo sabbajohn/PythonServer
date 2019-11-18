@@ -16,6 +16,7 @@ import concurrent.futures
 import asyncio.coroutines
 import getpass
 from utils.db import DB
+from comtele_sdk.textmessage_service import TextMessageService
 
 #from servers import server
 from Initialize import Initialize
@@ -52,10 +53,45 @@ class Manager(Initialize):
 			format='PID %(process)5s %(name)18s: %(message)s',
 			#stream=sys.stderr,
 		)
-		self.database = DB()
-		super().__init__(self)
-		self.USER = getpass.getuser()
 		log = logging.getLogger('Modulo de Gerenciamento')
+		
+		
+		self.Variaveis_de_controle = {
+			"SMS":{
+				"init": self.Config.getboolean("SERVICES","sms_init"),
+				"init_time":None,
+				"keepAlive": True,
+				"lasttimerunning":None,
+				"firstTime":True
+			},
+			"SVC":{
+				"init": self.Config.getboolean("SERVICES","svc_init"),
+				"init_time":None,
+				"keepAlive": True,
+				"lasttimerunning":None,
+				"firstTime":True
+			},
+			"SDU":{
+
+				"init": self.Config.getboolean("SERVICES","sdu_init"),
+				"init_time":None,
+				"keepAlive": True,
+				"lasttimerunning":None,
+				"firstTime":True
+			}
+		}
+		try:
+
+			self.database = DB(self)
+			super().__init__(self)
+		except Exception as err:
+				if "KILL_ALL" in err.args[0]:
+					sys.exit()
+				else:
+					log.info(sys.exc_info())
+
+		self.USER = getpass.getuser()
+		
 		self.Jobs = super().Jobs()
 		self.inicializando()
 	
@@ -104,63 +140,86 @@ class Manager(Initialize):
 		
 		with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
 			self.Config.write(configfile)
-		
-		
-		
-
-		
-	
 
 	def inicializando(self):
 		try:
-			self.Jobs['SMS'].start()
-			
-			self.ValidacaoEUpdate()
+			if self.Variaveis_de_controle['SMS']['init'] is True:
+				self.Jobs['SMS'].start()
+				self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
+				
+			if self.Variaveis_de_controle['SDU']['init'] is True:
+				self.ValidacaoEUpdate()
 
-		except:
-			message = []
-			message.append("Eita Juliana o forninho caiu!")
-			e= {
-			"class":"Só deus sabe",
-			"metodo":"Se eu não sei nem a classe...",
-			"status":4,
-			"message":message,
-			"erro":True,
-			"comments":"Arrumar uma forma de identificar melhor tais erros...",
-			"time":datetime.datetime.now()
-		}
-			
-			self.callback(e)
+		except Exception as err:
+			if "KILL_ALL" in err.args[0]:
+				
+				
+				message = []
+				message.append(err.args[0])
+				
+				e= {
+				"class":"???",
+				"metodo":"Se eu não sei nem a classe...",
+				"status":4,
+				"message":message,
+				"erro":True,
+				"comments":"Arrumar uma forma de identificar melhor tais erros...",
+				"time":datetime.datetime.now()
+				}
+				self.callback(e)
+			else:
+				e= {
+				"class":"???",
+				"metodo":"Se eu não sei nem a classe...",
+				"status":4,
+				"message":json.dumps(sys.exc_info()),
+				"erro":True,
+				"comments":"Arrumar uma forma de identificar melhor tais erros...",
+				"time":datetime.datetime.now()
+				}
+				self.callback(e)
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
-	
+			#sys.exit()
+
 	def ValidacaoEUpdate(self):
-		while True:
-			if self.isFirstTme['servico_de_validacao']:
+		
+		while self.Variaveis_de_controle["SVC"]["keepAlive"] is True:
+			
+			if self.Variaveis_de_controle["SVC"]['firstTime']:
+					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
 					self.Jobs['SVC'].start()
-					self.isFirstTme['servico_de_validacao'] = False
+					self.Variaveis_de_controle["SVC"]['firstTime'] = False
 					self.Jobs['SVC'].join()
+					self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
 					if not self.Jobs['SVC'].isAlive():
 						try:
-							self.Jobs['SDU'].start()
-							self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
+							if self.Variaveis_de_controle["SDU"]["init"] is True:
+								self.Variaveis_de_controle["SDU"]['init_time'] = str(datetime.datetime.now())
+								self.Jobs['SDU'].start()
+								self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
+								self.Variaveis_de_controle["SDU"]['lasttimerunning'] = str(datetime.datetime.now())
 						except:
 							print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
 			else:
-
-				if not self.Jobs['SVC'].isAlive():
+				if (self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
+					
 					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
 					self.Jobs['SVC'].start()
 					self.Jobs['SVC'].join()
-					if not self.Jobs['SDU'].isAlive():
+					self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+					if( not self.Jobs['SDU'].isAlive()) and (self.Variaveis_de_controle["SDU"]["keepAlive"] is True):
 						try:
 							self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+							self.Variaveis_de_controle["SVC"]['init_time'] = str(datetime.datetime.now())
 							self.Jobs['SDU'].start()
 							self.Jobs['SDU'].join()
-							sleep(6000)
+							self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+							sleep(200)
 						except:
 							print("Oops!{0} occured -- VEU :148".format(sys.exc_info()))
-	
+		
 	
 	
 	def callback(self,e):
@@ -270,7 +329,7 @@ class Manager(Initialize):
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
-		elif e['class'] == 'db':
+		elif e['class'] == 'DB':
 			if e['status']== -1:
 				self.Logs(e)
 			elif e['status']== 0:
@@ -314,34 +373,68 @@ class Manager(Initialize):
 				self.Logs(e)
 
 			elif e['status']== 2:
+				e["Controle"]=self.Variaveis_de_controle['SMS']
+				self.Variaveis_de_controle['SMS']['keepAlive'] = False
 				self.Logs(e)
+				self.Notificar(e)
+				
 			elif e['status']== 3:
+				self.Variaveis_de_controle['SMS']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SMS']
 				self.Logs(e)
+				self.Notificar(e)
+				
 			elif e['status']== 4:
+				self.Variaveis_de_controle['SMS']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SMS']
 				self.Logs(e)
+				self.Notificar(e)
+				sys.exit()
 				
 			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
+				self.Variaveis_de_controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SVC']
 				self.Logs(e)
+				self.Notificar(e)
+			
 			elif e['status']== 3:
+				self.Variaveis_de_controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SVC']
 				self.Logs(e)
+				self.Notificar(e)
+				
 			elif e['status']== 4:
+				self.Variaveis_de_controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SVC']
 				self.Logs(e)
-				self.Kill()
+				self.Notificar(e)
+				sys.exit()
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
+				self.Variaveis_de_controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SDU']
 				self.Logs(e)
+				self.Notificar(e)
+			
 			elif e['status']== 3:
+				self.Variaveis_de_controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SDU']
 				self.Logs(e)
+				self.Notificar(e)
+			
 			elif e['status']== 4:
+				self.Variaveis_de_controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SDU']
 				self.Logs(e)
-				
+				self.Notificar(e)
+				sys.exit()
 			pass
 
 		#DAS API'S	
@@ -381,16 +474,22 @@ class Manager(Initialize):
 				self.Logs(e)
 				
 			pass
-		elif e['class'] == 'db':
+		elif e['class'] == 'DB':
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
 				self.Logs(e)
+				self.Notificar(e)
+				sys.exit()
+
 			elif e['status']== 3:
 				self.Logs(e)
+				self.Notificar(e)
+				sys.exit()
 			elif e['status']== 4:
 				self.Logs(e)
-				
+				self.Notificar(e)
+				sys.exit()
 			pass
 		elif e['class'] == 'Relatorios':
 			if e['status']== 1:
@@ -401,7 +500,8 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 4:
 				self.Logs(e)
-				self.Kill()
+				self.Notificar(e)
+				sys.exit()
 			pass
 
 	def Logs(self, e):
@@ -413,8 +513,31 @@ class Manager(Initialize):
 		if e['comments']!="":
 			log.info("{0}: {1}".format(e['time'], e['comments']))
 
-	def Kill(self):
-		self.end()
+	def Notificar(self, e):
+		administradores = [
+			'47997619694',
+			'47988948000',
+			'47991566969'
+		]
+		log = logging.getLogger("Manager")
+		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
+		log.info(e)
+		
+		__api_key = '3aa20522-7c0a-4562-b25d-70ffc3f27f8e'
+		textmessage_service = TextMessageService(__api_key)
+		
+		
+		try:
+			result = textmessage_service.send('MS_.Manager - Error', json.dumps(e), administradores)
+			log.info( '{0}[!]Notificação de Falha enviada!!'.format(datetime.datetime.now()))
+		except :
+			log.info( '{0}[!!!]Não foi ossivel notificar!'.format(datetime.datetime.now()))
+			
+			
+		pass
+
+
+	
 if __name__ == "__main__":
 	pass
 	M = Manager()

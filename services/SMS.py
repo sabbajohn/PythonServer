@@ -61,17 +61,17 @@ class SMS(object):
 		while True:
 			try:
 				result = None
-				
-				""" cursor_r =self.database.getCursor("R") """
 				query = "SELECT * FROM sms WHERE sent_at is NULL"
-				
+			
 				result = self.database.execute("R",query)
-				""" cursor_r.execute("SELECT * FROM sms WHERE sent_at is NULL")
-				result = cursor_r.fetchall()
-				handler_r.commit()
-				"""
+			
 				if len(result)>0:
-					#Preciso mesmo dar lock?
+					if(escreveu == True):
+						message = []
+						message.append( "Novo sms encontrado!")
+						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+						message = None
+
 					message = []
 					message.append( "{0} sms's a serem enviados!".format(len(result)))
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
@@ -152,6 +152,7 @@ class SMS(object):
 			cursor_w = self.database.getCursor("W") """
 			query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
 			try:
+				""" with self._lock: """
 				self.database.execute("W",query, commit=True)
 				""" handler_w.commit() """
 				return

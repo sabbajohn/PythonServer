@@ -376,7 +376,11 @@ class servicoDeValidacao(object):
 
 
 										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
-									elif  "Token Inválido ou sem saldo para a consulta." in item['message'] :
+									elif  "Token Inválido ou sem saldo para a consulta." in item2['message'] :
+										message = []
+										message.append('[!]:Token Inválido ou sem saldo para a consulta."')
+										self.feedback(metodo="Runner",status=2,message = message)
+										message = None
 										sys.exit(item2['message'])
 							else:
 								pass
@@ -414,10 +418,9 @@ class servicoDeValidacao(object):
 		message.append("Buscando registros pendentes na base de dados.\n Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
-		query= self.Manager.Config.get("QUERIES","2")
-		'SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100'
+		query= self.Manager.Config.get("QUERIES",self.Manager.Config.get("QUERIES","set"))
 		self.result=database.execute("R", query)
-		#executor.execute("SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100")
+		
 		
 		if len(self.result) > 0:
 			message = []
@@ -432,7 +435,7 @@ class servicoDeValidacao(object):
 			message = None
 			return []
 			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
-			#sys.exit("")
+			
 
 		
 		lista = {}
@@ -602,7 +605,7 @@ class servicoDeValidacao(object):
 		except:
 			feedback["comments"] = ""
 		
-		feedback['time'] = datetime.datetime.now()
+		feedback['time'] = str(datetime.datetime.now())
 		#with self._lock:
 		self.Manager.callback(feedback)
 
@@ -622,6 +625,7 @@ class servicoDeValidacao(object):
 		self.Manager = M
 		self.Config = self.Manager.Config
 		self.database = self.Manager.database
+	
 	def end(self):
 		return 0
 		#raise Exception("kill-me")

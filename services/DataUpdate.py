@@ -45,6 +45,7 @@ class DataUpdate(object):
 						self.feedback(metodo ='start', status =5, message=message, erro = False)
 						message = None
 						sleep(1)
+					#with self._lock :
 					database.execute("W", line, commit=True)
 					"""	executor.execute(line)
 					H.commit()
@@ -156,7 +157,7 @@ class DataUpdate(object):
 		except:
 			feedback["comments"] = ""
 		
-		feedback['time'] = datetime.datetime.now()
+		feedback['time'] =str(datetime.datetime.now())
 		#with self._lock:
 		self.Manager.callback(feedback)
 

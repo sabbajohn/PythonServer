@@ -35,10 +35,6 @@ class Initialize:
 
 		#Definindo objeto das API's
 		
-		self.isFirstTme={
-			"servico_de_validacao":True,
-			"dataupdate":True
-		}
 		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS")
 		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
