@@ -24,9 +24,7 @@ class SMS(object):
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		""" TODO FIXME
-			! Não Preciso iniciar uma conexão com o DB toda vez ja existem prontas!
-		 """
+	
 
 	def start(self):
 		
@@ -221,9 +219,4 @@ class SMS(object):
 
 	
 
-	def end(self):
-		""" return 0 """
-		raise Exception("kill-me")
-
-	def restart(self):
-		raise Exception("restart")
+	
