@@ -121,7 +121,7 @@ class Manager(Initialize):
 				try:
 					print("Defina o tipo de Ambiente:")
 					print("(1) BETA\n(2) PRODUCAO\n")
-				 	env = input()
+					env = input()
 					
 					if env == '1':
 						self.Config.set("KEY", "env", "BETA")
