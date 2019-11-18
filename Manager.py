@@ -111,7 +111,7 @@ class Manager(Initialize):
 		except:
 			print(sys.exc_info()[0])
 		try:	
-			if "237.29" in IP or "10.255.248" in IP :
+			if "237.29" in IP or "192.168." in IP :
 				self.Config.set("KEY", "env", "BETA")
 
 			elif "242.11" in IP or "242.52" in IP:
