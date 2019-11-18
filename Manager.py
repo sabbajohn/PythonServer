@@ -219,9 +219,7 @@ class Manager(Initialize):
 							sleep(200)
 						except:
 							print("Oops!{0} occured -- VEU :148".format(sys.exc_info()))
-		
-	
-	
+
 	def callback(self,e):
 		
 		if e['class'] == 'SMS':
