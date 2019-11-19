@@ -23,7 +23,7 @@ soa = 0
 viacep = 0
 
 [QUERIES]
-1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) LIMIT 100
+1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) and confirmed_at is not NULL LIMIT 100
 2 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 order by Nome asc ,id desc LIMIT 100
 set = 1
 
@@ -33,6 +33,6 @@ svc_init = True
 sdu_init = True
 
 [WATCH]
-addr = 0.0.0.0
-port = 1234
+addr = 
+port = 
 
