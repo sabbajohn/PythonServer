@@ -50,7 +50,8 @@ class Manager(Initialize):
 			filename=self.Config.get("LOGS","manager_log"),
 			filemode='a+',
 			level=logging.INFO,
-			format='PID %(process)5s %(name)18s: %(message)s',
+			format='%(asctime)s %(name)18s: %(message)s',
+			datefmt='%d-%m-%Y %H:%M:%S'
 			#stream=sys.stderr,
 		)
 		log = logging.getLogger('Modulo de Gerenciamento')
@@ -62,14 +63,16 @@ class Manager(Initialize):
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
-				"firstTime":True
+				"firstTime":True,
+				"stop":False
 			},
 			"SVC":{
 				"init": self.Config.getboolean("SERVICES","svc_init"),
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
-				"firstTime":True
+				"firstTime":True,
+				"stop":False
 			},
 			"SDU":{
 
@@ -77,7 +80,8 @@ class Manager(Initialize):
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
-				"firstTime":True
+				"firstTime":True,
+				"stop":False
 			}
 		}
 		try:
@@ -187,41 +191,82 @@ class Manager(Initialize):
 
 	def ValidacaoEUpdate(self):
 		
-		while self.Variaveis_de_controle["SVC"]["keepAlive"] is True:
-			
-			if self.Variaveis_de_controle["SVC"]['firstTime']:
-					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
-					self.Jobs['SVC'].start()
-					self.Variaveis_de_controle["SVC"]['firstTime'] = False
-					self.Jobs['SVC'].join()
-					self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-					if not self.Jobs['SVC'].isAlive():
-						try:
-							if self.Variaveis_de_controle["SDU"]["init"] is True:
-								self.Variaveis_de_controle["SDU"]['init_time'] = str(datetime.datetime.now())
+			while self.Variaveis_de_controle["SVC"]["keepAlive"] is True:
+				if self.Variaveis_de_controle["SVC"]['firstTime']:
+						self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
+						self.Jobs['SVC'].start()
+						self.Variaveis_de_controle["SVC"]['firstTime'] = False
+						self.Jobs['SVC'].join()
+						self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+						if not self.Jobs['SVC'].isAlive():
+							try:
+								if self.Variaveis_de_controle["SDU"]["init"] is True:
+									self.Variaveis_de_controle["SDU"]['init_time'] = str(datetime.datetime.now())
+									self.Jobs['SDU'].start()
+									self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
+									self.Variaveis_de_controle["SDU"]['lasttimerunning'] = str(datetime.datetime.now())
+							except SystemExit:
+								pass
+							except not SystemExit:
+								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
+				else:
+					if (self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
+						
+						self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+						self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
+						self.Jobs['SVC'].start()
+						self.Jobs['SVC'].join()
+						self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+						if( not self.Jobs['SDU'].isAlive()) and (self.Variaveis_de_controle["SDU"]["keepAlive"] is True):
+							try:
+								self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+								self.Variaveis_de_controle["SVC"]['init_time'] = str(datetime.datetime.now())
 								self.Jobs['SDU'].start()
-								self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
-								self.Variaveis_de_controle["SDU"]['lasttimerunning'] = str(datetime.datetime.now())
-						except:
-							print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
-			else:
-				if (self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
-					
-					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
-					self.Jobs['SVC'].start()
-					self.Jobs['SVC'].join()
-					self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-					if( not self.Jobs['SDU'].isAlive()) and (self.Variaveis_de_controle["SDU"]["keepAlive"] is True):
-						try:
-							self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-							self.Variaveis_de_controle["SVC"]['init_time'] = str(datetime.datetime.now())
-							self.Jobs['SDU'].start()
-							self.Jobs['SDU'].join()
-							self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-							sleep(200)
-						except:
-							print("Oops!{0} occured -- VEU :148".format(sys.exc_info()))
+								self.Jobs['SDU'].join()
+								self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+								sleep(200)
+							except SystemExit:
+								pass
+							except not SystemExit:
+								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
+
+	def verifica(self):
+		if not self.Jobs['WATCH'].isAlive():
+			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
+			self.Jobs['WATCH'].start()
+		if (not self.Jobs['SMS'].isAlive()) and (self.Variaveis_de_controle["SMS"]["keepAlive"] is True):
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
+			self.Jobs['SMS'].start()
+			self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
+	
+	def finaliza(self, servico):
+		if "sdu" in servico:
+			if self.Jobs['SDU'].isAlive():
+				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
+				self.Variaveis_de_controle["SDU"]["stop"]=True
+				self.Jobs["SDU"].raise_exception()
+		if "svc" in servico:
+			if self.Jobs['SVC'].isAlive():
+				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
+				self.Variaveis_de_controle["SDU"]["stop"]=True
+				self.Jobs["SVC"].raise_exception()
+
+	def inicia(self, servico):
+		if "sdu" in servico:
+			self.Variaveis_de_controle["SDU"]["keepAlive"]=True
+			self.Variaveis_de_controle["SDU"]["stop"]=False
+			self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+			self.Jobs['SDU'].start()
+		if "svc" in servico:
+			self.Variaveis_de_controle["SVC"]["keepAlive"]=True
+			self.Variaveis_de_controle["SVC"]["stop"]=False
+			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+			self.Jobs['SVC'].start()
+		if "sms" in servico:
+			self.Variaveis_de_controle["SMS"]["keepAlive"]=True
+			self.Variaveis_de_controle["SMS"]["stop"]=False
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="sms", args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
+			self.Jobs['SMS'].start()
 
 	def callback(self,e):
 		
@@ -510,9 +555,9 @@ class Manager(Initialize):
 		log = logging.getLogger("{0}.{1}".format(e['class'], e['metodo']))
 		log.info(e['status'])
 		for msg in e['message']:
-			log.info("{0}: {1}".format(e['time'], msg))
+			log.info("#>: {0}".format(msg))
 		if e['comments']!="":
-			log.info("{0}: {1}".format(e['time'], e['comments']))
+			log.info("#>: {0}".format(e['comments']))
 
 	def Notificar(self, e):
 		administradores = [

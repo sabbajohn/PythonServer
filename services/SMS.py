@@ -24,7 +24,7 @@ class SMS(object):
 		self.database = self.Manager.database
 	
 
-	def start(self):
+	def start(self, stop):
 		
 		
 		
@@ -33,20 +33,27 @@ class SMS(object):
 			message.append( "Inicializando SMS")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			self.db_monitor()
-		except:
+			self.db_monitor(stop)
+		except SystemExit:
+			message = []
+			message.append( "Serviço finalizado via Watcher")
+			self.feedback(metodo="start", status =5, message = message, erro = False, comments = "Finalizado via Watcher" )
+			message = None
+			sys.exit()
+		else:
 			#O metodo é o start, mas o pau veio de dentro do db_monitor
-		#	print("Oops!{0} occured.".format(sys.exc_info()[0]))
+			#print("Oops!{0} occured.".format(sys.exc_info()[0]))
 			message = []
 			message.append( "{0}".format(sys.exc_info()))
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
+		
 
-	def db_monitor(self):
+	def db_monitor(self,stop):
 
 	
 		message = []
-		message.append( "[INFO]:Inicializando o Monitoramento do Banco de Dados")
+		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 		message = None
 		escreveu = False
@@ -55,6 +62,9 @@ class SMS(object):
 		
 		
 		while True:
+			if stop():
+				break
+			
 			try:
 				result = None
 				query = "SELECT * FROM sms WHERE sent_at is NULL"
@@ -96,6 +106,7 @@ class SMS(object):
 				message = None
 			finally:
 				pass
+		sys.exit()
 
 
 	def send(self,cliente):
@@ -116,14 +127,14 @@ class SMS(object):
 			
 			
 			message = []
-			message.append( "[!!!]:Oops!{0}occured.".format(sys.exc_info()[0]))
+			message.append( "Oops!{0}occured.".format(sys.exc_info()[0]))
 			self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
 			
 			return
 		else:
 			message = []
-			message.append( "[INFO]:SMS:{0}".format(result['Message']))
+			message.append( "SMS:{0}".format(result['Message']))
 			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
 			self.update(result, cliente)

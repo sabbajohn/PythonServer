@@ -17,6 +17,7 @@ from utils import CPF as cpf
 import asyncio
 import aiohttp
 from aiofile import AIOFile, LineReader, Writer
+import ctypes 
 #from Manager import Manager
 
 
@@ -416,7 +417,7 @@ class servicoDeValidacao(object):
 		self.result, self.contador_dispensadas
 		
 		
-		message.append("Buscando registros pendentes na base de dados.\n Aguarde!")
+		message.append("Buscando registros pendentes na base de dados. Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
 		query= self.Manager.Config.get("QUERIES",self.Manager.Config.get("QUERIES","set"))
@@ -515,6 +516,7 @@ class servicoDeValidacao(object):
 		return lista 	
 
 	def start(self):
+	
 		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		
 		
@@ -560,6 +562,7 @@ class servicoDeValidacao(object):
 			message = None
 			sleep(15)
 			return self.end()
+
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
 		comments = kwargst.get('comments')
@@ -627,8 +630,23 @@ class servicoDeValidacao(object):
 		self.Config = self.Manager.Config
 		self.database = self.Manager.database
 	
-	def end(self):
-		return 0
-		#raise Exception("kill-me")
-	def restart(self):
-		raise Exception("restart")
+	def get_id(self): 
+		
+		# returns id of the respective thread 
+		if hasattr(self, '_thread_id'): 
+			return self._thread_id 
+		for id, thread in threading._active.items(): 
+			if thread is self: 
+				return id
+		
+	def raise_exception(self): 
+		message = []
+		message.append( "Serviço finalizado via Watcher")
+		self.feedback(metodo="Watcher", status =5, message = message, erro = False, comments = "Finalizado via Watcher" )
+		message = None
+		thread_id = self.get_id() 
+		res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
+				ctypes.py_object(SystemExit)) 
+		if res > 1: 
+			ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
+			print('Exception raise failure')

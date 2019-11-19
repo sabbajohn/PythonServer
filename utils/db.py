@@ -15,7 +15,6 @@ class DB:
 	def __init__(self, M):
 		self.Manager = M
 		self.log = logging.getLogger('Banco de Dados')
-		self.log.info(datetime.datetime.now())
 		self.log.info('iniciando conexão com Banco de Dados.')
 		self.Config =   configparser.ConfigParser()
 		self.Config.read("config/DEFAULT.ini")

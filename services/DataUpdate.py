@@ -9,6 +9,7 @@ import time
 import datetime
 from datetime import date
 from time import sleep
+import ctypes 
 
 #from Manager import Manager
 import threading
@@ -77,6 +78,7 @@ class DataUpdate(object):
 
 
 	def start(self):
+		
 		self._lock =threading.Lock()
 		self._stop_event = threading.Event()
 		self.USER =getpass.getuser()
@@ -84,13 +86,8 @@ class DataUpdate(object):
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
 		message = None
-		
-		""" self.database = DB() """
 		start_time = time.time()
 		
-		
-		
-	
 		result = self.QueryRunner(self.database)
 		duration = time.time() - start_time
 		message = []
@@ -161,12 +158,24 @@ class DataUpdate(object):
 		#with self._lock:
 		self.Manager.callback(feedback)
 
-	def end(self):
-		return 0
-		#raise Exception("kill-me")
-	def restart(self):
-		raise Exception("restart")
+	def get_id(self): 
+		
+		# returns id of the respective thread 
+		if hasattr(self, '_thread_id'): 
+			return self._thread_id 
+		for id, thread in threading._active.items(): 
+			if thread is self: 
+				return id
+		
+	def raise_exception(self): 
+		message = []
+		message.append( "Serviço finalizado via Watcher")
+		self.feedback(metodo="Watcher", status =5, message = message, erro = False, comments = "Finalizado via Watcher" )
+		message = None
+		thread_id = self.get_id() 
+		res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
+				ctypes.py_object(SystemExit)) 
+		if res > 1: 
+			ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
+			print('Exception raise failure')
 
-
-
-	
