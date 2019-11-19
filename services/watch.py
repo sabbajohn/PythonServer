@@ -124,6 +124,7 @@ class Watch(object):
 			
 			return
 		elif 'svc' in service :
+			
 			if "mode" in service:
 				if "up" in service:
 					self.Manager.Variaveis_de_controle["SVC"]["keepAlive"] = True
@@ -132,12 +133,18 @@ class Watch(object):
 					self.Manager.Variaveis_de_controle["SVC"]["keepAlive"] = False
 					self.Manager.finaliza()
 				else: pass
+
 			if "start" in service:
 				if self.Manager.Jobs['SVC'].isAlive():
 					message = "SERVIÇO JA ATIVO"
 					return message.encode()
 				else:
 					self.Manager.inicia("svc")
+			""" if "set" in service: """
+			#TODO: Definir qual query será utilizada no processo!
+			
+
+
 			return str.encode(response.format(self.Manager.Jobs['SVC'].isAlive(),
 			 self.Manager.Variaveis_de_controle["SVC"]["init"],
 			 self.Manager.Variaveis_de_controle["SVC"]["init_time"],
@@ -166,5 +173,6 @@ class Watch(object):
 			 self.Manager.Variaveis_de_controle["SDU"]["keepAlive"],
 			 self.Manager.Variaveis_de_controle["SDU"]["lasttimerunning"],
 			 self.Manager.Variaveis_de_controle["SDU"]["firstTime"]))
+		
 		else:
 			return None
