@@ -1,7 +1,6 @@
-[KEY]
-env = BETA
-root = /home/objetiva/PythonServer
-user = objetiva
+env = 
+root = 
+user = 
 
 [LOGS]
 manager_log = ${KEY:root}/logs/manager.log
@@ -10,6 +9,7 @@ svc_log = ${KEY:root}/logs/svc.log
 sms_log = ${KEY:root}/logs/sms.log
 api_log = ${KEY:root}/logs/API.log
 startup_log = ${KEY:root}/logs/startup.log
+watch_log = ${KEY:root}/logs/watch.log
 
 [FILES]
 query = ${KEY:root}/queries/query.txt
@@ -31,4 +31,8 @@ set = 1
 sms_init = True
 svc_init = True
 sdu_init = True
+
+[WATCH]
+addr = 0.0.0.0
+port = 1234
 
