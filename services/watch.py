@@ -93,7 +93,7 @@ class Watch(object):
 		self.server_loop()
 
 	def job_info(self, service,client_socket ):
-		response = "status:{0}\ninit:{1}\ninit_time:{2}\nkeepAlive: {3}\nlasttimerunning:{4}\nfirstTime:{5}\n"
+		response = "status:{0}\ninit:{1}\ninit_time:{2}\nkeepAlive: {3}\nlasttimerunning:{4}\nnextrun:{5}\nfirstTime:{6}\nstop:{7}"
 		
 		service = service.rstrip()
 		if 'sms' in service :
@@ -118,7 +118,9 @@ class Watch(object):
 			 self.Manager.Variaveis_de_controle["SMS"]["init_time"],
 			 self.Manager.Variaveis_de_controle["SMS"]["keepAlive"],
 			 self.Manager.Variaveis_de_controle["SMS"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SMS"]["firstTime"]))
+			 self.Manager.Variaveis_de_controle["SMS"]["nextrun"],
+			 self.Manager.Variaveis_de_controle["SMS"]["firstTime"],
+			 self.Manager.Variaveis_de_controle["SMS"]["stop"]))
 			
 			
 			
@@ -142,7 +144,7 @@ class Watch(object):
 					self.Manager.inicia("svc")
 			""" if "set" in service: """
 			#TODO: Definir qual query será utilizada no processo!
-			
+
 
 
 			return str.encode(response.format(self.Manager.Jobs['SVC'].isAlive(),
@@ -150,7 +152,9 @@ class Watch(object):
 			 self.Manager.Variaveis_de_controle["SVC"]["init_time"],
 			 self.Manager.Variaveis_de_controle["SVC"]["keepAlive"],
 			 self.Manager.Variaveis_de_controle["SVC"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SVC"]["firstTime"]))
+			 self.Manager.Variaveis_de_controle["SVC"]["nextrun"],
+			 self.Manager.Variaveis_de_controle["SVC"]["firstTime"],
+			 self.Manager.Variaveis_de_controle["SVC"]["stop"]))
 		elif 'sdu' in service:
 			if "mode" in service:
 				if "up" in service:
@@ -172,7 +176,37 @@ class Watch(object):
 			 self.Manager.Variaveis_de_controle["SDU"]["init_time"],
 			 self.Manager.Variaveis_de_controle["SDU"]["keepAlive"],
 			 self.Manager.Variaveis_de_controle["SDU"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SDU"]["firstTime"]))
-		
+			 self.Manager.Variaveis_de_controle["SDU"]["nextrun"],
+			 self.Manager.Variaveis_de_controle["SDU"]["firstTime"],
+			 self.Manager.Variaveis_de_controle["SDU"]["stop"]))
+		elif 'src' in service :
+			if "mode" in service:
+				if "up" in service:
+					self.Manager.Variaveis_de_controle["SRC"]["keepAlive"] = True
+					self.Manager.verifica()
+				elif "down" in service:
+					self.Manager.Variaveis_de_controle["SRC"]["keepAlive"] = False
+					self.Manager.Variaveis_de_controle["SRC"]["stop"] = True
+					self.Manager.verifica()
+				else: pass
+			if "start" in service:
+				if self.Manager.Jobs['SRC'].isAlive():
+					message = "SERVIÇO JA ATIVO"
+					return message.encode()
+				else:
+					self.Manager.inicia("src")
+				
+			return str.encode(response.format(self.Manager.Jobs['SRC'].isAlive(),
+			 self.Manager.Variaveis_de_controle["SRC"]["init"],
+			 self.Manager.Variaveis_de_controle["SRC"]["init_time"],
+			 self.Manager.Variaveis_de_controle["SRC"]["keepAlive"],
+			 self.Manager.Variaveis_de_controle["SRC"]["lasttimerunning"],
+			 self.Manager.Variaveis_de_controle["SRC"]["nextrun"],
+			 self.Manager.Variaveis_de_controle["SRC"]["firstTime"],
+			 self.Manager.Variaveis_de_controle["SRC"]["stop"]))
+			
+			
+			
+			return
 		else:
 			return None

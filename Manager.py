@@ -59,7 +59,7 @@ class Manager(Initialize):
 		
 		self.Variaveis_de_controle = {
 			"SMS":{
-				"init": self.Config.getboolean("SERVICES","sms_init"),
+				"init": self.Config.getboolean("SMS","sms_init"),
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
@@ -67,19 +67,32 @@ class Manager(Initialize):
 				"stop":False
 			},
 			"SVC":{
-				"init": self.Config.getboolean("SERVICES","svc_init"),
+				"init": self.Config.getboolean("SVC","svc_init"),
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
+				"nextrun":None,
 				"firstTime":True,
 				"stop":False
+				
 			},
 			"SDU":{
 
-				"init": self.Config.getboolean("SERVICES","sdu_init"),
+				"init": self.Config.getboolean("SDU","sdu_init"),
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
+				"nextrun":None,
+				"firstTime":True,
+				"stop":False
+			},
+			"SRC":{
+
+				"init": self.Config.getboolean("SRC","src_init"),
+				"init_time":None,
+				"keepAlive": True,
+				"lasttimerunning":None,
+				"nextrun":None,
 				"firstTime":True,
 				"stop":False
 			}
@@ -153,6 +166,10 @@ class Manager(Initialize):
 			if self.Variaveis_de_controle['SMS']['init'] is True:
 				self.Jobs['SMS'].start()
 				self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
+			
+			if self.Variaveis_de_controle['SRC']['init'] is True:
+				self.Jobs['SRC'].start()
+				self.Variaveis_de_controle['SRC']['init_time'] =str( datetime.datetime.now())
 				
 			if self.Variaveis_de_controle['SDU']['init'] is True:
 				self.ValidacaoEUpdate()
@@ -224,7 +241,8 @@ class Manager(Initialize):
 								self.Jobs['SDU'].start()
 								self.Jobs['SDU'].join()
 								self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-								sleep(200)
+								self.Variaveis_de_controle["SVC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+int(self.Config.get("SVC","delay"))))
+								sleep(int(self.Config.get("SVC","delay")))
 							except SystemExit:
 								pass
 							except not SystemExit:
@@ -238,6 +256,10 @@ class Manager(Initialize):
 			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
 			self.Jobs['SMS'].start()
 			self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
+		if (not self.Jobs['SRC'].isAlive()) and (self.Variaveis_de_controle["SRC"]["keepAlive"] is True):
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Variaveis_de_controle["SRC"]["stop"],))
+			self.Jobs['SRC'].start()
+			self.Variaveis_de_controle['SRC']['init_time'] =str( datetime.datetime.now())
 	
 	def finaliza(self, servico):
 		if "sdu" in servico:
@@ -265,8 +287,13 @@ class Manager(Initialize):
 		if "sms" in servico:
 			self.Variaveis_de_controle["SMS"]["keepAlive"]=True
 			self.Variaveis_de_controle["SMS"]["stop"]=False
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="sms", args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
 			self.Jobs['SMS'].start()
+		if "src" in servico:
+			self.Variaveis_de_controle["SRC"]["keepAlive"]=True
+			self.Variaveis_de_controle["SRC"]["stop"]=False
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Variaveis_de_controle["SRC"]["stop"],))
+			self.Jobs['SRC'].start()
 
 	def callback(self,e):
 		
