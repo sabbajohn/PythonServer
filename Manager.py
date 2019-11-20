@@ -63,6 +63,7 @@ class Manager(Initialize):
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
+				"nextrun":None,
 				"firstTime":True,
 				"stop":False
 			},
@@ -314,6 +315,22 @@ class Manager(Initialize):
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
+		elif e['class'] == 'Watch':
+			if e['status']== -1:
+				self.Logs(e)
+			elif e['status']== 0:
+				self.Logs(e)
+			elif e['status']== 1:
+				self.Exceptions(e)
+			elif e['status']== 2:
+				self.Exceptions(e)
+			elif e['status']== 3:
+				self.Exceptions(e)
+			elif e['status']== 4:
+				self.Exceptions(e)
+			elif e['status']== 5:
+				self.Logs(e)
+			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== -1:
 				self.Logs(e)
@@ -465,6 +482,32 @@ class Manager(Initialize):
 				sys.exit()
 				
 			pass
+		elif e['class'] == 'Watch':
+			
+			
+			if e['status']== 1:
+				self.Logs(e)
+
+			elif e['status']== 2:
+				e["Controle"]=self.Variaveis_de_controle['SRC']
+				self.Variaveis_de_controle['SRC']['keepAlive'] = False
+				self.Logs(e)
+				self.Notificar(e)
+				
+			elif e['status']== 3:
+				self.Variaveis_de_controle['SRC']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SRC']
+				self.Logs(e)
+				self.Notificar(e)
+				
+			elif e['status']== 4:
+				self.Variaveis_de_controle['SRC']['keepAlive'] = False
+				e["Controle"]=self.Variaveis_de_controle['SRC']
+				self.Logs(e)
+				self.Notificar(e)
+				sys.exit()
+				
+			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
 				self.Logs(e)
@@ -579,12 +622,12 @@ class Manager(Initialize):
 
 	def Logs(self, e):
 
-		log = logging.getLogger("{0}.{1}".format(e['class'], e['metodo']))
-		log.info(e['status'])
+		log = logging.getLogger("\t{0}.{1}\t".format(e['class'], e['metodo']))
 		for msg in e['message']:
-			log.info("#>: {0}".format(msg))
-		if e['comments']!="":
-			log.info("#>: {0}".format(e['comments']))
+			if msg is not None and msg != "":
+				log.info("\t\t#>: {0}".format(msg))
+		if e['comments']!="" and e['comments'] is not None:
+			log.info("\t\t#>: {0}".format(e['comments']))
 
 	def Notificar(self, e):
 		administradores = [
