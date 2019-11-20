@@ -32,8 +32,7 @@ class Watch(object):
 	
 	def client_handler(self,client_socket):
 		
-		client_socket.sendall(bytes("help",'utf-8'))
-		time.sleep(0.5)
+		
 		while True:
 				# show a simple prompt
 				
@@ -45,9 +44,9 @@ class Watch(object):
 				while "\n" not in cmd_buffer:
 					try:
 						cmd_buffer += client_socket.recv(1024).decode('utf-8')
-						print(cmd_buffer)
-						if cmd_buffer == "\n" or cmd_buffer =="\r" or cmd_buffer =='EOF' or cmd_buffer =='':
+						if cmd_buffer == "\n" or  cmd_buffer =='':
 							cmd_buffer = ""
+
 							continue
 						elif "exit" in cmd_buffer:
 							return 
@@ -62,8 +61,7 @@ class Watch(object):
 					except ConnectionResetError:
 						return
 
-						return
-	
+						
 		
 				
 				# we have a valid command so execute it and send back the results
@@ -86,7 +84,7 @@ class Watch(object):
 					client_socket.sendall(response)
 				
 				except:
-					pass
+					continue
 
 	def server_loop(self):
 				
@@ -119,7 +117,7 @@ class Watch(object):
 		self.server_loop()
 
 	def job_info(self, service,client_socket ):
-		response = "{'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' }"
+		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
 		
 		service = service.rstrip()
 		if 'sms' in service :
@@ -146,7 +144,7 @@ class Watch(object):
 			 self.Manager.Variaveis_de_controle["SMS"]["lasttimerunning"],
 			 self.Manager.Variaveis_de_controle["SMS"]["nextrun"],
 			 self.Manager.Variaveis_de_controle["SMS"]["firstTime"],
-			 self.Manager.Variaveis_de_controle["SMS"]["stop"]),'ascii')
+			 self.Manager.Variaveis_de_controle["SMS"]["stop"]),'utf-8')
 			
 			
 			
@@ -236,7 +234,9 @@ class Watch(object):
 			self.feedback(metodo="job_info", status =5, message = message, erro = False)
 			message = None
 			self.feedback()
-			os.system("sudo pkill python3")
+			os.system("pkill python3")
+		elif service == '' or len(service)<3:
+			return ''
 		else:
 			return bytes("help",'utf-8')
 

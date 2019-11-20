@@ -625,9 +625,9 @@ class Manager(Initialize):
 		log = logging.getLogger("\t{0}.{1}\t".format(e['class'], e['metodo']))
 		for msg in e['message']:
 			if msg is not None and msg != "":
-				log.info("\t\t#>: {0}".format(msg))
+				log.info("\t\t\t\t\t#>: {0}".format(msg))
 		if e['comments']!="" and e['comments'] is not None:
-			log.info("\t\t#>: {0}".format(e['comments']))
+			log.info("\t\t\t\t\t#>: {0}".format(e['comments']))
 
 	def Notificar(self, e):
 		administradores = [

@@ -71,17 +71,41 @@ def client_sender(buffer):
 							usage(),
 							continue
 							# wait for more input
-						else:
-							if "status" in response:
-								response=response.strip("<>() \n SERVICES:#").replace('\'', '\"')
-								resp = json.loads(response)
-								print (resp)
-							#TODO: Organizar saida dos dados a partir do  json!!!
-							print(response)
+						elif "status" in response:
+						
+							response=response.strip("<>() \n SERVICES:#").replace('\'', '\"')
+							response = json.loads("{"+response+"}")
+							if response['status']== "True":
+								print(colored("status","blue"),colored(response['status'], "green"))
+							else:
+								print(colored("status","blue"),colored(response['status'], "red"))
+							
+							print(colored("init","blue"),colored(response['init'], "blue"))
+							print(colored("init_time","blue"),colored(response['init_time'], "blue"))
+							if response['keepAlive']== "True":
+								print(colored("keepAlive","blue"),colored(response['keepAlive'], "green"))
+							else:
+								print(colored("keepAlive","blue"),colored(response['keepAlive'], "red"))
+							
+							print(colored("lasttimerunning","blue"),colored(response['lasttimerunning'], "blue"))
+							print(colored("nextrun","blue"),colored(response['nextrun'], "blue"))
+							print(colored("firstTime","blue"),colored(response['firstTime'], "blue"))
 
+							if response['stop']== "True":
+								print(colored("stop","blue"),colored(response['stop'], "red"))
+							else:
+								print(colored("stop","blue"),colored(response['stop'], "green"))
+							
+						else:
+							print(response)
+							
+
+						
+						
 						buffer = input("")
 						buffer += "\n"
 						client.send(bytes(buffer,"utf-8"))
+		
 							
 						
 					
@@ -104,6 +128,7 @@ def client_sender(buffer):
 		except:
 			print(colored("Não foi possivel conectar","red"))
 			sys.exit()
+
 
 
 def usage():
@@ -168,7 +193,9 @@ def main():
 							port = int(a)
 					else:
 							assert False,"Unhandled Option"  
-				
+		usage()
+		print("")
+		print("")	
 		# read in the buffer from the commandline
 		# this will block, so send CTRL-D if not sending input
 		# to stdin
