@@ -14,8 +14,11 @@ class DB:
 	""" TODO: Definir execute e commit dentro desta classe """
 	def __init__(self, M):
 		self.Manager = M
-		self.log = logging.getLogger('Banco de Dados')
-		self.log.info('iniciando conexão com Banco de Dados.')
+		message = []
+		message.append("Iniciando conexões com o Banco de Dados!")
+		self.feedback(metodo="__init__", status =5, message = message, erro = False)
+		message = None
+		self.feedback()
 		self.Config =   configparser.ConfigParser()
 		self.Config.read("config/DEFAULT.ini")
 		self.Config_ENV =   configparser.ConfigParser()
@@ -44,11 +47,15 @@ class DB:
 			self.connection_pool={}
 			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
 			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
-			self.log.info('Conexões esstabelecida com Sucesso!')
+			message = []
+			message.append("Conexões esstabelecidas com Sucesso!")
+			
+			self.feedback(metodo="__init__", status =5, message = message, erro = False)
+			message = None
 		
 			
 		except mysql.connector.Error as err:
-			self.log.info('Erro ao conecar com o Banco de Dados.')
+			
 			message = []
 			message.append( "{0}".format(sys.exc_info()[0]))
 			message.append("FALHA NO BANCO DE DADOS, TODAS AS TAREFAS SERÂO ENCERRADAS!")
