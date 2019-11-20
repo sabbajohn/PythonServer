@@ -242,8 +242,8 @@ class Manager(Initialize):
 								self.Jobs['SDU'].start()
 								self.Jobs['SDU'].join()
 								self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-								self.Variaveis_de_controle["SVC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+int(self.Config.get("SVC","delay"))))
-								sleep(int(self.Config.get("SVC","delay")))
+								self.Variaveis_de_controle["SVC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
+								sleep(float(self.Config.get("SVC","delay")))
 							except SystemExit:
 								pass
 							except not SystemExit:
