@@ -22,7 +22,7 @@ class recuperacaoDeCarrinhos(object):
 		self.Config_ENV.read("config/{0}.ini".format(self.Manager.Config.get("KEY", "env")))
 
 		self.query = self.Config.get('SRC', 'query')
-		self.delay = int(self.Config.get('SRC', 'delay'))
+		self.delay = float(self.Config.get('SRC', 'delay'))
 		self.mandrill_key = self.Config_ENV.get('MANDRILL', 'API_KEY')
 		self.cont = self.Config.get('SRC', 'enviados')
 
@@ -165,7 +165,7 @@ class recuperacaoDeCarrinhos(object):
 					self.Config.set("SRC", "enviados", str(int(self.Config.get("SRC", "enviados")) +self.cont))
 					with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
 						self.Config.write(configfile)
-					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+int(self.delay)))
+					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
 			except mandrill.Error as e:
 				
 				
