@@ -276,15 +276,35 @@ class Manager(Initialize):
 
 	def inicia(self, servico):
 		if "sdu" in servico:
-			self.Variaveis_de_controle["SDU"]["keepAlive"]=True
-			self.Variaveis_de_controle["SDU"]["stop"]=False
-			self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-			self.Jobs['SDU'].start()
+			if self.Variaveis_de_controle["SDU"]['firstTime']:
+				self.Variaveis_de_controle["SDU"]['init_time'] =str( datetime.datetime.now())
+				self.Variaveis_de_controle["SDU"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
+				self.Variaveis_de_controle["SDU"]["keepAlive"]=True
+				self.Variaveis_de_controle["SDU"]["stop"]=False
+				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+				self.Jobs['SDU'].start()
+			else:
+				
+				
+				self.Variaveis_de_controle["SDU"]["keepAlive"]=True
+				self.Variaveis_de_controle["SDU"]["stop"]=False
+				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+				self.Jobs['SDU'].start()
+
 		if "svc" in servico:
-			self.Variaveis_de_controle["SVC"]["keepAlive"]=True
-			self.Variaveis_de_controle["SVC"]["stop"]=False
-			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-			self.Jobs['SVC'].start()
+			if self.Variaveis_de_controle["SVC"]['firstTime']:
+					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
+					self.Variaveis_de_controle["SVC"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
+					self.Variaveis_de_controle["SVC"]["keepAlive"]=True
+					self.Variaveis_de_controle["SVC"]["stop"]=False
+					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+					self.Jobs['SVC'].start()
+			else:
+				self.Variaveis_de_controle["SDU"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
+				self.Variaveis_de_controle["SVC"]["keepAlive"]=True
+				self.Variaveis_de_controle["SVC"]["stop"]=False
+				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+				self.Jobs['SVC'].start()
 		if "sms" in servico:
 			self.Variaveis_de_controle["SMS"]["keepAlive"]=True
 			self.Variaveis_de_controle["SMS"]["stop"]=False
