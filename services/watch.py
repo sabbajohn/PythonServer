@@ -157,7 +157,7 @@ class Watch(object):
 					self.Manager.verifica()
 				elif "down" in service:
 					self.Manager.Variaveis_de_controle["SVC"]["keepAlive"] = False
-					self.Manager.finaliza()
+					self.Manager.finaliza('svc')
 				else: pass
 
 			if "start" in service:
@@ -186,7 +186,7 @@ class Watch(object):
 					self.Manager.verifica()
 				elif "down" in service:
 					self.Manager.Variaveis_de_controle["SDU"]["keepAlive"] = False	
-					self.Manager.finaliza()
+					self.Manager.finaliza('sdu')
 				else: pass
 			if "start" in service:
 				if self.Manager.Jobs['SDU'].isAlive():
