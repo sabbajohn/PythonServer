@@ -1,6 +1,5 @@
 asyncio
 aiohttp
-json
 aiofile
 flask
 flask_restful
