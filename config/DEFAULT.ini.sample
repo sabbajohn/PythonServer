@@ -1,0 +1,47 @@
+env = 
+root = 
+user = 
+
+[LOGS]
+manager_log = ${KEY:root}/logs/manager.log
+sdu_log = ${KEY:root}/logs/sdu.log
+svc_log = ${KEY:root}/logs/svc.log
+sms_log = ${KEY:root}/logs/sms.log
+api_log = ${KEY:root}/logs/API.log
+startup_log = ${KEY:root}/logs/startup.log
+watch_log = ${KEY:root}/logs/watch.log
+
+[FILES]
+query = ${KEY:root}/queries/query.txt
+responses = ${KEY:root}/responses/response.json
+responses_api = ${KEY:root}/responses/response_api.json
+responses_sms = ${KEY:root}/responses/response-sms.json
+
+[CONSULTAS]
+hd = 0
+soa = 0
+viacep = 0
+
+[QUERIES]
+1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) and confirmed_at is not NULL and CPFCNPJ <> "" and CPFCNPJ is not NULL LIMIT 100
+2 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0  and confirmed_at is not NULL and CPFCNPJ <> "" and CPFCNPJ is not NULL order by Nome asc ,id desc LIMIT 100
+set = 1
+
+
+;SERVICES  
+[SMS]
+sms_init = True
+[SVC]
+svc_init = True
+delay = 200
+[SDU]
+sdu_init = True
+[SRC]
+src_init = True
+delay=3600
+query =
+
+[WATCH]
+addr = 
+port = 
+
