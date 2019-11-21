@@ -8,7 +8,6 @@ import threading
 import subprocess
 import json
 import time
-import ipdb
 from termcolor import colored
 import signal
 import os
