@@ -1,0 +1,9 @@
+asyncio
+aiohttp
+aiofile
+flask
+flask_restful
+sqlalchemy
+comtele_sdk
+mandrill
+termcolor

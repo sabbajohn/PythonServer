@@ -61,6 +61,7 @@ class Manager(Initialize):
 			"SMS":{
 				"init": self.Config.getboolean("SMS","sms_init"),
 				"init_time":None,
+				"delay":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
 				"nextrun":None,
@@ -69,6 +70,7 @@ class Manager(Initialize):
 			},
 			"SVC":{
 				"init": self.Config.getboolean("SVC","svc_init"),
+				"delay":float(self.Config.get("SVC","delay")),
 				"init_time":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
@@ -81,6 +83,7 @@ class Manager(Initialize):
 
 				"init": self.Config.getboolean("SDU","sdu_init"),
 				"init_time":None,
+				"delay":None,
 				"keepAlive": True,
 				"lasttimerunning":None,
 				"nextrun":None,
@@ -91,6 +94,7 @@ class Manager(Initialize):
 
 				"init": self.Config.getboolean("SRC","src_init"),
 				"init_time":None,
+				"delay":float(self.Config.get("SRC","delay")),
 				"keepAlive": True,
 				"lasttimerunning":None,
 				"nextrun":None,
@@ -223,15 +227,16 @@ class Manager(Initialize):
 									self.Jobs['SDU'].start()
 									self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
 									self.Variaveis_de_controle["SDU"]['lasttimerunning'] = str(datetime.datetime.now())
+									sleep(self.Variaveis_de_controle['SVC']['delay'])
 							except SystemExit:
 								pass
 							except not SystemExit:
 								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
-				else:
-					if (self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
+				elif (time.time() - time.mktime(datetime.datetime.strptime(self.Variaveis_de_controle["SVC"]['lasttimerunning'], "%Y-%m-%d %H:%M:%S.%f").timetuple()))>(self.Variaveis_de_controle['SVC']['delay']):
+					if ( self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
 						
 						self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-						self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
+						self.Variaveis_de_controle["SVC"]['init_time'] =str(datetime.datetime.now())
 						self.Jobs['SVC'].start()
 						self.Jobs['SVC'].join()
 						self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
@@ -243,7 +248,7 @@ class Manager(Initialize):
 								self.Jobs['SDU'].join()
 								self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
 								self.Variaveis_de_controle["SVC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
-								sleep(float(self.Config.get("SVC","delay")))
+								sleep(self.Variaveis_de_controle['SVC']['delay'])
 							except SystemExit:
 								pass
 							except not SystemExit:
@@ -645,9 +650,9 @@ class Manager(Initialize):
 		log = logging.getLogger("\t{0}.{1}\t".format(e['class'], e['metodo']))
 		for msg in e['message']:
 			if msg is not None and msg != "":
-				log.info("\t\t\t\t\t#>: {0}".format(msg))
+				log.info("\t\t\t\t\t\t\t\t#>: {0}".format(msg))
 		if e['comments']!="" and e['comments'] is not None:
-			log.info("\t\t\t\t\t#>: {0}".format(e['comments']))
+			log.info("\t\t\t\t\\t\t\tt#>: {0}".format(e['comments']))
 
 	def Notificar(self, e):
 		administradores = [

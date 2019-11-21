@@ -7,35 +7,27 @@ import getopt
 import threading
 import subprocess
 import json
-from termcolor import colored	
+import time
+import ipdb
+from termcolor import colored
+import signal
+import os
 
 
 # define some global variables
-command			= True
-target			 = ""
-upload_destination = ""
-port			   = 0
-
+command				= True
+target			 	= ""
+upload_destination 	= ""
+port			 	= 0
+client 				= None
 # this runs a command and returns the output
 
-def run_command(command):
-		
-		# trim the newline
-		command = command.rstrip()
-		
-		# run the command and get the output back
-		try:
-				output = subprocess.check_output(command,stderr=subprocess.STDOUT, shell=True)
-		except:
-				output = "Failed to execute command.\r\n"
-		
-		# send the output back to the client
-		return output
 
 # if we don't listen we are a client....make it so.
 def client_sender(buffer):
 		global target
 		global port
+		global client
 
 		client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -60,7 +52,7 @@ def client_sender(buffer):
 						response = ""
 						
 						while recv_len:
-								data	 = str(client.recv(4096),encoding="utf-8")
+								data	 = str(client.recv(4096),encoding="utf-8").rstrip()
 								recv_len = len(data)
 								response+= data
 								
@@ -68,7 +60,8 @@ def client_sender(buffer):
 										break
 						
 						if "help" in response :
-							usage(),
+							usage()
+							client.send(bytes("\n","utf-8"))
 							continue
 							# wait for more input
 						elif "status" in response:
@@ -95,40 +88,57 @@ def client_sender(buffer):
 								print(colored("stop","blue"),colored(response['stop'], "red"))
 							else:
 								print(colored("stop","blue"),colored(response['stop'], "green"))
+
 							
+							client.send(bytes("\n","utf-8"))
+							continue
 						else:
-							print(response)
+							if response.count("SERVICES:#>") >= 2:
+								response = response.strip("SERVICES:#")
+							print(response , end="")
+							pass
 							
 
-						
-						
-						buffer = input("")
+						buffer = input('')
 						buffer += "\n"
-						client.send(bytes(buffer,"utf-8"))
-		
-							
+						if 'help' in buffer:
+							usage()
+
+						elif 'exit' in buffer:
+							client.send(bytes(buffer,"utf-8"))
+							print(colored("Finalizando Conexão","red"))
+							os.kill(os.getpid(),signal.SIGINT)
+						else:
+							client.send(bytes(buffer,"utf-8"))
 						
 					
 						
 
 						
 
-				except not EOFError:
-					print(sys.exc_info())
-					# just catch generic errors - you can do your homework to beef this up
-					client.send(bytes("exit",'utf-8'))
-					print(colored("[*] Exception! Exiting.", "red"))
-					# teardown the connection
-					client.close()
-					return
-			
-					
+				except EOFError:
+					pass	
+				
+				except (ConnectionResetError,BrokenPipeError) as e:
+					print(colored(type(e), "red", "on_grey"))	
+					print(colored(e, "yellow"))
+					print(colored("Não foi possivel conectar","red"))
+					os.kill(os.getpid(),signal.SIGINT)
 				else:
 					client.send(bytes("exit",'utf-8'))
-		except:
+		
+		except (ConnectionResetError,BrokenPipeError) as e:
+
+			print(colored(type(e), "red", "on_grey"))	
+			print(colored(e, "yellow"))
 			print(colored("Não foi possivel conectar","red"))
 			sys.exit()
 
+		except Exception as e:
+			print(colored(type(e), "red", "on_grey"))
+			print(colored(e, "yellow"))
+			print(colored("Saindo apos Erro","red"))
+			sys.exit()
 
 
 def usage():
@@ -164,9 +174,35 @@ def usage():
 
 
 	
+def exit_gracefully(signum, frame):
+	lock_= threading.Lock()
+	signal.signal(signal.SIGINT, original_sigint)
+	try:
+		quest = input("\nReally quit? (y/n)> ").lower().startswith('y')
+		if quest:
+			client.send(bytes("exit",'utf-8'))
+			# teardown the connection
+			client.close()
+			sys.exit('Encerrando Cliente...')
+			
+	except KeyboardInterrupt:
+		print("Ok ok, Encerrando Cliente...")
+		client.send(bytes("exit",'utf-8'))
+		# teardown the connection
+		client.close()
+		sys.exit(1)
+	except Exception as e:
+		client.send(bytes("exit",'utf-8'))
+		# teardown the connection
+		client.close()
+		sys.exit('Encerrando Cliente...')
+
+	# restore the exit gracefully handler here    
+	signal.signal(signal.SIGINT, exit_gracefully)
+	
 
 def main():
-	
+		
 		global port
 		
 		
@@ -195,7 +231,7 @@ def main():
 							assert False,"Unhandled Option"  
 		usage()
 		print("")
-		print("")	
+		print("")
 		# read in the buffer from the commandline
 		# this will block, so send CTRL-D if not sending input
 		# to stdin
@@ -208,4 +244,7 @@ def main():
 		# we are going to listen and potentially 
 		# upload things, execute commands and drop a shell back
 		# depending on our command line options above
+
+original_sigint = signal.getsignal(signal.SIGINT)
+signal.signal(signal.SIGINT, exit_gracefully)
 main()
