@@ -646,7 +646,7 @@ class Manager(Initialize):
 			pass
 
 	def Logs(self, e):
-
+		e["ENV"] = self.Config.get("KEY", "env")
 		log = logging.getLogger("\t{0}.{1}\t".format(e['class'], e['metodo']))
 		for msg in e['message']:
 			if msg is not None and msg != "":
