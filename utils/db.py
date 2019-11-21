@@ -48,7 +48,7 @@ class DB:
 			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
 			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
 			message = []
-			message.append("Conexões esstabelecidas com Sucesso!")
+			message.append("Conexões estabelecidas com Sucesso!")
 			
 			self.feedback(metodo="__init__", status =5, message = message, erro = False)
 			message = None
