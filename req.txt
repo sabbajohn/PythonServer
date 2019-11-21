@@ -4,6 +4,6 @@ aiofile
 flask
 flask_restful
 sqlalchemy
-comtele_sdk.textmessage_service
+comtele_sdk
 mandrill
 termcolor
