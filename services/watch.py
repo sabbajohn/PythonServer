@@ -15,7 +15,7 @@ import logging
 class Watch(object):
 	def __init__(self, M):
 		self.Manager = M
-		
+		self.services=['sms','svc','src','sdu']
 		
 		try:
 			self.target				= self.Manager.Config.get("WATCH","addr")
@@ -29,65 +29,16 @@ class Watch(object):
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input
 		# to stdin
+	def start(self):
+		message = []
+		message.append("Inicializando Watcher")
+		self.feedback(metodo="__init__", status =5, message = message, erro = False)
+		message = None
+		self.feedback()
+		self.server_loop()
 	
-	def client_handler(self,client_socket):
-		
-		
-		while True:
-				# show a simple prompt
-				
-				
-				client_socket.send(bytes("SERVICES:#>",'utf-8'))
-				
-				# now we receive until we see a linefeed (enter key)
-				cmd_buffer = ""
-				while "\n" not in cmd_buffer:
-					try:
-						cmd_buffer += client_socket.recv(1024).decode('utf-8')
-						if cmd_buffer == "\n" or  cmd_buffer =='':
-							cmd_buffer = ""
-
-							continue
-						elif "exit" in cmd_buffer:
-							return 
-						else:
-							continue
-					except client_socket.timeout:
-						message = []
-						message.append("Didn't receive data! [Timeout]")
-						self.feedback(metodo="client_handler", status =5, message = message, erro = False)
-						message = None
-						self.feedback()
-					except ConnectionResetError:
-						return
-
-						
-		
-				
-				# we have a valid command so execute it and send back the results
-				message = []
-				message.append("Consulta realizada:{0}".format(cmd_buffer))
-				self.feedback(metodo="client_handler", status =5, message = message, erro = False)
-				message = None
-				self.feedback()
-				
-				response = self.job_info(cmd_buffer, client_socket)
-				
-				# send back the response
-				try:
-					len(response)>0 
-					message = []
-					message.append("Resposta encaminhada:{0}".format(response.decode('utf-8')))
-					self.feedback(metodo="client_handler", status =5, message = message, erro = False)
-					message = None
-					self.feedback()
-					client_socket.sendall(response)
-				
-				except:
-					continue
-
 	def server_loop(self):
-				
+		#TODO: RESTART Watch caso de falha de endereço em uso
 		# if no target is defined we listen on all interfaces
 		if not len(self.target):
 			self.target = "0.0.0.0"
@@ -108,14 +59,93 @@ class Watch(object):
 			client_thread = threading.Thread(target=self.client_handler,args=(client_socket,),name="Watcher client")
 			client_thread.start()
 
-	def start(self):
-		message = []
-		message.append("Inicializando Watcher")
-		self.feedback(metodo="__init__", status =5, message = message, erro = False)
-		message = None
-		self.feedback()
-		self.server_loop()
+	def client_handler(self,client_socket):
+		
+		
+		while True:
+				
+			# show a simple prompt
+			try:	
+				client_socket.send(bytes('SERVICES:#> ','utf-8'))
+			except BrokenPipeError:
+				return
 
+			# now we receive until we see a linefeed (enter key)
+			cmd_buffer = ""
+			while "\n" not in cmd_buffer:
+				try:
+					cmd_buffer += client_socket.recv(1024).decode('utf-8')
+					if len(cmd_buffer)< 3 or cmd_buffer == "\n" or  cmd_buffer =='':
+						cmd_buffer = ""
+						break
+					elif "exit" in cmd_buffer:
+						client_socket.sendall("Finalizando cliente, até mais!".encode(encoding='utf-8'))
+						return 
+					else:
+						break
+				except client_socket.timeout:
+					message = []
+					message.append("Didn't receive data! [Timeout]")
+					self.feedback(metodo="client_handler", status =5, message = message, erro = False)
+					message = None
+					self.feedback()
+					return
+				except ConnectionResetError:
+					return
+
+				except Exception as e:
+					message = []
+					message.append(type(e))
+					message.append(e)
+
+					self.feedback(metodo="client_handler", status =5, message = message, erro = False, comments="Era para ser code 4 mas ainda preciso remodelar os erros")
+					message = None
+					self.feedback()
+			if len(cmd_buffer)< 3 or cmd_buffer == "\n" or  cmd_buffer =='':
+				continue
+
+			if  any(srv in cmd_buffer for srv in self.services ):
+
+				# we have a valid command so execute it and send back the results
+				message = []
+				message.append("Consulta realizada:{0}".format(cmd_buffer))
+				self.feedback(metodo="client_handler", status =5, message = message, erro = False)
+				message = None
+				self.feedback()
+
+				response = self.job_info(cmd_buffer, client_socket)
+
+				# send back the response
+				try:
+					len(response)>0 
+					message = []
+					message.append("Resposta encaminhada:{0}".format(response.decode('utf-8')))
+					self.feedback(metodo="client_handler", status =5, message = message, erro = False)
+					message = None
+					self.feedback()
+					client_socket.sendall(response)
+					continue
+				
+				except:
+					message = []
+					message.append("Exceção não tratada")
+					message.append(sys.exc_info())
+
+					self.feedback(metodo="client_handler", status =5, message = message, erro = False, comments="Era para ser code 4 mas ainda preciso remodelar os erros")
+					message = None
+					self.feedback()
+					continue
+			else:
+				message = []
+				message.append("Comando não contem nenhum serviço conhecido:{0}".format(cmd_buffer))
+				self.feedback(metodo="client_handler", status =5, message = message, erro = False)
+				message = None
+				self.feedback()
+				client_socket.sendall('help'.encode())
+				time.sleep(3)
+				continue
+
+	
 	def job_info(self, service,client_socket ):
 		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
 		
