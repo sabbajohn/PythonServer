@@ -50,7 +50,7 @@ class Manager(Initialize):
 			filename=self.Config.get("LOGS","manager_log"),
 			filemode='a+',
 			level=logging.INFO,
-			format='%(asctime)s %(name)18s: %(message)s',
+			format='%(asctime)s %(name)18s #> %(message)s',
 			datefmt='%d-%m-%Y %H:%M:%S'
 			#stream=sys.stderr,
 		)
@@ -278,6 +278,7 @@ class Manager(Initialize):
 				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
 				self.Variaveis_de_controle["SDU"]["stop"]=True
 				self.Jobs["SVC"].raise_exception()
+	
 	def run(self,s):
 		if "src" in s:
 				loop = asyncio.new_event_loop()
@@ -657,12 +658,12 @@ class Manager(Initialize):
 
 	def Logs(self, e):
 		e["ENV"] = self.Config.get("KEY", "env")
-		log = logging.getLogger("\t{0}.{1}\t".format(e['class'], e['metodo']))
+		log = logging.getLogger('{message:{fill}^{width}}'.format(message=e['class']+"."+e['metodo'],fill=" ",align="^",width=50	))
 		for msg in e['message']:
 			if msg is not None and msg != "":
-				log.info("\t\t\t\t\t\t\t\t#>: {0}".format(msg))
+				log.info(" {0} ".format(msg))
 		if e['comments']!="" and e['comments'] is not None:
-			log.info("\t\t\t\t\\t\t\tt#>: {0}".format(e['comments']))
+			log.info(" {0} ".format(e['comments']))
 
 	def Notificar(self, e):
 		administradores = [
