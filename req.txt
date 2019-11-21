@@ -1,9 +1,0 @@
-asyncio
-aiohttp
-aiofile
-flask
-flask_restful
-sqlalchemy
-concurrent
-subprocess
-comtele_sdk
