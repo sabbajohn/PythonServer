@@ -278,6 +278,16 @@ class Manager(Initialize):
 				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
 				self.Variaveis_de_controle["SDU"]["stop"]=True
 				self.Jobs["SVC"].raise_exception()
+	def run(self,s):
+		if "src" in s:
+				loop = asyncio.new_event_loop()
+				return_value = loop.run_until_complete(self.recuperacaoDeCarrinhos.runNow())
+			
+				return return_value
+		if "sms" in s:
+			loop = asyncio.new_event_loop()
+			return_value = loop.run_until_complete(self.SMS.runNow())
+			return return_value
 
 	def inicia(self, servico):
 		if "sdu" in servico:
@@ -340,7 +350,7 @@ class Manager(Initialize):
 			elif e['status']== 5:
 				self.Logs(e)
 			pass
-		elif e['class'] == 'Watch':
+		elif e['class'] == 'recuperacaoDeCarrinhos':
 			if e['status']== -1:
 				self.Logs(e)
 			elif e['status']== 0:
@@ -507,7 +517,7 @@ class Manager(Initialize):
 				sys.exit()
 				
 			pass
-		elif e['class'] == 'Watch':
+		elif e['class'] == 'recuperacaoDeCarrinhos':
 			
 			
 			if e['status']== 1:

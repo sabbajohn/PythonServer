@@ -122,7 +122,7 @@ def client_sender(buffer):
 				except (ConnectionResetError,BrokenPipeError) as e:
 					print(colored(type(e), "red", "on_grey"))	
 					print(colored(e, "yellow"))
-					print(colored("Não foi possivel conectar","red"))
+					print(colored("Conexão perdida!","red"))
 					os.kill(os.getpid(),signal.SIGINT)
 				else:
 					client.send(bytes("exit",'utf-8'))

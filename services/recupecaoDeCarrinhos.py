@@ -10,10 +10,11 @@ import json
 import getpass
 import threading
 import mandrill
-import configparser
+import configparser	
+import asyncio
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
-
+	
 		self.Manager = M
 		self.database = self.Manager.database
 		self.mandrill_client = None
@@ -49,6 +50,53 @@ class recuperacaoDeCarrinhos(object):
 		
 
 		pass
+	
+	async def runNow(self):
+		message = []
+		message.append( "Icializando Consulta não agendada")
+		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+		message = None
+		escreveu = False
+		try:
+				result = None
+				
+			
+				result = self.database.execute("R",self.query)
+			
+				if len(result)>0:
+					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
+					if(escreveu == True):
+						message = []
+						message.append( "Novos carrinhos encontrados!")
+						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+						message = None
+
+					message = []
+					message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+					message = None
+	
+					params = self.emailParams(result)
+					return self.send(params)
+					
+					
+				else: 
+					if(escreveu == False):
+						message = []
+						message.append( "Nenhum carrinho abandonado no momento!")
+						self.feedback(metodo="runNow", status =5, message = message, erro = False, comments ="Nenhum Carrinho!"  )
+						message = None
+						escreveu= True
+						return False
+		except Exception as e: 
+
+			message = []
+			message.append(type(e))
+			message.append(e)
+
+			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Exceção não tratada "  )
+			message = None
+			return False
 
 	def db_monitor(self,stop):
 		message = []
@@ -68,6 +116,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
+					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -135,7 +184,7 @@ class recuperacaoDeCarrinhos(object):
 		merge_vars = []
 		keys_to = [ "email","name"]
 		template_content =  [{'content': 'example content', 'name': 'example name'}]# faço nem ideia do que seja isso
-		global_merge_vars=  [{'content':  self.Config_ENV.get("LINKS","link_site"), 'name': 'link_site'},{'content':  self.Config_ENV.get("LINKS","contact_mail"), 'name': 'CONTACT_MAIL'}]
+		global_merge_vars=  [{'content':  self.Config_ENV.get("LINKS","link_site"), 'name': 'link_site'},{'content':  self.Config_ENV.get("LINKS","contact_mail"), 'name': 'CONTACT_MAIL'},{'content':  self.Config_ENV.get("LINKS","link_de_compra"), 'name': 'link_de_compra'}]
 		for x in result:
 			merge_vars.append({'rcpt':x[0],'vars': [{'content': x[1], 'name':'Nome'}]})
 			to.append(dict(zip(keys_to, x)))
@@ -146,6 +195,7 @@ class recuperacaoDeCarrinhos(object):
 			'global_merge_vars':global_merge_vars,
 			'to': to,
 			'merge_vars':merge_vars
+			
 		}
 		return {
 			"template_content":template_content,
@@ -154,18 +204,19 @@ class recuperacaoDeCarrinhos(object):
 		}
 
 	def send(self, p):
-
+		
 		if(self.checkAPI()):
 
 
 			try:
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], asy=True, ip_pool='Main Pool')
-				if 'queued' in result[0]["status"] :
+				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
 					self.Config.set("SRC", "enviados", str(int(self.Config.get("SRC", "enviados")) +self.cont))
 					with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
 						self.Config.write(configfile)
 					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
+					return True
 			except mandrill.Error as e:
 				
 				
@@ -174,16 +225,25 @@ class recuperacaoDeCarrinhos(object):
 				self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
 				message = None
 				
-				return
+				return False
 			except not mandrill.Error:
 				message = []
 				message.append( "SMS:{0}".format(['Message']))
 				self.feedback(metodo="send", status =5, message = message, erro = False)
 				message = None
-				self.update()
-				return
+
+				return False
+			except Exception as e:
+				message.append( type(e))
+				message.append(e)
+				self.feedback(metodo="send", status =5, message = message, erro = False)
+				message = None
 		else:
-			pass
+				message = []
+				message.append( "Não foi Possivel validara a Chave API")
+				self.feedback(metodo="send", status =5, message = message, erro = False, comments = "Algo não panejado" )
+				message = None
+				return False
 
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
@@ -232,7 +292,7 @@ class recuperacaoDeCarrinhos(object):
 			feedback["comments"] = ""
 		
 		feedback['time'] = datetime.datetime.now()
-		#with self._lock:
+	
 		self.Manager.callback(feedback)
 
 	

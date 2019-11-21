@@ -14,6 +14,7 @@ import logging
 
 class Watch(object):
 	def __init__(self, M):
+	
 		self.Manager = M
 		self.services=['sms','svc','src','sdu']
 		
@@ -83,7 +84,7 @@ class Watch(object):
 						return 
 					else:
 						break
-				except client_socket.timeout:
+				except TimeoutError:
 					message = []
 					message.append("Didn't receive data! [Timeout]")
 					self.feedback(metodo="client_handler", status =5, message = message, erro = False)
@@ -166,6 +167,15 @@ class Watch(object):
 					return message.encode()
 				else:
 					self.Manager.inicia("sms")
+			if "run" in service:
+			
+				if self.Manager.run('sms'):
+
+					client_socket.send("Serviço executado".encode())
+					time.sleep(2)
+				else:
+					client_socket.send("Não haviam tarefas a serem executadas ou tivemos um erro, verificar logs".encode())
+					time.sleep(2)
 				
 			return bytearray(response.format(self.Manager.Jobs['SMS'].isAlive(),
 			 self.Manager.Variaveis_de_controle["SMS"]["init"],
@@ -249,7 +259,15 @@ class Watch(object):
 					return message.encode()
 				else:
 					self.Manager.inicia("src")
-				
+			if "run" in service:
+			
+				if self.Manager.run('src'):
+
+					client_socket.send("Serviço executado".encode())
+					time.sleep(2)
+				else:
+					client_socket.send("Não haviam tarefas a serem executadas ou tivemos um erro, verificar logs".encode())
+					time.sleep(2)
 			return bytearray(response.format(self.Manager.Jobs['SRC'].isAlive(),
 			 self.Manager.Variaveis_de_controle["SRC"]["init"],
 			 self.Manager.Variaveis_de_controle["SRC"]["init_time"],
@@ -317,5 +335,5 @@ class Watch(object):
 			feedback["comments"] = ""
 		
 		feedback['time'] =str( datetime.datetime.now())
-		#with self._lock:
+
 		self.Manager.callback(feedback)

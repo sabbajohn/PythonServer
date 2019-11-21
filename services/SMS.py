@@ -10,6 +10,7 @@ import json
 import getpass
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
+import asyncio
 
 
 
@@ -48,7 +49,60 @@ class SMS(object):
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
 		
+	async def runNow(self):
 
+	
+		message = []
+		message.append( "Inicializando o Monitoramento do Banco de Dados")
+		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+		message = None
+		escreveu = False
+		#quem sabe botar isso dentro de um try
+		
+		
+	
+		try:
+			result = None
+			query = "SELECT * FROM sms WHERE sent_at is NULL"
+		
+			result = self.database.execute("R",query)
+		
+			if len(result)>0:
+				if(escreveu == True):
+					message = []
+					message.append( "Novo sms encontrado!")
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+					message = None
+
+				message = []
+				message.append( "{0} sms's a serem enviados!".format(len(result)))
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
+				message = None
+				
+				
+				
+				for x in result:
+					self.send(x)
+				
+				return True
+			else: 
+			
+				message = []
+				message.append( "Nenhum SMS Pendente no momento!")
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+				message = None
+				escreveu= True
+				return False
+		
+				
+		except: 
+			message = []
+			message.append( sys.exc_info())
+			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+			message = None
+		finally:
+			return False
+	
 	def db_monitor(self,stop):
 
 	
@@ -131,7 +185,7 @@ class SMS(object):
 			self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
 			
-			return
+			return True
 		else:
 			message = []
 			message.append( "SMS:{0}".format(result['Message']))
@@ -162,7 +216,7 @@ class SMS(object):
 				""" with self._lock: """
 				self.database.execute("W",query, commit=True)
 				""" handler_w.commit() """
-				return
+				return True
 			except :
 				message = []
 				message.append( "{0}".format(sys.exc_info()[0]))
