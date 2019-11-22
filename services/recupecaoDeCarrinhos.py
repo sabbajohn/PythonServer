@@ -194,7 +194,10 @@ class recuperacaoDeCarrinhos(object):
 		message = {
 			'global_merge_vars':global_merge_vars,
 			'to': to,
-			'merge_vars':merge_vars
+			'merge_vars':merge_vars,
+			'track_clicks': True,
+			'track_opens': True
+			
 			
 		}
 		return {
