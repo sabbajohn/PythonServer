@@ -19,7 +19,6 @@ raise_on_warnings: True
 API_KEY=
 
 [LINKS]
+link_site=http://beta.megasorte.com
+link_de_compra = http://beta.megasorte.com/carrinho?origin=rt
 contact_mail = sac@megasorte.com
-link_site=http://beta.megasorte.com/
-
-
