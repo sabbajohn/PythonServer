@@ -111,8 +111,6 @@ class Manager(Initialize):
 					sys.exit()
 				else:
 					log.info(sys.exc_info())
-
-		self.USER = getpass.getuser()
 		
 		self.Jobs = super().Jobs()
 		self.inicializando()
