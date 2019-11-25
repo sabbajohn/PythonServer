@@ -16,7 +16,7 @@ class Controle(object):
 		self.LINK = LINK()
 		self.logs=logs()
 		self.files=files()
-		"""self.modulos(self) """
+		self.modulos = modulos
 
 	
 class Key(Controle):
@@ -103,11 +103,11 @@ class files(Controle):
 		self.responses_sms=("FILES","responses_sms")
 
 class modulos(Controle):
-	def __init__(self,Controle):
-		self.Controle = Controle
+	def __init__(self):
+	
 		class SMS:
-			def __init__(self, modulos):
-				self.moulos = modulos
+			def __init__(self):
+				
 				init			= self.Config.getboolean("SMS","sms_init")
 				init_time			=None
 				delay				=None
@@ -118,8 +118,8 @@ class modulos(Controle):
 				stop				=False
 			
 		class SVC:
-			def __init__(self, modulos):
-				self.moulos = modulos
+			def __init__(self):
+			
 				init= self.Config.getboolean("SVC","svc_init")
 				init_time			=None
 				delay				=float(("SVC","delay"))
@@ -130,8 +130,8 @@ class modulos(Controle):
 				stop				=False
 		
 		class SDU:
-			def __init__(self, modulos):
-				self.moulos = modulos
+			def __init__(self):
+				
 				init= self.Config.getboolean("SDU","sdu_init")
 				init_time			=None
 				delay				=None
@@ -142,8 +142,8 @@ class modulos(Controle):
 				stop				=False
 			
 		class SRC:
-			def __init__(self, modulos):
-				self.moulos = modulos
+			def __init__(self):
+			
 				init				= self.Config.getboolean("SRC","src_init")
 				init_time			= None
 				delay				= float(("SRC","delay"))
