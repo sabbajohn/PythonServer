@@ -562,7 +562,7 @@ class Manager(Initialize):
 				e["Controle"]=self.Variaveis_de_controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
-				sys.exit()
+				self.finaliza('svc')
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
@@ -584,7 +584,7 @@ class Manager(Initialize):
 				e["Controle"]=self.Variaveis_de_controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
-				sys.exit()
+				self.finaliza('sdu')
 			pass
 
 		#DAS API'S	
