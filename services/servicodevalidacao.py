@@ -102,11 +102,11 @@ class servicoDeValidacao(object):
 					if(resp['failsafe']==True):
 						failsafe.append(resp)
 
-						with open(self.Config.get("FILES","responses"),"a+") as f: #Analizar Resposatas e Gerar Querys
+						with open(self.svc_files.responses,"a+") as f: #Analizar Resposatas e Gerar Querys
 							for item in failsafe:
 								agora = datetime.datetime.now()
 								f.write("{0}:{1}\n".format(agora ,item))
-						with open(self.Config.get("FILES","query"),"a+") as f:
+						with open(self.svc_files.query,"a+") as f:
 							for item in failsafe:
 								if item['viaCep'] == True:
 									endereco =  await self.viaCEP(item["CEP"])
@@ -180,12 +180,12 @@ class servicoDeValidacao(object):
 			except:
 
 				data.append(resp)
-				with open(self.Config.get("FILES","responses"),"a+") as f: #Analizar Resposatas e Gerar Querys
+				with open(self.svc_files.responses,"a+") as f: #Analizar Resposatas e Gerar Querys
 					for item2 in data:
 						agora = datetime.datetime.now()
 						f.write("{0}:{1}\n".format(agora ,item2))
 
-				with open(self.Config.get("FILES","query"),"a+") as f:
+				with open(self.svc_files.query,"a+") as f:
 					for item2 in data:
 						try:
 							r = item2['result']['numero_de_cpf']
@@ -420,7 +420,7 @@ class servicoDeValidacao(object):
 		message.append("Buscando registros pendentes na base de dados. Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
-		query= self.Manager.Config.get("QUERIES",self.Manager.Config.get("QUERIES","set"))
+		query= self.svc_conf.query
 		self.result=database.execute("R", query)
 		
 		
@@ -552,11 +552,16 @@ class servicoDeValidacao(object):
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
 			message.append("Foram realizadas {0} ao Via Cep".format(self.contador_ViaCep))
 			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds")
-			self.Config.set("CONSULTAS", "hd", str(int(self.Config.get("CONSULTAS", "hd")) +self.contador_hd))
-			self.Config.set("CONSULTAS", "soa", str(int(self.Config.get("CONSULTAS", "soa")) +self.contador_failsafe))
-			self.Config.set("CONSULTAS", "viacep", str(int(self.Config.get("CONSULTAS", "viacep")) +self.contador_ViaCep)) 
-			with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-				self.Config.write(configfile)
+			self.svc_api.hubd.consultas += self.contador_hd
+			self.svc_api.soa.consultas += self.contador_failsafe
+			self.svc_api.viacep.consultas += self.contador_ViaCep
+			
+
+			self.Config_ENV.set("HUBD", "consultas", str(	self.svc_api.hubd.consultas +self.contador_hd))
+			self.Config_ENV.set("SOA", "consultas", str( self.svc_api.soa.consultas+self.contador_failsafe))
+			self.Config_ENV.set("VIACEP", "consultas", str(	self.svc_api.viacep.consultas +self.contador_ViaCep)) 
+			with open("{0}/config/{1}.ini".format(self.Manager.Controle.key.root,self.Manager.Controle.key.env), "w+") as configfile:		
+				self.Config_ENV.write(configfile)
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
@@ -627,9 +632,10 @@ class servicoDeValidacao(object):
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = 0
 		self.Manager = M
-		self.Config = self.Manager.Config
 		self.database = self.Manager.database
-	
+		self.svc_files = self.Manager.getControle('files')
+		self.svc_conf = self.Manager.getControle('svc')
+		self.svc_api = self.Manager.getControle('api')
 	def get_id(self): 
 		
 		# returns id of the respective thread 

@@ -26,6 +26,7 @@ class Watch(object):
 			self.port				= int(self.Manager.Config.get("WATCH","port"))
 		except:
 			self.port = 5000
+		self.controle = self.Manager.getControle('modulos')
 
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input
@@ -154,11 +155,11 @@ class Watch(object):
 		if 'sms' in service :
 			if "mode" in service:
 				if "up" in service:
-					self.Manager.Variaveis_de_controle["SMS"]["keepAlive"] = True
+					self.controle.SMS.keepAlive = True
 					self.Manager.verifica()
 				elif "down" in service:
-					self.Manager.Variaveis_de_controle["SMS"]["keepAlive"] = False
-					self.Manager.Variaveis_de_controle["SMS"]["stop"] = True
+					self.controle.SMS.keepAlive = False
+					self.controle.SMS.stop = True
 					self.Manager.verifica()
 				else: pass
 			if "start" in service:
@@ -178,13 +179,13 @@ class Watch(object):
 					time.sleep(2)
 				
 			return bytearray(response.format(self.Manager.Jobs['SMS'].isAlive(),
-			 self.Manager.Variaveis_de_controle["SMS"]["init"],
-			 self.Manager.Variaveis_de_controle["SMS"]["init_time"],
-			 self.Manager.Variaveis_de_controle["SMS"]["keepAlive"],
-			 self.Manager.Variaveis_de_controle["SMS"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SMS"]["nextrun"],
-			 self.Manager.Variaveis_de_controle["SMS"]["firstTime"],
-			 self.Manager.Variaveis_de_controle["SMS"]["stop"]),'utf-8')
+				self.controle.SMS.init,
+				self.controle.SMS.init_time,
+				self.controle.SMS.keepAlive,
+				self.controle.SMS.lasttimerunning,
+				self.controle.SMS.nextrun,
+				self.controle.SMS.firstTime,
+				self.controle.SMS.stop),'utf-8')
 			
 			
 			
@@ -193,10 +194,10 @@ class Watch(object):
 			
 			if "mode" in service:
 				if "up" in service:
-					self.Manager.Variaveis_de_controle["SVC"]["keepAlive"] = True
+					self.controle.SVC.keepAlive = True
 					self.Manager.verifica()
 				elif "down" in service:
-					self.Manager.Variaveis_de_controle["SVC"]["keepAlive"] = False
+					self.controle.SVC.keepAlive = False
 					self.Manager.finaliza('svc')
 				else: pass
 
@@ -212,20 +213,20 @@ class Watch(object):
 
 
 			return bytearray(response.format(self.Manager.Jobs['SVC'].isAlive(),
-			 self.Manager.Variaveis_de_controle["SVC"]["init"],
-			 self.Manager.Variaveis_de_controle["SVC"]["init_time"],
-			 self.Manager.Variaveis_de_controle["SVC"]["keepAlive"],
-			 self.Manager.Variaveis_de_controle["SVC"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SVC"]["nextrun"],
-			 self.Manager.Variaveis_de_controle["SVC"]["firstTime"],
-			 self.Manager.Variaveis_de_controle["SVC"]["stop"]),'utf-8')
+				self.controle.SVC.init,
+				self.controle.SVC.init_time,
+				self.controle.SVC.keepAlive,
+				self.controle.SVC.lasttimerunning,
+				self.controle.SVC.nextrun,
+				self.controle.SVC.firstTime,
+				self.controle.SVC.stop),'utf-8')
 		elif 'sdu' in service:
 			if "mode" in service:
 				if "up" in service:
-					self.Manager.Variaveis_de_controle["SDU"]["keepAlive"] = True
+					self.controle.SDU.keepAlive = True
 					self.Manager.verifica()
 				elif "down" in service:
-					self.Manager.Variaveis_de_controle["SDU"]["keepAlive"] = False	
+					self.controle.SDU.keepAlive = False	
 					self.Manager.finaliza('sdu')
 				else: pass
 			if "start" in service:
@@ -236,21 +237,21 @@ class Watch(object):
 					self.Manager.inicia("sdu")
 		
 			return bytearray(response.format(self.Manager.Jobs['SDU'].isAlive(),
-			 self.Manager.Variaveis_de_controle["SDU"]["init"],
-			 self.Manager.Variaveis_de_controle["SDU"]["init_time"],
-			 self.Manager.Variaveis_de_controle["SDU"]["keepAlive"],
-			 self.Manager.Variaveis_de_controle["SDU"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SDU"]["nextrun"],
-			 self.Manager.Variaveis_de_controle["SDU"]["firstTime"],
-			 self.Manager.Variaveis_de_controle["SDU"]["stop"]),'utf-8')
+			 self.controle.SDU.init,
+			 self.controle.SDU.init_time,
+			 self.controle.SDU.keepAlive,
+			 self.controle.SDU.lasttimerunning,
+			 self.controle.SDU.nextrun,
+			 self.controle.SDU.firstTime,
+			 self.controle.SDU.stop),'utf-8')
 		elif 'src' in service :
 			if "mode" in service:
 				if "up" in service:
-					self.Manager.Variaveis_de_controle["SRC"]["keepAlive"] = True
+					self.controle.SRC.keepAlive = True
 					self.Manager.verifica()
 				elif "down" in service:
-					self.Manager.Variaveis_de_controle["SRC"]["keepAlive"] = False
-					self.Manager.Variaveis_de_controle["SRC"]["stop"] = True
+					self.controle.SRC.keepAlive = False
+					self.controle.SRC.stop = True
 					self.Manager.verifica()
 				else: pass
 			if "start" in service:
@@ -269,13 +270,13 @@ class Watch(object):
 					client_socket.send("Não haviam tarefas a serem executadas ou tivemos um erro, verificar logs".encode())
 					time.sleep(2)
 			return bytearray(response.format(self.Manager.Jobs['SRC'].isAlive(),
-			 self.Manager.Variaveis_de_controle["SRC"]["init"],
-			 self.Manager.Variaveis_de_controle["SRC"]["init_time"],
-			 self.Manager.Variaveis_de_controle["SRC"]["keepAlive"],
-			 self.Manager.Variaveis_de_controle["SRC"]["lasttimerunning"],
-			 self.Manager.Variaveis_de_controle["SRC"]["nextrun"],
-			 self.Manager.Variaveis_de_controle["SRC"]["firstTime"],
-			 self.Manager.Variaveis_de_controle["SRC"]["stop"]),'utf-8')
+			 self.controle.SRC.init,
+			 self.controle.SRC.init_time,
+			 self.controle.SRC.keepAlive,
+			 self.controle.SRC.lasttimerunning,
+			 self.controle.SRC.nextrun,
+			 self.controle.SRC.firstTime,
+			 self.controle.SRC.stop),'utf-8')
 		elif 'SELFDESTROY' in service :
 			message = []
 			message.append("!!! Comando de Autodestruição recebido!")

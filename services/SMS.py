@@ -23,6 +23,7 @@ class SMS(object):
 		self._lock = threading.Lock()
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
+		self.sms_api = self.Manager.getControle("api")
 	
 
 	def start(self, stop):
@@ -42,8 +43,7 @@ class SMS(object):
 			message = None
 			sys.exit()
 		else:
-			#O metodo é o start, mas o pau veio de dentro do db_monitor
-			#print("Oops!{0} occured.".format(sys.exc_info()[0]))
+		
 			message = []
 			message.append( "{0}".format(sys.exc_info()))
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
@@ -171,8 +171,8 @@ class SMS(object):
 		self.feedback(metodo="send", status =5, message = message, erro = False, comments = "send" )
 		message = None
 		
-		__api_key = '3aa20522-7c0a-4562-b25d-70ffc3f27f8e'
-		textmessage_service = TextMessageService(__api_key)
+	
+		textmessage_service = TextMessageService(self.sms_api.comtele.api_key)
 		Receivers = []
 		Receivers.append(str(cliente[2]))
 		try:

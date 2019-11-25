@@ -60,32 +60,53 @@ class DB(Controle):
 class API(Controle):
 	def __init__(self,Controle):
 	
-
+		
 		self.mandril = self.mandrill(Controle)
 		self.hubd = self.hubd(Controle)
 		self.soa = self.soa(Controle)
 		self.comtele = self.comtele(Controle)
+		self.viacep = self.viacep(Controle)
+	
+			
+
+	
+	class viacep:
+		def __init__(self,Controle):
+			self.tag="VIACEP"
+			self.consultas = int(Controle.Config_ENV.get(self.tag,"consultas"))
+	
+	class comtele:
+		def __init__(self,Controle):
+			self.tag="COMTELE"
+			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
+			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
 		
+			
 	class mandrill:
 		def __init__(self,Controle):
-		
-			self.api_key=Controle.Config_ENV.get("MANDRILL","api_key")
+			self.tag="MANDRILL"
+			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
+			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
 		
 	class hubd:
 		def __init__(self,Controle):
-				self.url=Controle.Config_ENV.get("HUBD","url")
-				self.api_key=Controle.Config_ENV.get("HUBD","api_key")
-	
+				self.tag="HUBD"
+				self.url=Controle.Config_ENV.get(self.tag,"url")
+				self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
+				self.consultas = int(Controle.Config_ENV.get(self.tag,"consultas"))
 	class soa:
 		def __init__(self,Controle):
-			self.url=Controle.Config_ENV.get("SOA","url")
-			self.user=Controle.Config_ENV.get("SOA","user")
-			self.key=Controle.Config_ENV.get("SOA","key")
-			
-	class comtele:
-		def __init__(self,Controle):
-			self.api_key=Controle.Config_ENV.get("COMTELE","api_key")
-		
+			self.tag="SOA"
+			self.url=Controle.Config_ENV.get(self.tag,"url")
+			self.user=Controle.Config_ENV.get(self.tag,"user")
+			self.key=Controle.Config_ENV.get(self.tag,"key")
+			self.consultas = int(Controle.Config_ENV.get(self.tag,"consultas"))
+	
+		#TODO: Adicionar watch
+	
+
+	
+
 class LINK(Controle):
 	def __init__(self,Controle):
 	
@@ -131,8 +152,8 @@ class modulos(Controle):
 			self.init_time			=None
 			self.delay				=None
 			self.keepAlive			= True
-			self.lasttimerunning		=None
-			self.nextrun				=None
+			self.lasttimerunning	=None
+			self.nextrun			=None
 			self.firstTime			=True
 			self.stop				=False
 			
@@ -143,10 +164,12 @@ class modulos(Controle):
 			self.init_time			=None
 			self.delay				=float(Controle.Config.get("SVC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning		=None
-			self.nextrun				=None
+			self.lasttimerunning	=None
+			self.nextrun			=None
 			self.firstTime			=True
 			self.stop				=False
+			self.query 				= Controle.Config.get("SVC",Controle.Config.get("SVC", "set")) 	
+			
 	
 	class SDU:
 			
@@ -155,8 +178,8 @@ class modulos(Controle):
 			self.init_time			=None
 			self.delay				=None
 			self.keepAlive			= True
-			self.lasttimerunning		=None
-			self.nextrun				=None
+			self.lasttimerunning	=None
+			self.nextrun			=None
 			self.firstTime			=True
 			self.stop				=False
 			
@@ -167,9 +190,10 @@ class modulos(Controle):
 			self.init_time			= None
 			self.delay				= float(Controle.Config.get("SRC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning		=None
-			self.nextrun				=None
+			self.lasttimerunning	=None
+			self.nextrun			=None
 			self.firstTime			=True
 			self.stop				=False
+			self.querys				= Controle.Config.get("SRC","query")
 
  

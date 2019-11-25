@@ -28,13 +28,21 @@ from controle import Controle
 class Initialize:
 	
 	def __init__(self,M):
-		self.controle = Controle(self)
-		self.Config = None
-		self.Config_ENV = None
-		#self.controle = None
-		#self.__cfg() 
+		
+		self.__cfg() 
+		logging.basicConfig(
+			filename=self.Config.get("LOGS","manager_log"),
+			filemode='a+',
+			level=logging.INFO,
+			format='%(asctime)s %(name)18s #> %(message)s',
+			datefmt='%d-%m-%Y %H:%M:%S'
+			#stream=sys.stderr,
+		)
 		#Definindo objeto dos Serviços
+		self.Controle = Controle(self)
+		self.Modulos = self.Controle.modulos
 		self.database = DB(self)
+
 		self.SMS = SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
 		self.DataUpdate = DataUpdate(M)
@@ -43,8 +51,8 @@ class Initialize:
 
 		#Definindo objeto das API's
 		
-		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:M.Variaveis_de_controle["SMS"]["stop"],))
-		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:M.Variaveis_de_controle["SRC"]["stop"],))
+		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.modulos.SMS.stop,))
+		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:lambda:self.Controle.modulos.SRC.stop,))
 		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
@@ -79,8 +87,8 @@ class Initialize:
 
 		except Exception as e:
 
-				print(type(e))
-				print(e)
+			print(type(e))
+			print(e)
 	
 		#DEFINE ENV
 		try:	
@@ -121,9 +129,8 @@ class Initialize:
 				print(type(e))
 				print(e)
 		
-		try:
-			self.controle = self.__loadvariaveisDeControle()
-
+	
+	#Em desuso...
 	def __loadvariaveisDeControle(self):
 		
 		Variaveis_de_controle = {
@@ -135,19 +142,19 @@ class Initialize:
 			"env":{
 				"DB":{
 						"MSQL_R":{
-							"host":self.Config_ENV.get("KEY","host"),
-							"user":self.Config_ENV.get("KEY","user"),
-							"passwd":self.Config_ENV.get("KEY","passwd"),
-							"database":self.Config_ENV.get("KEY","database"),
-							"raise_on_warnings":self.Config_ENV.get("KEY","raise_on_warnings")
+							"host":self.Config_ENV.get("MYSQL_R","host"),
+							"user":self.Config_ENV.get("MYSQL_R","user"),
+							"passwd":self.Config_ENV.get("MYSQL_R","passwd"),
+							"database":self.Config_ENV.get("MYSQL_R","database"),
+							"raise_on_warnings":self.Config_ENV.get("MYSQL_R","raise_on_warnings")
 						},
 						"MSQL_W":{
 
-							"host":self.Config_ENV.get("KEY","host"),
-							"user":self.Config_ENV.get("KEY","user"),
-							"passwd":self.Config_ENV.get("KEY","passwd"),
-							"database":self.Config_ENV.get("KEY","database"),
-							"raise_on_warnings":self.Config_ENV.get("KEY","raise_on_warnings")
+							"host":self.Config_ENV.get("MYSQL_W","host"),
+							"user":self.Config_ENV.get("MYSQL_W","user"),
+							"passwd":self.Config_ENV.get("MYSQL_W","passwd"),
+							"database":self.Config_ENV.get("MYSQL_W","database"),
+							"raise_on_warnings":self.Config_ENV.get("MYSQL_W","raise_on_warnings")
 						}
 				},
 				
@@ -170,9 +177,9 @@ class Initialize:
 	
 				},
 				"LINK":{
-					"link_site":self.Config_ENV.get("LINKS","link_site"),
-					"link_de_compra":self.Config_ENV.get("LINKS","link_de_compra"),
-					"contact_mail":self.Config_ENV.get("LINKS","contact_mail")
+					"link_site":self.Config_ENV.get("LINK","link_site"),
+					"link_de_compra":self.Config_ENV.get("LINK","link_de_compra"),
+					"contact_mail":self.Config_ENV.get("LINK","contact_mail")
 				}
 			},
 			"logs":{
@@ -236,7 +243,18 @@ class Initialize:
 			}
 		}
 		return Variaveis_de_controle
-	
+	#TODO, metodo para atualizar configurações
+	""" def setMyself(self, module):
+		modulo = self.getControle(module)
+
+		api_dict = modulo.__dict__
+		for x in api_dict:
+
+			self.Config_ENV.set(api_dict[x].tag, api_dict[x].__dict__)
+		
+		with open("{0}/config/BETA.ini".format(self.Controle.Key.root), "w+") as configfile:		
+			self.Config_ENV.write(configfile)	
+ """
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,
@@ -247,8 +265,27 @@ class Initialize:
 		}
 		return jobs
 	
-	def getControle(self):
+	def getControle(self, module):
+		if "db" in module.casefold():
+			return self.Controle.DB
+		elif 'files' in module.casefold():
+			return self.Controle.files
+		elif 'api' in module.casefold():
+			return self.Controle.API
+		elif 'modulos' in module.casefold():
+			return self.Controle.modulos
+		elif 'sms' in module.casefold():
+			return self.Controle.modulos.SMS
+		elif 'svc' in module.casefold():
+			return self.Controle.modulos.SVC
+		elif 'SRC' in module.casefold():
+			return self.Controle.modulos.SRC
+		elif 'sdu' in module.casefold():
+			return self.Controle.modulos.SDU
+	
+			
 		self.controle	
+	
 
 	def setConfigFile(self, conf):
 		
