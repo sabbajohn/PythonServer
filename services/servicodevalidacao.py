@@ -561,7 +561,7 @@ class servicoDeValidacao(object):
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
 			sleep(15)
-			return self.end()
+			return
 
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
