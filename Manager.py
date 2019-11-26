@@ -235,7 +235,6 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
-				
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -385,33 +384,41 @@ class Manager(Initialize):
 			pass
 
 	def Exceptions(self, e):
-	
+		""" TODO: 
+		! revisar erros e execeções!
+		"""
 		
 		#DOS SERVIÇOS
-		if e['class'] == 'SMS':
-			
-			
+		if e['class'] == 'SMS':	
 			if e['status']== 1:
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
+				self.Logs(e)
+				self.Notificar(e)
 				self.Logs(e)
 
 			elif e['status']== 2:
-				e["Controle"]=self.controle['SMS']
-				self.controle['SMS']['keepAlive'] = False
+			
 				self.Logs(e)
-				self.Notificar(e)
+				
 				
 			elif e['status']== 3:
-				self.controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.controle['SMS']
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
+				self.Logs(e)
 				
 			elif e['status']== 4:
-				self.controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.controle['SMS']
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
-				sys.exit()
+				self.Logs(e)
+				
 				
 			pass
 		elif e['class'] == 'recuperacaoDeCarrinhos':
