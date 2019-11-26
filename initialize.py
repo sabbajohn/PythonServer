@@ -40,7 +40,7 @@ class Initialize:
 		)
 		#Definindo objeto dos Serviços
 		self.Controle = Controle(self)
-		self.Modulos = self.Controle.modulos
+		self.servicos = self.Controle.servicos
 		self.database = DB(self)
 
 		self.SMS = SMS(M)
@@ -51,8 +51,8 @@ class Initialize:
 
 		#Definindo objeto das API's
 		
-		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.modulos.SMS.stop,))
-		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:lambda:self.Controle.modulos.SRC.stop,))
+		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
+		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:lambda:self.Controle.servicos.SRC.stop,))
 		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
@@ -128,121 +128,42 @@ class Initialize:
 		except  Exception as e:
 				print(type(e))
 				print(e)
-		
 	
-	#Em desuso...
-	def __loadvariaveisDeControle(self):
+	def todict(self,obj, classkey=None):
+		if isinstance(obj, dict):
+			data = {}
+			for (k, v) in obj.items():
+				data[k] = self.todict(v, classkey)
+			return data
+		elif hasattr(obj, "_ast"):
+			return self.todict(obj._ast())
+		elif hasattr(obj, "__iter__") and not isinstance(obj, str):
+			return [self.todict(v, classkey) for v in obj]
+		elif hasattr(obj, "__dict__"):
+			data = dict([(key, self.todict(value, classkey)) 
+			for key, value in obj.__dict__.items() 
+				if not callable(value) and not key.startswith('_')])
+			if classkey is not None and hasattr(obj, "__class__"):
+				data[classkey] = obj.__class__.__name__
+			return data
+		else:
+			return obj
+
+	def configFile(self):
+
+		contrle_dict =  self.todict(self.Controle)
+		for mod in contrle_dict:
+
+			if 'api' in mod.casefold():
+				for x in contrle_dict[mod]:
+					if any(api in  x.casefold() for api in ["comtele", "mandrill"]):
+						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"enviados",str(contrle_dict[mod][x]['enviados']))
+					else:
+						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"consultas",str(contrle_dict[mod][x]['consultas']))
 		
-		Variaveis_de_controle = {
-			"key":{
-				"env":	self.Config.get("KEY","env"),
-				"root":	self.Config.get("KEY","root"),
-				"user":	self.Config.get("KEY","user")
-			},
-			"env":{
-				"DB":{
-						"MSQL_R":{
-							"host":self.Config_ENV.get("MYSQL_R","host"),
-							"user":self.Config_ENV.get("MYSQL_R","user"),
-							"passwd":self.Config_ENV.get("MYSQL_R","passwd"),
-							"database":self.Config_ENV.get("MYSQL_R","database"),
-							"raise_on_warnings":self.Config_ENV.get("MYSQL_R","raise_on_warnings")
-						},
-						"MSQL_W":{
+		with open("{0}/config/{1}.ini".format(self.Controle.Key.root,self.Controle.Key.env ), "w+") as configfile:		
+			self.Config_ENV.write(configfile)
 
-							"host":self.Config_ENV.get("MYSQL_W","host"),
-							"user":self.Config_ENV.get("MYSQL_W","user"),
-							"passwd":self.Config_ENV.get("MYSQL_W","passwd"),
-							"database":self.Config_ENV.get("MYSQL_W","database"),
-							"raise_on_warnings":self.Config_ENV.get("MYSQL_W","raise_on_warnings")
-						}
-				},
-				
-				"API":{
-					"mandrill":{
-						"api_key":self.Config_ENV.get("MANDRILL","api_key")
-					},
-					"hubd":{
-						"url":self.Config_ENV.get("HUBD","url"),
-						"api_key":self.Config_ENV.get("HUBD","api_key")
-					},
-					"soa":{
-						"url":self.Config_ENV.get("SOA","url"),
-						"user":self.Config_ENV.get("SOA","user"),
-						"key":self.Config_ENV.get("SOA","key")
-					},
-					"comtele":{
-						"api_key":self.Config_ENV.get("COMTELE","api_key")
-					},
-	
-				},
-				"LINK":{
-					"link_site":self.Config_ENV.get("LINK","link_site"),
-					"link_de_compra":self.Config_ENV.get("LINK","link_de_compra"),
-					"contact_mail":self.Config_ENV.get("LINK","contact_mail")
-				}
-			},
-			"logs":{
-				"manager_log":self.Config.get("LOGS","manager_log"),
-				"sdu_log":self.Config.get("LOGS","sdu_log"),
-				"svc_log":self.Config.get("LOGS","svc_log"),
-				"sms_log":self.Config.get("LOGS","sms_log"),
-				"api_log":self.Config.get("LOGS","api_log"),
-				"startup_log":self.Config.get("LOGS","startup_log"),
-				"watch_log":self.Config.get("LOGS","watch_log")
-			},
-			"files":{
-				"query":self.Config.get("FILES","query"),
-				"responses":self.Config.get("FILES","responses"),
-				"responses_api":self.Config.get("FILES","responses_api"),
-				"responses_sms":self.Config.get("FILES","responses_sms"),
-			},
-			"modulos":{
-				"SMS":{
-					"init": self.Config.getboolean("SMS","sms_init"),
-					"init_time":None,
-					"delay":None,
-					"keepAlive": True,
-					"lasttimerunning":None,
-					"nextrun":None,
-					"firstTime":True,
-					"stop":False
-					},
-				"SVC":{
-					"init": self.Config.getboolean("SVC","svc_init"),
-					"delay":float(self.Config.get("SVC","delay")),
-					"init_time":None,
-					"keepAlive": True,
-					"lasttimerunning":None,
-					"nextrun":None,
-					"firstTime":True,
-					"stop":False	
-				},
-				"SDU":{
-
-					"init": self.Config.getboolean("SDU","sdu_init"),
-					"init_time":None,
-					"delay":None,
-					"keepAlive": True,
-					"lasttimerunning":None,
-					"nextrun":None,
-					"firstTime":True,
-					"stop":False
-				},
-				"SRC":{
-
-					"init": self.Config.getboolean("SRC","src_init"),
-					"init_time":None,
-					"delay":float(self.Config.get("SRC","delay")),
-					"keepAlive": True,
-					"lasttimerunning":None,
-					"nextrun":None,
-					"firstTime":True,
-					"stop":False
-				}
-			}
-		}
-		return Variaveis_de_controle
 	#TODO, metodo para atualizar configurações
 	""" def setMyself(self, module):
 		modulo = self.getControle(module)
@@ -273,20 +194,19 @@ class Initialize:
 		elif 'api' in module.casefold():
 			return self.Controle.API
 		elif 'modulos' in module.casefold():
-			return self.Controle.modulos
+			return self.Controle.servicos
 		elif 'sms' in module.casefold():
-			return self.Controle.modulos.SMS
+			return self.Controle.servicos.SMS
 		elif 'svc' in module.casefold():
-			return self.Controle.modulos.SVC
+			return self.Controle.servicos.SVC
 		elif 'SRC' in module.casefold():
-			return self.Controle.modulos.SRC
+			return self.Controle.servicos.SRC
 		elif 'sdu' in module.casefold():
-			return self.Controle.modulos.SDU
+			return self.Controle.servicos.SDU
 	
 			
 		self.controle	
 	
-
 	def setConfigFile(self, conf):
 		
 		if "DEFAULT".casefold() in conf.casefold():

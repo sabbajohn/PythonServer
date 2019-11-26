@@ -53,7 +53,7 @@ class Manager(Initialize):
 		
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
-		self.inicializando(self.Controle.modulos)#So precisa de modulos, so vai modulos!
+		self.inicializando(self.Controle.servicos)#So precisa de modulos, so vai modulos!
 	
 	
 	def inicializando(self, modulos):
@@ -72,7 +72,7 @@ class Manager(Initialize):
 				
 				
 			if modulos.SDU.init is True:
-				self.ValidacaoEUpdate(self.Controle.modulos.SVC, self.Controle.modulos.SDU)
+				self.ValidacaoEUpdate(self.Controle.servicos.SVC, self.Controle.servicos.SDU)
 
 
 		except Exception as err:
@@ -129,7 +129,7 @@ class Manager(Initialize):
 								pass
 							except not SystemExit:
 								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
-				elif (time.time() - time.mktime(datetime.datetime(SVC_c.lasttimerunning).timetuple()))>(SVC_c.delay):
+				elif (time.time() - datetime.datetime.timestamp(SVC_c.lasttimerunning))>(SVC_c.delay):
 					if ( SVC_c.keepAlive is True) and (not self.Jobs['SVC'].isAlive()):
 						
 						self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
@@ -144,8 +144,8 @@ class Manager(Initialize):
 								self.Jobs['SDU'].start()
 								self.Jobs['SDU'].join()
 								SVC_c.lasttimerunning = datetime.datetime.now()
-								SVC_c.nextrun = datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
-								sleep(self.controle.SVC['delay'])
+								SVC_c.nextrun = datetime.datetime.fromtimestamp(time.time()+SVC_c.delay)
+								sleep(SVC_c.delay)
 							except SystemExit:
 								pass
 							except not SystemExit:
@@ -155,25 +155,25 @@ class Manager(Initialize):
 		if not self.Jobs['WATCH'].isAlive():
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
-		if (not self.Jobs['SMS'].isAlive()) and (self.Controle.modulos.SMS.keepAlive is True):
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Controle.modulos.SMS.stop,))
+		if (not self.Jobs['SMS'].isAlive()) and (self.Controle.servicos.SMS.keepAlive is True):
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Controle.servicos.SMS.stop,))
 			self.Jobs['SMS'].start()
-			self.Controle.modulos.SMS.init_time =datetime.datetime.now()
-		if (not self.Jobs['SRC'].isAlive()) and (self.Controle.modulos.SRC.keepAlive is True):
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Controle.modulos.SRC.stop,))
+			self.Controle.servicos.SMS.init_time =datetime.datetime.now()
+		if (not self.Jobs['SRC'].isAlive()) and (self.Controle.servicos.SRC.keepAlive is True):
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
-			self.Controle.modulos.SRC.init_time = datetime.datetime.now()
+			self.Controle.servicos.SRC.init_time = datetime.datetime.now()
 	
 	def finaliza(self, servico):
 		if "sdu" in servico:
 			if self.Jobs['SDU'].isAlive():
-				self.Controle.modulos.SDU.keepAlive=False
-				self.Controle.modulos.SDU.stop=True
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SDU"].raise_exception()
 		if "svc" in servico:
 			if self.Jobs['SVC'].isAlive():
-				self.Controle.modulos.SDU.keepAlive=False
-				self.Controle.modulos.SDU.stop=True
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SVC"].raise_exception()
 	
 	def run(self,s):
@@ -189,44 +189,44 @@ class Manager(Initialize):
 
 	def inicia(self, servico):
 		if "sdu" in servico:
-			if self.Controle.modulos.SDU.firstTime:
-				self.Controle.modulos.SDU.init_time =datetime.datetime.now()
-				self.Controle.modulos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
-				self.Controle.modulos.SDU.keepAlive=True
-				self.Controle.modulos.SDU.stop=False
+			if self.Controle.servicos.SDU.firstTime:
+				self.Controle.servicos.SDU.init_time =datetime.datetime.now()
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.keepAlive=True
+				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
 				self.Jobs['SDU'].start()
 			else:
 				
 				
-				self.Controle.modulos.SDU.keepAlive=True
-				self.Controle.modulos.SDU.stop=False
+				self.Controle.servicos.SDU.keepAlive=True
+				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
 				self.Jobs['SDU'].start()
 
 		if "svc" in servico:
-			if self.Controle.modulos.SVC.firstTime:
-					self.Controle.modulos.SVC.init_time =datetime.datetime.now()
-					self.Controle.modulos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
-					self.Controle.modulos.SVC.keepAlive=True
-					self.Controle.modulos.SVC.stop=False
+			if self.Controle.servicos.SVC.firstTime:
+					self.Controle.servicos.SVC.init_time =datetime.datetime.now()
+					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+					self.Controle.servicos.SVC.keepAlive=True
+					self.Controle.servicos.SVC.stop=False
 					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 					self.Jobs['SVC'].start()
 			else:
-				self.Controle.modulos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
-				self.Controle.modulos.SVC.keepAlive=True
-				self.Controle.modulos.SVC.stop=False
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SVC.keepAlive=True
+				self.Controle.servicos.SVC.stop=False
 				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 				self.Jobs['SVC'].start()
 		if "sms" in servico:
-			self.Controle.modulos.SMS.keepAlive=True
-			self.Controle.modulos.SMS.stop=False
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.modulos.SMS.stop,))
+			self.Controle.servicos.SMS.keepAlive=True
+			self.Controle.servicos.SMS.stop=False
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
 			self.Jobs['SMS'].start()
 		if "src" in servico:
-			self.Controle.modulos.SRC.keepAlive=True
-			self.Controle.modulos.SRC.stop=False
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.modulos.SRC.stop,))
+			self.Controle.servicos.SRC.keepAlive=True
+			self.Controle.servicos.SRC.stop=False
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
 
 	def callback(self,e):
