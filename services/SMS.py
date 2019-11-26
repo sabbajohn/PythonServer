@@ -24,8 +24,6 @@ class SMS(object):
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
 		self.sms_api = self.Manager.getControle("api")
-		
-	
 
 	def start(self, stop):
 		
@@ -162,7 +160,6 @@ class SMS(object):
 			finally:
 				pass
 		sys.exit()
-
 
 	def send(self,cliente):
 
