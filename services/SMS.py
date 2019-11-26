@@ -24,6 +24,7 @@ class SMS(object):
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
 		self.sms_api = self.Manager.getControle("api")
+		
 	
 
 	def start(self, stop):
@@ -191,6 +192,9 @@ class SMS(object):
 			message.append( "SMS:{0}".format(result['Message']))
 			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
+			self.sms_api.comtele.enviados +=1
+			self.Manager.configFile()
+
 			self.update(result, cliente)
 			return
 

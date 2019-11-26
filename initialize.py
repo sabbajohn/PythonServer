@@ -199,7 +199,7 @@ class Initialize:
 			return self.Controle.servicos.SMS
 		elif 'svc' in module.casefold():
 			return self.Controle.servicos.SVC
-		elif 'SRC' in module.casefold():
+		elif 'src' in module.casefold():
 			return self.Controle.servicos.SRC
 		elif 'sdu' in module.casefold():
 			return self.Controle.servicos.SDU
