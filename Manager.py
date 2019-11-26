@@ -562,6 +562,7 @@ class Manager(Initialize):
 			log.info(" {0} ".format(e['comments']))
 
 	def Notificar(self, e):
+		e["AMBIENTE"]= self.Controle.Key.env
 		administradores = [
 			'47997619694',
 			'47988948000',
