@@ -57,8 +57,7 @@ class Initialize:
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
-	
-	
+
 	def __cfg(self):
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
@@ -128,7 +127,7 @@ class Initialize:
 		except  Exception as e:
 				print(type(e))
 				print(e)
-	
+
 	def todict(self,obj, classkey=None):
 		if isinstance(obj, dict):
 			data = {}
@@ -175,7 +174,7 @@ class Initialize:
 		
 		with open("{0}/config/BETA.ini".format(self.Controle.Key.root), "w+") as configfile:		
 			self.Config_ENV.write(configfile)	
- """
+ 	"""
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,
@@ -239,4 +238,4 @@ class Initialize:
 				print(type(e))
 				print(e)
 				return False
-		
+

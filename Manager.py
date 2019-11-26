@@ -55,7 +55,6 @@ class Manager(Initialize):
 		self.Jobs = super().Jobs()
 		self.inicializando(self.Controle.servicos)#So precisa de modulos, so vai modulos!
 	
-	
 	def inicializando(self, modulos):
 		
 		try:
