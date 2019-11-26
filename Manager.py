@@ -228,6 +228,9 @@ class Manager(Initialize):
 			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
 
+	# SE vou tratar todo mundo igual porque tantons casos?
+	# Verificar a prioridade entres os serviçoes e se havera tratativas diferentes 
+	# entre os serviços
 	def callback(self,e):
 		
 		if e['class'] == 'SMS':
@@ -429,18 +432,18 @@ class Manager(Initialize):
 
 			elif e['status']== 2:
 				e["Controle"]=self.controle['SRC']
-				self.controle['SRC']['keepAlive'] = False
+				self.Controle.servicos.SRC.keepAlive = False
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 3:
-				self.controle['SRC']['keepAlive'] = False
+				self.Controle.servicos.SRC.keepAlive = False
 				e["Controle"]=self.controle['SRC']
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 4:
-				self.controle['SRC']['keepAlive'] = False
+				self.Controle.servicos.SRC.keepAlive = False
 				e["Controle"]=self.controle['SRC']
 				self.Logs(e)
 				self.Notificar(e)
@@ -451,19 +454,19 @@ class Manager(Initialize):
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
-				self.controle['SVC']['keepAlive'] = False
+				self.Controle.servicos.SVC.keepAlive = False
 				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 3:
-				self.controle['SVC']['keepAlive'] = False
+				self.Controle.servicos.SVC.keepAlive = False
 				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 4:
-				self.controle['SVC']['keepAlive'] = False
+				self.Controle.servicos.SVC.keepAlive = False
 				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
@@ -473,19 +476,19 @@ class Manager(Initialize):
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
-				self.controle['SDU']['keepAlive'] = False
+				self.Controle.servicos.SDU.keepAlive = False
 				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 3:
-				self.controle['SDU']['keepAlive'] = False
+				self.Controle.servicos.SDU.keepAlive = False
 				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 4:
-				self.controle['SDU']['keepAlive'] = False
+				self.Controle.servicos.SDU.keepAlive = False
 				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
