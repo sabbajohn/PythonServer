@@ -16,7 +16,7 @@ class Watch(object):
 	def __init__(self, M):
 	
 		self.Manager = M
-		self.services=['sms','svc','src','sdu']
+		self.services=['sms','svc','src','sdu','api']
 		
 		try:
 			self.target				= self.Manager.Config.get("WATCH","addr")
@@ -27,10 +27,12 @@ class Watch(object):
 		except:
 			self.port = 5000
 		self.controle = self.Manager.getControle('modulos')
+		self.controle_api= self.Manager.getControle('api')
 
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input
 		# to stdin
+	
 	def start(self):
 		message = []
 		message.append("Inicializando Watcher")
@@ -147,9 +149,9 @@ class Watch(object):
 				time.sleep(3)
 				continue
 
-	
 	def job_info(self, service,client_socket ):
 		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
+		response_api="'VIACEP_CONSULTAS':'{0}', 'HUBD_CONSULTAS':'{1}', 'SOA_CONSULTAS':'{2}', 'MANDRILL_ENVIOS': '{3}',  'COMTELE_ENVIOS':'{4}'"
 		
 		service = service.rstrip()
 		if 'sms' in service :
@@ -277,6 +279,14 @@ class Watch(object):
 			 self.controle.SRC.nextrun,
 			 self.controle.SRC.firstTime,
 			 self.controle.SRC.stop),'utf-8')
+		elif 'api' in service:
+			return bytearray(response_api.format(
+			 self.controle_api.viacep.consultas,
+			 self.controle_api.hubd.consultas,
+			 self.controle_api.soa.consultas,
+			 self.controle_api.comtele.enviados,
+			 self.controle_api.mandrill.enviados,
+			),'utf-8')
 		elif 'SELFDESTROY' in service :
 			message = []
 			message.append("!!! Comando de Autodestruição recebido!")
