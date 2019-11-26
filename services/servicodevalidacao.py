@@ -535,7 +535,7 @@ class servicoDeValidacao(object):
 			message.append("Finalizando graciosamente")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
-			return
+			return 
 		try:
 			self.event_loop.run_until_complete(
 				self.runner(executor)
@@ -551,17 +551,15 @@ class servicoDeValidacao(object):
 			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.contador_hd))
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
 			message.append("Foram realizadas {0} ao Via Cep".format(self.contador_ViaCep))
-			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds")
+			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds") 
 			self.svc_api.hubd.consultas += self.contador_hd
 			self.svc_api.soa.consultas += self.contador_failsafe
 			self.svc_api.viacep.consultas += self.contador_ViaCep
+			self.Manager.configFile()
+			
 			
 
-			self.Config_ENV.set("HUBD", "consultas", str(	self.svc_api.hubd.consultas +self.contador_hd))
-			self.Config_ENV.set("SOA", "consultas", str( self.svc_api.soa.consultas+self.contador_failsafe))
-			self.Config_ENV.set("VIACEP", "consultas", str(	self.svc_api.viacep.consultas +self.contador_ViaCep)) 
-			with open("{0}/config/{1}.ini".format(self.Manager.Controle.key.root,self.Manager.Controle.key.env), "w+") as configfile:		
-				self.Config_ENV.write(configfile)
+		
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
