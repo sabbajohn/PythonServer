@@ -175,7 +175,7 @@ class SMS(object):
 		textmessage_service = TextMessageService(self.sms_api.comtele.api_key)
 		Receivers = []
 		Receivers.append(str(cliente[2]))
-		try:
+		try:		
 			result = textmessage_service.send('MS_.{}'.format(cliente[3]), cliente[4], Receivers)
 		except Exception as e :
 			
@@ -184,7 +184,7 @@ class SMS(object):
 			message.append(type(e))
 			message.append(e)
 			
-			self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Erro ao enviar SMS" )
+			self.feedback(metodo="send", status =1, message = message, erro = True, comments = "Erro ao enviar SMS" )
 			message = None
 			
 			return True

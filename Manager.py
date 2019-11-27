@@ -416,7 +416,6 @@ class Manager(Initialize):
 				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
-				
 				self.finaliza('sms')
 
 			elif e['status']== 2:
@@ -619,11 +618,13 @@ class Manager(Initialize):
 		try:
 			result = textmessage_service.send('MS_.Manager - Error', json.dumps(e), administradores)
 			log.info( '{0}[!]Notificação de Falha enviada!!'.format(datetime.datetime.now()))
-		except :
+		except Exception as e :
 			log.info( '{0}[!!!]Não foi ossivel notificar!'.format(datetime.datetime.now()))
+			log.info( '{0}[!!!]{1}'.format(datetime.datetime.now(),e))
 			
+		return
 			
-		pass
+		
 
 
 	
