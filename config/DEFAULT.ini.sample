@@ -1,7 +1,7 @@
 [KEY]
-env = BETA
-root = /home/objetiva/PythonServer
-user = objetiva
+env = 
+root = 
+user = 
 
 [LOGS]
 manager_log = ${KEY:root}/logs/manager.log
