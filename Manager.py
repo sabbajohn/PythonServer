@@ -2,24 +2,22 @@
 # coding: utf-8
 import sys
 import os
-import logging
 import time
-import configparser
-import socket
-from datetime import date
-import json
-import threading
-from  urllib import request, parse
 from time import sleep
 import datetime
+from datetime import date
+import configparser
+import json
+import socket
+from  urllib import request, parse
+import threading
 import concurrent.futures
 import asyncio.coroutines
-import getpass
-from utils.db import DB
+import logging
 from comtele_sdk.textmessage_service import TextMessageService
+from initialize import Initialize
 
-#from servers import server
-from Initialize import Initialize
+
 class Manager(Initialize):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
@@ -41,141 +39,41 @@ class Manager(Initialize):
 	# 	}
 	#
 	
-
-	 
 	def __init__(self):
-	
-		self.cfg()
-		logging.basicConfig(
-			filename=self.Config.get("LOGS","manager_log"),
-			filemode='a+',
-			level=logging.INFO,
-			format='%(asctime)s %(name)18s #> %(message)s',
-			datefmt='%d-%m-%Y %H:%M:%S'
-			#stream=sys.stderr,
-		)
-		log = logging.getLogger('Modulo de Gerenciamento')
+		time.time() 
 		
 		
-		self.Variaveis_de_controle = {
-			"SMS":{
-				"init": self.Config.getboolean("SMS","sms_init"),
-				"init_time":None,
-				"delay":None,
-				"keepAlive": True,
-				"lasttimerunning":None,
-				"nextrun":None,
-				"firstTime":True,
-				"stop":False
-			},
-			"SVC":{
-				"init": self.Config.getboolean("SVC","svc_init"),
-				"delay":float(self.Config.get("SVC","delay")),
-				"init_time":None,
-				"keepAlive": True,
-				"lasttimerunning":None,
-				"nextrun":None,
-				"firstTime":True,
-				"stop":False
-				
-			},
-			"SDU":{
-
-				"init": self.Config.getboolean("SDU","sdu_init"),
-				"init_time":None,
-				"delay":None,
-				"keepAlive": True,
-				"lasttimerunning":None,
-				"nextrun":None,
-				"firstTime":True,
-				"stop":False
-			},
-			"SRC":{
-
-				"init": self.Config.getboolean("SRC","src_init"),
-				"init_time":None,
-				"delay":float(self.Config.get("SRC","delay")),
-				"keepAlive": True,
-				"lasttimerunning":None,
-				"nextrun":None,
-				"firstTime":True,
-				"stop":False
-			}
-		}
 		try:
-
-			self.database = DB(self)
 			super().__init__(self)
-		except Exception as err:
-				if "KILL_ALL" in err.args[0]:
-					sys.exit()
-				else:
-					log.info(sys.exc_info())
+	
+		except Exception as e:
+			print(type(e))
+			print(e)
+			sys.exit(0)
 		
+		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
-		self.inicializando()
+		self.inicializando(self.Controle.servicos)#So precisa de modulos, so vai modulos!
 	
-	def cfg(self):
-		self.Config =   configparser.ConfigParser()
-		self.Config._interpolation = configparser.ExtendedInterpolation()
-		DIR = os.getcwd()
-		USER =getpass.getuser()
-		self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
-		s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		s.connect(("8.8.8.8", 80))
-		IP = s.getsockname()[0]
-		s.close()
-		try:
-			self.Config.set("KEY", "root", DIR)
-			self.Config.set("KEY", "user",USER)
-		except:
-			print(sys.exc_info()[0])
-		try:	
-			if "237.29" in IP or "192.168." in IP :
-				self.Config.set("KEY", "env", "BETA")
-
-			elif "242.11" in IP or "242.52" in IP:
-				self.Config.set("KEY", "env", "PROD")
-			else:
-				print("Não foi Possivel identivicar o ambiente!")
-				try:
-					print("Defina o tipo de Ambiente:")
-					print("(1) BETA\n(2) PRODUCAO\n")
-					env = input()
-					
-					if env == '1':
-						self.Config.set("KEY", "env", "BETA")
-					elif env == '2':
-						self.Config.set("KEY", "env", "PROD")
-					else:
-						sys.exit("Opção invalida!")
-				except:
-					raise Exception("Não foi Possivel identivicar o ambiente!")
-					print(sys.exc_info()[0])
-					sys.exit("Erro ao definir env")
-				""" self.Config_ENV.read("{0}/config/DEFAULT.ini".format(DIR)) """
 	
-		except:
-			print(sys.exc_info()[0])
+	def inicializando(self, modulos):
 		
-		with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
-			self.Config.write(configfile)
-
-	def inicializando(self):
-
 		try:
 			self.Jobs['WATCH'].start()
 			
-			if self.Variaveis_de_controle['SMS']['init'] is True:
+			if modulos.SMS.init is True:
 				self.Jobs['SMS'].start()
-				self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
-			
-			if self.Variaveis_de_controle['SRC']['init'] is True:
-				self.Jobs['SRC'].start()
-				self.Variaveis_de_controle['SRC']['init_time'] =str( datetime.datetime.now())
+				modulos.SMS.init_time =datetime.datetime.now()
 				
-			if self.Variaveis_de_controle['SDU']['init'] is True:
-				self.ValidacaoEUpdate()
+			
+			if modulos.SRC.init is True:
+				Jobs['SRC'].start()
+				modulos.SRC.init_time = datetime.datetime.now()
+				
+				
+			if modulos.SDU.init is True:
+				self.ValidacaoEUpdate(self.Controle.servicos.SVC, self.Controle.servicos.SDU)
+
 
 		except Exception as err:
 			if "KILL_ALL" in err.args[0]:
@@ -209,44 +107,45 @@ class Manager(Initialize):
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 			#sys.exit()
 
-	def ValidacaoEUpdate(self):
+	def ValidacaoEUpdate(self, SVC_c, SDU_c):
 		
-			while self.Variaveis_de_controle["SVC"]["keepAlive"] is True:
-				if self.Variaveis_de_controle["SVC"]['firstTime']:
-						self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
+			while SVC_c.keepAlive is True:
+				if SVC_c.firstTime:
+						SVC_c.init_time =datetime.datetime.now()
+						
 						self.Jobs['SVC'].start()
-						self.Variaveis_de_controle["SVC"]['firstTime'] = False
+						SVC_c.firstTime= False
 						self.Jobs['SVC'].join()
-						self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
+						SVC_c.lasttimerunning = datetime.datetime.now()
 						if not self.Jobs['SVC'].isAlive():
 							try:
-								if self.Variaveis_de_controle["SDU"]["init"] is True:
-									self.Variaveis_de_controle["SDU"]['init_time'] = str(datetime.datetime.now())
+								if SDU_c.init is True:
+									SDU_c.init_time = datetime.datetime.now()
 									self.Jobs['SDU'].start()
 									self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
-									self.Variaveis_de_controle["SDU"]['lasttimerunning'] = str(datetime.datetime.now())
-									sleep(self.Variaveis_de_controle['SVC']['delay'])
+									SDU_c.lasttimerunning = datetime.datetime.now()
+									sleep(SVC_c.delay)
 							except SystemExit:
 								pass
 							except not SystemExit:
 								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
-				elif (time.time() - time.mktime(datetime.datetime.strptime(self.Variaveis_de_controle["SVC"]['lasttimerunning'], "%Y-%m-%d %H:%M:%S.%f").timetuple()))>(self.Variaveis_de_controle['SVC']['delay']):
-					if ( self.Variaveis_de_controle["SVC"]["keepAlive"] is True) and (not self.Jobs['SVC'].isAlive()):
+				elif (time.time() - datetime.datetime.timestamp(SVC_c.lasttimerunning))>(SVC_c.delay):
+					if ( SVC_c.keepAlive is True) and (not self.Jobs['SVC'].isAlive()):
 						
 						self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-						self.Variaveis_de_controle["SVC"]['init_time'] =str(datetime.datetime.now())
+						SVC_c.init_time =datetime.datetime.now()
 						self.Jobs['SVC'].start()
 						self.Jobs['SVC'].join()
-						self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-						if( not self.Jobs['SDU'].isAlive()) and (self.Variaveis_de_controle["SDU"]["keepAlive"] is True):
+						SVC_c.lasttimerunning = datetime.datetime.now()
+						if( not self.Jobs['SDU'].isAlive()) and (SDU_c.keepAlive is True):
 							try:
 								self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-								self.Variaveis_de_controle["SVC"]['init_time'] = str(datetime.datetime.now())
+								SVC_c.init_time = datetime.datetime.now()
 								self.Jobs['SDU'].start()
 								self.Jobs['SDU'].join()
-								self.Variaveis_de_controle["SVC"]['lasttimerunning'] = str(datetime.datetime.now())
-								self.Variaveis_de_controle["SVC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
-								sleep(self.Variaveis_de_controle['SVC']['delay'])
+								SVC_c.lasttimerunning = datetime.datetime.now()
+								SVC_c.nextrun = datetime.datetime.fromtimestamp(time.time()+SVC_c.delay)
+								sleep(SVC_c.delay)
 							except SystemExit:
 								pass
 							except not SystemExit:
@@ -256,25 +155,25 @@ class Manager(Initialize):
 		if not self.Jobs['WATCH'].isAlive():
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
-		if (not self.Jobs['SMS'].isAlive()) and (self.Variaveis_de_controle["SMS"]["keepAlive"] is True):
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
+		if (not self.Jobs['SMS'].isAlive()) and (self.Controle.servicos.SMS.keepAlive is True):
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Controle.servicos.SMS.stop,))
 			self.Jobs['SMS'].start()
-			self.Variaveis_de_controle['SMS']['init_time'] =str( datetime.datetime.now())
-		if (not self.Jobs['SRC'].isAlive()) and (self.Variaveis_de_controle["SRC"]["keepAlive"] is True):
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Variaveis_de_controle["SRC"]["stop"],))
+			self.Controle.servicos.SMS.init_time =datetime.datetime.now()
+		if (not self.Jobs['SRC'].isAlive()) and (self.Controle.servicos.SRC.keepAlive is True):
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
-			self.Variaveis_de_controle['SRC']['init_time'] =str( datetime.datetime.now())
+			self.Controle.servicos.SRC.init_time = datetime.datetime.now()
 	
 	def finaliza(self, servico):
 		if "sdu" in servico:
 			if self.Jobs['SDU'].isAlive():
-				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
-				self.Variaveis_de_controle["SDU"]["stop"]=True
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SDU"].raise_exception()
 		if "svc" in servico:
 			if self.Jobs['SVC'].isAlive():
-				self.Variaveis_de_controle["SDU"]["keepAlive"]=False
-				self.Variaveis_de_controle["SDU"]["stop"]=True
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SVC"].raise_exception()
 	
 	def run(self,s):
@@ -290,44 +189,44 @@ class Manager(Initialize):
 
 	def inicia(self, servico):
 		if "sdu" in servico:
-			if self.Variaveis_de_controle["SDU"]['firstTime']:
-				self.Variaveis_de_controle["SDU"]['init_time'] =str( datetime.datetime.now())
-				self.Variaveis_de_controle["SDU"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
-				self.Variaveis_de_controle["SDU"]["keepAlive"]=True
-				self.Variaveis_de_controle["SDU"]["stop"]=False
+			if self.Controle.servicos.SDU.firstTime:
+				self.Controle.servicos.SDU.init_time =datetime.datetime.now()
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.keepAlive=True
+				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
 				self.Jobs['SDU'].start()
 			else:
 				
 				
-				self.Variaveis_de_controle["SDU"]["keepAlive"]=True
-				self.Variaveis_de_controle["SDU"]["stop"]=False
+				self.Controle.servicos.SDU.keepAlive=True
+				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
 				self.Jobs['SDU'].start()
 
 		if "svc" in servico:
-			if self.Variaveis_de_controle["SVC"]['firstTime']:
-					self.Variaveis_de_controle["SVC"]['init_time'] =str( datetime.datetime.now())
-					self.Variaveis_de_controle["SVC"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
-					self.Variaveis_de_controle["SVC"]["keepAlive"]=True
-					self.Variaveis_de_controle["SVC"]["stop"]=False
+			if self.Controle.servicos.SVC.firstTime:
+					self.Controle.servicos.SVC.init_time =datetime.datetime.now()
+					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+					self.Controle.servicos.SVC.keepAlive=True
+					self.Controle.servicos.SVC.stop=False
 					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 					self.Jobs['SVC'].start()
 			else:
-				self.Variaveis_de_controle["SDU"]["nextrun"]=str(datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay"))))
-				self.Variaveis_de_controle["SVC"]["keepAlive"]=True
-				self.Variaveis_de_controle["SVC"]["stop"]=False
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SVC.keepAlive=True
+				self.Controle.servicos.SVC.stop=False
 				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 				self.Jobs['SVC'].start()
 		if "sms" in servico:
-			self.Variaveis_de_controle["SMS"]["keepAlive"]=True
-			self.Variaveis_de_controle["SMS"]["stop"]=False
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Variaveis_de_controle["SMS"]["stop"],))
+			self.Controle.servicos.SMS.keepAlive=True
+			self.Controle.servicos.SMS.stop=False
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
 			self.Jobs['SMS'].start()
 		if "src" in servico:
-			self.Variaveis_de_controle["SRC"]["keepAlive"]=True
-			self.Variaveis_de_controle["SRC"]["stop"]=False
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Variaveis_de_controle["SRC"]["stop"],))
+			self.Controle.servicos.SRC.keepAlive=True
+			self.Controle.servicos.SRC.stop=False
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
 
 	def callback(self,e):
@@ -497,20 +396,20 @@ class Manager(Initialize):
 				self.Logs(e)
 
 			elif e['status']== 2:
-				e["Controle"]=self.Variaveis_de_controle['SMS']
-				self.Variaveis_de_controle['SMS']['keepAlive'] = False
+				e["Controle"]=self.controle['SMS']
+				self.controle['SMS']['keepAlive'] = False
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 3:
-				self.Variaveis_de_controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SMS']
+				self.controle['SMS']['keepAlive'] = False
+				e["Controle"]=self.controle['SMS']
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 4:
-				self.Variaveis_de_controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SMS']
+				self.controle['SMS']['keepAlive'] = False
+				e["Controle"]=self.controle['SMS']
 				self.Logs(e)
 				self.Notificar(e)
 				sys.exit()
@@ -523,20 +422,20 @@ class Manager(Initialize):
 				self.Logs(e)
 
 			elif e['status']== 2:
-				e["Controle"]=self.Variaveis_de_controle['SRC']
-				self.Variaveis_de_controle['SRC']['keepAlive'] = False
+				e["Controle"]=self.controle['SRC']
+				self.controle['SRC']['keepAlive'] = False
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 3:
-				self.Variaveis_de_controle['SRC']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SRC']
+				self.controle['SRC']['keepAlive'] = False
+				e["Controle"]=self.controle['SRC']
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 4:
-				self.Variaveis_de_controle['SRC']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SRC']
+				self.controle['SRC']['keepAlive'] = False
+				e["Controle"]=self.controle['SRC']
 				self.Logs(e)
 				self.Notificar(e)
 				sys.exit()
@@ -546,45 +445,45 @@ class Manager(Initialize):
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
-				self.Variaveis_de_controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SVC']
+				self.controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 3:
-				self.Variaveis_de_controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SVC']
+				self.controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
 				
 			elif e['status']== 4:
-				self.Variaveis_de_controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SVC']
+				self.controle['SVC']['keepAlive'] = False
+				e["Controle"]=self.controle['SVC']
 				self.Logs(e)
 				self.Notificar(e)
-				self.finaliza('svc')
+				sys.exit()
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
 				self.Logs(e)
 			elif e['status']== 2:
-				self.Variaveis_de_controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SDU']
+				self.controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 3:
-				self.Variaveis_de_controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SDU']
+				self.controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
 			
 			elif e['status']== 4:
-				self.Variaveis_de_controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.Variaveis_de_controle['SDU']
+				self.controle['SDU']['keepAlive'] = False
+				e["Controle"]=self.controle['SDU']
 				self.Logs(e)
 				self.Notificar(e)
-				self.finaliza('sdu')
+				sys.exit()
 			pass
 
 		#DAS API'S	

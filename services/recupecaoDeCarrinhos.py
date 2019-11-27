@@ -18,14 +18,12 @@ class recuperacaoDeCarrinhos(object):
 		self.Manager = M
 		self.database = self.Manager.database
 		self.mandrill_client = None
-		self.Config =self.Manager.Config
-		self.Config_ENV =   configparser.ConfigParser()
-		self.Config_ENV.read("config/{0}.ini".format(self.Manager.Config.get("KEY", "env")))
-
-		self.query = self.Config.get('SRC', 'query')
-		self.delay = float(self.Config.get('SRC', 'delay'))
-		self.mandrill_key = self.Config_ENV.get('MANDRILL', 'API_KEY')
-		self.cont = self.Config.get('SRC', 'enviados')
+		self.src_api =self.Manager.getControle('api')
+		self.src_service =self.Manager.getControle('src')
+		self.query = 	self.src_service.querys
+		self.delay = self.src_service.delay
+		self.mandrill_key = self.src_api.mandrill.api_key
+		self.cont = self.src_api.mandrill.enviados
 
 	def start(self, stop):
 		try:
@@ -215,9 +213,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], asy=True, ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
-					self.Config.set("SRC", "enviados", str(int(self.Config.get("SRC", "enviados")) +self.cont))
-					with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-						self.Config.write(configfile)
+					self.Manager.configFile()
 					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
 					return True
 			except mandrill.Error as e:

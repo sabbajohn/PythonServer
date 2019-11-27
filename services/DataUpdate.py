@@ -21,7 +21,7 @@ class DataUpdate(object):
 	def QueryRunner(self, database):
 		n_updates = 0
 		rest = 0
-		log = logging.getLogger('QueryRunner')
+		
 		message = []
 		message.append("Procurando Por Arquivo de Querys.")
 		self.feedback(metodo ='start', status =5, message=message, erro = False)

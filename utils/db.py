@@ -19,34 +19,21 @@ class DB:
 		self.feedback(metodo="__init__", status =5, message = message, erro = False)
 		message = None
 		self.feedback()
-		self.Config =   configparser.ConfigParser()
-		self.Config.read("config/DEFAULT.ini")
-		self.Config_ENV =   configparser.ConfigParser()
-		self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
-
+		db_conf = self.Manager.getControle("db")
 		
+		db_w= db_conf.MYSQL_W.__dict__
+		db_w["raise_on_warnings"] = bool(db_w["raise_on_warnings"] )
+		db_r=db_conf.MYSQL_R.__dict__
+		db_r["raise_on_warnings"] = bool(db_w["raise_on_warnings"] )
 	
 	
 	
-		db_W ={ 
-			"host":self.Config_ENV.get("MYSQL_W","host"),
-			"user":self.Config_ENV.get("MYSQL_W","user"),
-			"passwd":self.Config_ENV.get("MYSQL_W","passwd"),
-			"database":self.Config_ENV.get("MYSQL_W","database"),
-			'raise_on_warnings': self.Config_ENV.getboolean("MYSQL_W", "raise_on_warnings")
-		}
-		db_R ={
-			"host":self.Config_ENV.get("MYSQL_R","host"),
-			"user":self.Config_ENV.get("MYSQL_R","user"),
-			"passwd":self.Config_ENV.get("MYSQL_R","passwd"),
-			"database":self.Config_ENV.get("MYSQL_R","database"),
-			'raise_on_warnings': self.Config_ENV.getboolean("MYSQL_R", "raise_on_warnings")
-					
-		}
+		
+		
 		try:
 			self.connection_pool={}
-			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_W)
-			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_R)
+			self.connection_pool['W'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="W", pool_size=10, **db_w)
+			self.connection_pool['R'] = mysql.connector.pooling.MySQLConnectionPool(pool_name="R", pool_size=10, **db_r)
 			message = []
 			message.append("Conexões estabelecidas com Sucesso!")
 			

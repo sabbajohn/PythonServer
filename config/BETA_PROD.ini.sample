@@ -1,24 +1,44 @@
 [MYSQL_R]
+host =
+user = 
+passwd = 
+database = 
+raise_on_warnings = 
 
-host:127.0.0.1
-user:root
-passwd:toor
-database:read_only_database
-raise_on_warnings: True
-
-	
 [MYSQL_W]
-host:127.0.0.1
-user:root
-passwd:toor
-database:writeble_data_base
-raise_on_warnings: True
+host = 
+user = 
+passwd = 
+database = 
+raise_on_warnings = 
 
-;APIS
 [MANDRILL]
-API_KEY=
+api_key = 
+enviados = 
 
-[LINKS]
-link_site=http://beta.megasorte.com
+[VIACEP]
+consultas = 
+
+
+[HUBD]
+url = 
+api_key = 
+consultas = 
+
+
+[SOA]
+url = 
+user = 
+key = 
+consultas = 
+
+
+[COMTELE]
+api_key = 5aa20522-7c0a-4562-b25d-70ffc3f27f8e
+enviados = 0
+
+[LINK]
+link_site = http://beta.megasorte.com
 link_de_compra = http://beta.megasorte.com/carrinho?origin=rt
 contact_mail = sac@megasorte.com
+

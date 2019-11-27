@@ -1,7 +1,7 @@
 [KEY]
-env = 
-root = 
-user = 
+env = BETA
+root = /home/objetiva/PythonServer
+user = objetiva
 
 [LOGS]
 manager_log = ${KEY:root}/logs/manager.log
@@ -18,31 +18,27 @@ responses = ${KEY:root}/responses/response.json
 responses_api = ${KEY:root}/responses/response_api.json
 responses_sms = ${KEY:root}/responses/response-sms.json
 
-[CONSULTAS]
-hd = 0
-soa = 0
-viacep = 0
-
-[QUERIES]
-1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) and confirmed_at is not NULL and CPFCNPJ <> "" and CPFCNPJ is not NULL LIMIT 100
-2 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0  and confirmed_at is not NULL and CPFCNPJ <> "" and CPFCNPJ is not NULL order by Nome asc ,id desc LIMIT 100
-set = 1
-
-
-;SERVICES  
 [SMS]
 sms_init = True
+
 [SVC]
 svc_init = True
 delay = 200
+1 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0 and (Nome = "" or Nome is NULL) and confirmed_at is not NULL LIMIT 100
+2 = SELECT  CPFCNPJ, DtNascimento, id, Nome, Cidade, SgUF,CEP FROM cliente where id_status = 0  and confirmed_at is not NULL order by Nome asc ,id desc LIMIT 100
+set = 1
+
 [SDU]
 sdu_init = True
+
 [SRC]
-src_init = True
-delay=3600
-query =
+src_init = False
+delay = 3600
+query = SELECT cli.Email, cli.Nome, c.DHCarrinho FROM cliente cli INNER JOIN carrinho c ON c.id_cliente = cli.id INNER JOIN edicao e ON e.id = c.id_edicao WHERE c.Status <> 2 AND e.StatusEdicao = 'A' AND c.DHCarrinho > DATE_SUB(NOW(), INTERVAL 2 HOUR) AND c.DHCarrinho < DATE_SUB(NOW(), INTERVAL 0 HOUR) AND e.DHInicioVendas < NOW() AND e.DHEncerramentoVendas > NOW() ORDER BY c.DHCarrinho
+enviados = 120
+assunto = Tem certeza que você vai fazer isso, [nome]?
 
 [WATCH]
-addr = 
-port = 
+addr = 0.0.0.0
+port = 5001
 

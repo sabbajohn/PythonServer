@@ -91,6 +91,19 @@ def client_sender(buffer):
 							
 							client.send(bytes("\n","utf-8"))
 							continue
+						elif "VIACEP_CONSULTAS" in response:
+						
+							response=response.strip("<>() \n SERVICES:#").replace('\'', '\"')
+							response = json.loads("{"+response+"}")
+							
+							print(colored("VIACEP_CONSULTAS","green"),colored(response['VIACEP_CONSULTAS'], "blue"))
+							print(colored("HUBD_CONSULTAS","green"),colored(response['HUBD_CONSULTAS'], "blue"))
+							print(colored("SOA_CONSULTAS","green"),colored(response['SOA_CONSULTAS'], "blue"))
+							print(colored("MANDRILL_ENVIOS","green"),colored(response['MANDRILL_ENVIOS'], "blue"))
+							print(colored("COMTELE_ENVIOS","green"),colored(response['COMTELE_ENVIOS'], "blue"))
+				
+							client.send(bytes("\n","utf-8"))
+							continue
 						else:
 							if response.count("SERVICES:#>") >= 2:
 								response = response.strip("SERVICES:#")
