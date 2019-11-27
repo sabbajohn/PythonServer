@@ -17,6 +17,8 @@ class DataUpdate(object):
 	def __init__(self, M):
 		self.Manager = M
 		self.database = self.Manager.database
+		self.sdu_files = self.Manager.getControle("files")
+		self.sdu_servico = self.Manager.getControle("sdu")
 
 	def QueryRunner(self, database):
 		n_updates = 0
@@ -26,9 +28,7 @@ class DataUpdate(object):
 		message.append("Procurando Por Arquivo de Querys.")
 		self.feedback(metodo ='start', status =5, message=message, erro = False)
 		message = None
-		fname = "/home/{0}/PythonServer/queries/query.txt".format(self.USER)
-		""" H = database.getConn("W")
-		executor= database.getCursor("W") """
+		fname = self.sdu_files.query
 		if os.path.isfile(fname):
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
@@ -46,31 +46,31 @@ class DataUpdate(object):
 						self.feedback(metodo ='start', status =5, message=message, erro = False)
 						message = None
 						sleep(1)
-					#with self._lock :
 					database.execute("W", line, commit=True)
-					"""	executor.execute(line)
-					H.commit()
-					executor.rowcount """
 					n_updates = n_updates +1
 					rest = rest +1
 					message = []
 					message.append("Executando Querys n°{0}".format(n_updates))
 					self.feedback(metodo ='start', status =5, message=message, erro = False)
 					message = None
-				except:
+				except Exception as e:
 					message = []
-					message.append('Erro ao Atualiza o Banco de Dados! Erro {0}'.format(sys.exc_info()))
-					#sys.exit("[!]Não foi possivel Atualiza a base de dados! Erro {0}".format(err)) Não matar
+				
+					message.append('Erro ao Atualiza o Banco de Dados! Erro ')
+					message.append(type(e))
+					message.append(e)
+					
 					self.feedback(metodo ='start', status =3, message=message, erro = True)
 					message = None
-			""" database.closeConn("W") """
+		
 			return n_updates
 
 
 		else:
 			message = []
-			message.append("Arquivo não encontrado!")
-			self.feedback(metodo ='start', status =3, message=message, erro = True)
+			message.append("Arquivo query não encontrado!")
+			message.append("Verificar Diretorio: {0}".format(self.sdu_files.query))
+			self.feedback(metodo ='start', status =1, message=message, erro = True) #Arquivo de Query vazio....
 			message = None
 			return 0
 
@@ -102,8 +102,16 @@ class DataUpdate(object):
 
 		agora = datetime.datetime.now()
 		if result > 0:
-			os.system("mv  /home/"+self.USER+"/PythonServer/queries/query.txt /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ")
-			os.system("touch /home/{0}/PythonServer/queries/query.txt".format(self.USER))
+			try:
+
+				os.system("mv {0} /home/"+self.USER+"/PythonServer/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ".format(self.sdu_files.query))
+				os.system("touch {0}".format(self.sdu_files.query))
+			except Exception as e:
+				message = []
+				message.append("Falha ao mover arquivos query")
+
+				self.feedback(metodo ='list_generator', status =4, message=message, erro = False, comments= "Executou as inserções, mas não criou arquivo de query para proximo turno e nem logs")
+				message = None
 		return 
 		
 		
@@ -141,7 +149,7 @@ class DataUpdate(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))
@@ -177,5 +185,5 @@ class DataUpdate(object):
 				ctypes.py_object(SystemExit)) 
 		if res > 1: 
 			ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
-			print('Exception raise failure')
+			print('Finalizando Serviço')
 

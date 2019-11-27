@@ -21,11 +21,11 @@ from initialize import Initialize
 class Manager(Initialize):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
-	#  0 - NIVEL LOG 				TAREFA CONCLUIDA'				[OK]
-	#  1 - NIVEL EXCEPT - 			ERRO							[X]				Notificar-me	->	Pausar Thread
+	#  0 - NIVEL LOG 				TAREFA CONCLUIDA				[OK]
+	#  1 - NIVEL EXCEPT - 			ERRO COMUM						[X]				Notificar-me	->	Pausar Thread
 	#  2 - NIVEL EXCEPT - 			WARNING							[!]
-	#  3 - NIVEL EXCEPT - 			DIE 							[DIE]			Notificar-me	->	Pausar Thread
-	#  4 - NIVEL EXCEPT - 			ATTETION (Erro não tratado) 	[!!!]			Notificar-me	->	Pausar Thread
+	#  3 - NIVEL EXCEPT - 			ERRO DADOS						[SQL ERRO]		Notificar-me	->	Pausar Thread
+	#  4 - NIVEL EXCEPT - 										 	[!!!]			Notificar-me	->	Pausar Thread
 	#  5 - NIVEL INFO - 			""								[INFO]
 	#	
 	# e = {

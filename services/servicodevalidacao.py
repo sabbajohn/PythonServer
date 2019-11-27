@@ -64,11 +64,11 @@ class servicoDeValidacao(object):
 		self.contador_failsafe = self.contador_failsafe+1
 		
 		
-		url = "http://www.soawebservices.com.br/restservices/producao/cdc/pessoafisicaestendida.ashx"
+		url = self.svc_api.soa.url
 		data={
 		'Credenciais': {
-			'Email': 'ti@bwabrasil.com.br',
-			'Senha': 'prucdNTE'
+			'Email': self.svc_api.soa.user,
+			'Senha': self.svc_api.soa.key
 		},
 		"Documento": str(params['CPF'])
 		}
@@ -376,12 +376,12 @@ class servicoDeValidacao(object):
 
 
 
-										#f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = {1};\n".format(item['message'],item['CPF']))
+										
 									elif  "Token Inválido ou sem saldo para a consulta." in item2['message'] :
 										self.contador_hd = self.contador_hd -1 
 										message = []
 										message.append('Token Inválido ou sem saldo para a consulta."')
-										self.feedback(metodo="Runner",status=2,message = message)
+										self.feedback(metodo="Runner",status=1,message = message)
 										message = None
 										sys.exit(item2['message'])
 							else:
@@ -412,18 +412,21 @@ class servicoDeValidacao(object):
 					
 
 	async def list_generator(self,database):
-		message = []
-
 		self.result, self.contador_dispensadas
-		
-		
+		message = []
 		message.append("Buscando registros pendentes na base de dados. Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
 		query= self.svc_conf.query
-		self.result=database.execute("R", query)
-		
-		
+		try:
+			self.result=database.execute("R", query)
+		except Exception as e:
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo ='list_generator', status =3, message=message)
+			message = None
+			
 		if len(self.result) > 0:
 			message = []
 			message.append('{0} itens serão analisados.'.format(len(self.result)))
@@ -436,7 +439,7 @@ class servicoDeValidacao(object):
 			self.feedback(metodo ='list_generator', status =0, message=message)
 			message = None
 			return []
-			""" TODO: Sair de forma mais Amigavel sys.exit() é muito grosseiro """
+			
 			
 
 		
@@ -599,7 +602,7 @@ class servicoDeValidacao(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))
@@ -616,7 +619,6 @@ class servicoDeValidacao(object):
 		#with self._lock:
 		self.Manager.callback(feedback)
 
-	
 	def __init__(self, M):
 		self._stop_event = threading.Event()
 		self._lock =threading.Lock()
@@ -634,6 +636,7 @@ class servicoDeValidacao(object):
 		self.svc_files = self.Manager.getControle('files')
 		self.svc_conf = self.Manager.getControle('svc')
 		self.svc_api = self.Manager.getControle('api')
+	
 	def get_id(self): 
 		
 		# returns id of the respective thread 
@@ -653,4 +656,4 @@ class servicoDeValidacao(object):
 				ctypes.py_object(SystemExit)) 
 		if res > 1: 
 			ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
-			print('Exception raise failure')
+			print('Finalizando Serviço')
