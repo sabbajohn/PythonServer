@@ -182,7 +182,7 @@ class recuperacaoDeCarrinhos(object):
 		merge_vars = []
 		keys_to = [ "email","name"]
 		template_content =  [{'content': 'example content', 'name': 'example name'}]# faço nem ideia do que seja isso
-		global_merge_vars=  [{'content':  self.Config_ENV.get("LINKS","link_site"), 'name': 'link_site'},{'content':  self.Config_ENV.get("LINKS","contact_mail"), 'name': 'CONTACT_MAIL'},{'content':  self.Config_ENV.get("LINKS","link_de_compra"), 'name': 'link_de_compra'}]
+		global_merge_vars=  [{'content':  self.Config_ENV.get("LINK","link_site"), 'name': 'link_site'},{'content':  self.Config_ENV.get("LINK","contact_mail"), 'name': 'CONTACT_MAIL'},{'content':  self.Config_ENV.get("LINK","link_de_compra"), 'name': 'link_de_compra'}]
 		for x in result:
 			merge_vars.append({'rcpt':x[0],'vars': [{'content': x[1], 'name':'Nome'}]})
 			to.append(dict(zip(keys_to, x)))
