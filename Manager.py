@@ -96,7 +96,7 @@ class Manager(Initialize):
 				"class":"???",
 				"metodo":"Se eu não sei nem a classe...",
 				"status":4,
-				"message": [e, type(e)],
+				"message": [err, type(err)],
 				"erro":True,
 				"comments":"Arrumar uma forma de identificar melhor tais erros...",
 				"time":datetime.datetime.now()
