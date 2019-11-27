@@ -209,6 +209,7 @@ class servicos(Controle):
 		self.SVC = self.SVC(Controle)
 		self.SDU = self.SDU(Controle)
 		self.SRC = self.SRC(Controle)
+		self.WATCH = self.WATCH(Controle)
 
 	class WATCH:
 		def __init__(self,Controle):
