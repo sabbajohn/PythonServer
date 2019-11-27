@@ -114,7 +114,8 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
-					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
+				
+					self.src_service.lasttimerunning = datetime.datetime.now()
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -148,7 +149,6 @@ class recuperacaoDeCarrinhos(object):
 			finally:
 				pass
 		sys.exit()
-
 	def checkAPI(self):
 		if self.mandrill_client is None:
 			try:

@@ -259,10 +259,10 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= float(Controle.Config.get("SRC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning	=None
-			self.nextrun			=None
-			self.firstTime			=True
-			self.stop				=False
+			self.lasttimerunning	= None
+			self.nextrun			= None
+			self.firstTime			= True
+			self.stop				= False
 			self.querys				= Controle.Config.get("SRC","query")
 
  
