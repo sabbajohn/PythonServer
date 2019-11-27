@@ -204,6 +204,8 @@ class Initialize:
 			return self.Controle.servicos.SRC
 		elif 'sdu' in module.casefold():
 			return self.Controle.servicos.SDU
+		elif 'link' in module.casefold():
+			return self.Controle.LINK
 	
 			
 		self.controle	
