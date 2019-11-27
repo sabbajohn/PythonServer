@@ -212,8 +212,8 @@ class servicos(Controle):
 
 	class WATCH:
 		def __init__(self,Controle):
-			self.addr				=  Controle.Config.getboolean("WATCH","addr")
-			self.port				=  int(Controle.Config.getboolean("WATCH","port"))
+			self.addr				=  Controle.Config.get("WATCH","addr")
+			self.port				=  int(Controle.Config.get("WATCH","port"))
 	class SMS:
 		def __init__(self,Controle):
 		  
@@ -264,5 +264,6 @@ class servicos(Controle):
 			self.firstTime			=True
 			self.stop				=False
 			self.querys				= Controle.Config.get("SRC","query")
+	
 
  

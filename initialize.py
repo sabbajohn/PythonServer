@@ -59,11 +59,15 @@ class Initialize:
 		# Inicializando
 
 	def __cfg(self):
+		
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
+		betas						= ["237.29", "192.168.", "10.8.0"]
+		prods						= ["242.11","242.52"]
 		self.Config					= configparser.ConfigParser()
 		self.Config_ENV				= configparser.ConfigParser()
 		self.Config._interpolation	= configparser.ExtendedInterpolation()
+		
 		try:
 			self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
 		except Exception as e:
@@ -90,11 +94,13 @@ class Initialize:
 			print(e)
 	
 		#DEFINE ENV
+		
 		try:	
-			if "237.29" in IP or "192.168." in IP :
+
+			if any(beta in IP for beta in betas):
 				self.Config.set("KEY", "env", "BETA")
 
-			elif "242.11" in IP or "242.52" in IP:
+			elif any(prod in IP for prod in prods):
 				self.Config.set("KEY", "env", "PROD")
 			else:
 				print("Não foi Possivel identivicar o ambiente!")
@@ -202,6 +208,10 @@ class Initialize:
 			return self.Controle.servicos.SRC
 		elif 'sdu' in module.casefold():
 			return self.Controle.servicos.SDU
+		elif 'link' in module.casefold():
+			return self.Controle.LINK
+		elif 'watch' in module.casefold():
+			return self.Controle.servicos.WATCH
 	
 			
 		self.controle	

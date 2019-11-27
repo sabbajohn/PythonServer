@@ -15,19 +15,21 @@ import logging
 class Watch(object):
 	def __init__(self, M):
 	
-		self.Manager = M
+		self.Manager 		= M
+		self.controle 		= self.Manager.getControle('modulos')
+		self.controle_api	= self.Manager.getControle('api')
+		self.watch_vars		= self.Manager.getControle('watch')
 		self.services=['sms','svc','src','sdu','api']
 		
 		try:
-			self.target				= self.Manager.Config.get("WATCH","addr")
+			self.target				= self.watch_vars.addr
 		except:
 			self.target = '0.0.0.0'
 		try:
-			self.port				= int(self.Manager.Config.get("WATCH","port"))
+			self.port				= self.watch_vars.port
 		except:
 			self.port = 5000
-		self.controle = self.Manager.getControle('modulos')
-		self.controle_api= self.Manager.getControle('api')
+		
 
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input

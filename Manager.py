@@ -169,11 +169,28 @@ class Manager(Initialize):
 				self.Controle.servicos.SDU.keepAlive=False
 				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SDU"].raise_exception()
+			else:
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
+
 		if "svc" in servico:
 			if self.Jobs['SVC'].isAlive():
 				self.Controle.servicos.SDU.keepAlive=False
 				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SVC"].raise_exception()
+			else:
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
+		if "sms" in servico:
+		
+			self.Controle.servicos.SMS.keepAlive=False
+			self.Controle.servicos.SMS.stop=True
+
+				
+		if "src" in servico:
+			self.Controle.servicos.SRC.keepAlive=False
+			self.Controle.servicos.SRC.stop=True
+
 	
 	def run(self,s):
 		if "src" in s:
@@ -190,7 +207,7 @@ class Manager(Initialize):
 		if "sdu" in servico:
 			if self.Controle.servicos.SDU.firstTime:
 				self.Controle.servicos.SDU.init_time =datetime.datetime.now()
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 				self.Controle.servicos.SDU.keepAlive=True
 				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
@@ -206,13 +223,13 @@ class Manager(Initialize):
 		if "svc" in servico:
 			if self.Controle.servicos.SVC.firstTime:
 					self.Controle.servicos.SVC.init_time =datetime.datetime.now()
-					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 					self.Controle.servicos.SVC.keepAlive=True
 					self.Controle.servicos.SVC.stop=False
 					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 					self.Jobs['SVC'].start()
 			else:
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 				self.Controle.servicos.SVC.keepAlive=True
 				self.Controle.servicos.SVC.stop=False
 				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
@@ -399,7 +416,8 @@ class Manager(Initialize):
 				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
-				self.Logs(e)
+				
+				self.finaliza('sms')
 
 			elif e['status']== 2:
 			
@@ -412,87 +430,99 @@ class Manager(Initialize):
 				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
-				self.Logs(e)
-				
+				self.finaliza('sms')
+				sys.exit()
 			elif e['status']== 4:
 				e["Controle"]=self.Controle.servicos.SMS.__dict__
 				self.Controle.servicos.SMS.keepAlive = False
 				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
-				self.Notificar(e)
-				self.Logs(e)
+				self.finaliza('sms')
 				
 				
 			pass
 		elif e['class'] == 'recuperacaoDeCarrinhos':
-			
-			
-			if e['status']== 1:
-				self.Logs(e)
 
-			elif e['status']== 2:
-				e["Controle"]=self.controle['SRC']
+			if e['status']== 1:
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
 				self.Controle.servicos.SRC.keepAlive = False
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza('src')
+				
+
+			elif e['status']== 2:
+				self.Logs(e)
 				
 			elif e['status']== 3:
 				self.Controle.servicos.SRC.keepAlive = False
-				e["Controle"]=self.controle['SRC']
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
-				
+				self.finaliza('src')
+				sys.exit()
+
 			elif e['status']== 4:
 				self.Controle.servicos.SRC.keepAlive = False
-				e["Controle"]=self.controle['SRC']
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
 				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
+				self.finaliza('src')
+				
 				
 			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
 				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.controle['SVC']
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("svc")
+				
+			elif e['status']== 2:
+				self.Logs(e)
 			
 			elif e['status']== 3:
 				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.controle['SVC']
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("svc")
+				sys.exit()
 				
 			elif e['status']== 4:
 				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.controle['SVC']
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
+				self.finaliza("svc")
+				
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
 				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=self.controle['SDU']
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("sdu")
+
+				
+			elif e['status']== 2:
+				self.Logs(e)
 			
 			elif e['status']== 3:
 				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=self.controle['SDU']
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("sdu")
+				sys.exit()
 			
 			elif e['status']== 4:
 				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=self.controle['SDU']
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
+				self.finaliza("sdu")
+
+				
 			pass
 
 		#DAS API'S	
@@ -563,7 +593,7 @@ class Manager(Initialize):
 			pass
 
 	def Logs(self, e):
-		e["ENV"] = self.Config.get("KEY", "env")
+		e["ENV"] = self.Controle.Key.env
 		log = logging.getLogger('{message:{fill}^{width}}'.format(message=e['class']+"."+e['metodo'],fill=" ",align="^",width=50	))
 		for msg in e['message']:
 			if msg is not None and msg != "":
