@@ -67,7 +67,7 @@ class Manager(Initialize):
 				
 			
 			if modulos.SRC.init is True:
-				Jobs['SRC'].start()
+				self.Jobs['SRC'].start()
 				modulos.SRC.init_time = datetime.datetime.now()
 				
 				
