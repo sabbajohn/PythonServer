@@ -25,7 +25,7 @@ class recuperacaoDeCarrinhos(object):
 		self.query 				= self.src_service.querys
 		self.delay 				= self.src_service.delay
 		self.mandrill_key 		= self.src_api.mandrill.api_key
-		self.cont 				= self.src_api.mandrill.enviados
+		
 
 	def start(self, stop):
 		schedule.every().hour.at(":00").do(self.db_monitor)
@@ -219,10 +219,14 @@ class recuperacaoDeCarrinhos(object):
 			try:
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], asy=True, ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
-					self.cont = p['cont'] 
-					self.Manager.configFile()
+					self.src_api.mandrill.enviados += p['cont'] 
+					try:
+						self.Manager.configFile()
+					except:
+						pass
+					
 					message = []
-					message.append("{0} email's foram enviados".format(self.cont))
+					message.append("{0} email's foram enviados".format(p['cont'] ))
 					self.feedback(metodo="send", status =5, message = message, erro = True, comments = "Email's de recuperação de carrinho" )
 					message = None
 					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
