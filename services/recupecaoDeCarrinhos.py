@@ -72,7 +72,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
-					self.self.src_service.lasttimerunning =str( datetime.datetime.now())
+					self.src_service.lasttimerunning =str( datetime.datetime.now())
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
