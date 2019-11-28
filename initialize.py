@@ -53,7 +53,7 @@ class Initialize:
 		#Definindo objeto das API's
 		
 		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
-		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:lambda:self.Controle.servicos.SRC.stop,))
+		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")

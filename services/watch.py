@@ -270,10 +270,10 @@ class Watch(object):
 				if self.Manager.run('src'):
 
 					client_socket.send("Serviço executado".encode())
-					time.sleep(2)
+					time.sleep(1)
 				else:
 					client_socket.send("Não haviam tarefas a serem executadas ou tivemos um erro, verificar logs".encode())
-					time.sleep(2)
+					time.sleep(1)
 			return bytearray(response.format(self.Manager.Jobs['SRC'].isAlive(),
 			 self.controle.SRC.init,
 			 self.controle.SRC.init_time,
