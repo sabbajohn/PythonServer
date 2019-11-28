@@ -221,14 +221,19 @@ class recuperacaoDeCarrinhos(object):
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
 					self.Manager.configFile()
-					self.src_service.nextrun= str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
+					message = []
+					message.append("{} email's foram enviados")
+					self.feedback(metodo="send", status =5, message = message, erro = True, comments = "Email's de recuperação de carrinho" )
+					message = None
+					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
 					return True
 			except mandrill.Error as e:
 				
 				
 				message = []
-				message.append( "Oops!{0}occured.".format(e))
-				self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
+				message.append( type(e))
+				message.append(e)
+				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Provavelmente algum erro no mandrill" )
 				message = None
 				
 				return False
@@ -236,12 +241,12 @@ class recuperacaoDeCarrinhos(object):
 			except Exception as e:
 				message.append( type(e))
 				message.append(e)
-				self.feedback(metodo="send", status =5, message = message, erro = False)
+				self.feedback(metodo="send", status =2, message = message, erro = True)
 				message = None
 		else:
 				message = []
 				message.append( "Não foi Possivel validara a Chave API")
-				self.feedback(metodo="send", status =5, message = message, erro = False, comments = "Algo não panejado" )
+				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Algo não panejado" )
 				message = None
 				return False
 
