@@ -607,6 +607,8 @@ class Manager(Initialize):
 			'47988948000',
 			'47991566969'
 		]
+		for x in e['controle']:
+			e['controle'][x] = str(x)
 		log = logging.getLogger("Manager")
 		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
 		log.info(e)
@@ -619,7 +621,7 @@ class Manager(Initialize):
 			result = textmessage_service.send('MS_.Manager - Error', json.dumps(e), administradores)
 			log.info( '{0}[!]Notificação de Falha enviada!!'.format(datetime.datetime.now()))
 		except Exception as e :
-			log.info( '{0}[!!!]Não foi ossivel notificar!'.format(datetime.datetime.now()))
+			log.info( '{0}[!!!]Não foi possivel notificar!'.format(datetime.datetime.now()))
 			log.info( '{0}[!!!]{1}'.format(datetime.datetime.now(),e))
 			
 		return
