@@ -28,12 +28,13 @@ class recuperacaoDeCarrinhos(object):
 		
 
 	def start(self, stop):
-		schedule.every().hour.at(":00").do(self.db_monitor)
+	
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
+			schedule.every().hour.at(":00").do(self.db_monitor)
 			while True:
 				if stop():
 					break
@@ -148,9 +149,10 @@ class recuperacaoDeCarrinhos(object):
 					pass
 				return
 				#time.sleep(self.delay)
-		except: 
+		except Exception as e :
 			message = []
-			message.append( sys.exc_info())
+			message.append(type(e))
+			message.append(e)
 			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
 			message = None
 		finally:
@@ -179,9 +181,10 @@ class recuperacaoDeCarrinhos(object):
 				try:
 					self.mandrill_client = mandrill.Mandrill(self.mandrill_key)
 					return True
-				except :
+				except Exception as e :
 					message = []
-					message.append( sys.exc_info())
+					message.append(type(e))
+					message.append(e)
 					self.feedback(metodo="Monitor", status =2, message = message, erro = True )
 					message = None
 					return False
