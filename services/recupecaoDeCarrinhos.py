@@ -12,6 +12,7 @@ import threading
 import mandrill
 import configparser	
 import asyncio
+import schedule
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 	
@@ -27,13 +28,18 @@ class recuperacaoDeCarrinhos(object):
 		self.cont 				= self.src_api.mandrill.enviados
 
 	def start(self, stop):
+		schedule.every().minute.at(":00").do(self.db_monitor)
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-
-			self.db_monitor(stop)
+			while True:
+				if stop():
+					break
+				schedule.run_pending()
+				time.sleep(1)
+			
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")
@@ -63,7 +69,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
-					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
+					self.self.src_service.lasttimerunning =str( datetime.datetime.now())
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -115,7 +121,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
-					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
+					self.src_service.lasttimerunning =str( datetime.datetime.now())
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -215,7 +221,7 @@ class recuperacaoDeCarrinhos(object):
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
 					self.Manager.configFile()
-					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
+					self.src_service.nextrun= str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
 					return True
 			except mandrill.Error as e:
 				
