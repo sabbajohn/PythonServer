@@ -133,7 +133,7 @@ class recuperacaoDeCarrinhos(object):
 
 				params = self.emailParams(result)
 				self.send(params)
-				time.sleep(self.delay)
+				return
 				
 			else: 
 				if(escreveu == False):
