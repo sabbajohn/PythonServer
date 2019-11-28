@@ -178,7 +178,7 @@ class Initialize:
 			if(cenv_editado):
 				with open("config/{0}.ini".format(self.Config.get("KEY", "env")), "w+") as configfile:
 					self.Config.write(configfile)
-			print(colored("\nVerifique se os valores definidos estão corretos.\n", "blue"))
+			""" print(colored("\nVerifique se os valores definidos estão corretos.\n", "blue"))
 			for each_section in self.Config_ENV.sections():
 				print("[{0}]".format(each_section))
 				for(each_key, each_val) in self.Config_ENV.items(each_section):
@@ -194,10 +194,11 @@ class Initialize:
 				sys.exit()
 			
 			
-
+ """
 		except:
 			pass
-
+		
+		return
 
 
 
