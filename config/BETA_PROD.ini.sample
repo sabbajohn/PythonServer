@@ -1,40 +1,40 @@
 [MYSQL_R]
-host =
+host = 
 user = 
 passwd = 
 database = 
-raise_on_warnings = 
+raise_on_warnings = True
 
 [MYSQL_W]
 host = 
 user = 
 passwd = 
-database = 
-raise_on_warnings = 
+database =
+raise_on_warnings = True
 
 [MANDRILL]
 api_key = 
-enviados = 
+enviados = 0
 
 [VIACEP]
-consultas = 
+consultas = 0
 
 
 [HUBD]
 url = 
 api_key = 
-consultas = 
+consultas = 0
 
 
 [SOA]
 url = 
 user = 
 key = 
-consultas = 
+consultas = 0
 
 
 [COMTELE]
-api_key = 5aa20522-7c0a-4562-b25d-70ffc3f27f8e
+api_key = 
 enviados = 0
 
 [LINK]
