@@ -239,7 +239,7 @@ class recuperacaoDeCarrinhos(object):
 				messages = []
 				messages.append( type(e))
 				messages.append(e)
-				self.feedback(metodo="send", status =2, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
 				messages = None
 				
 				return False
@@ -248,13 +248,13 @@ class recuperacaoDeCarrinhos(object):
 				messages = []
 				messages.append( type(e))
 				messages.append(e)
-				self.feedback(metodo="send", status =2, message = messages, erro = True)
+				self.feedback(metodo="send", status =1, message = messages, erro = True)
 				messages = None
 				return False
 		else:
 				messages = []
 				messages.append( "Não foi Possivel validara a Chave API")
-				self.feedback(metodo="send", status =2, message = messages, erro = True, comments = "Chave Mandrill" )
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Chave Mandrill" )
 				messages = None
 				return False
 
