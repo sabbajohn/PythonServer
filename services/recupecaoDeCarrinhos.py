@@ -216,15 +216,13 @@ class recuperacaoDeCarrinhos(object):
 	def send(self, p):
 		
 		if(self.checkAPI()):
-
-
 			try:
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], asy=True, ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
 					self.Manager.configFile()
 					message = []
-					message.append("{} email's foram enviados".format(self.cont))
+					message.append("{0} email's foram enviados".format(self.cont))
 					self.feedback(metodo="send", status =5, message = message, erro = True, comments = "Email's de recuperação de carrinho" )
 					message = None
 					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
