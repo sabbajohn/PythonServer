@@ -16,6 +16,7 @@ import asyncio.coroutines
 import logging
 from comtele_sdk.textmessage_service import TextMessageService
 from initialize import Initialize
+from termcolor import colored
 
 
 class Manager(Initialize):
