@@ -28,7 +28,7 @@ class recuperacaoDeCarrinhos(object):
 		self.cont 				= self.src_api.mandrill.enviados
 
 	def start(self, stop):
-		schedule.every().minute.at(":00").do(self.db_monitor(stop))
+		schedule.every().minute.at(":00").do(self.db_monitor())
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
@@ -103,7 +103,7 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			return False
 
-	def db_monitor(self,stop):
+	def db_monitor(self):
 		message = []
 		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
