@@ -141,7 +141,7 @@ class recuperacaoDeCarrinhos(object):
 				if(escreveu == False):
 					message = []
 					message.append( "Nenhum carrinho abandonado no momento!")
-					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve! L144"  )
 					message = None
 					escreveu= True
 				
@@ -151,7 +151,7 @@ class recuperacaoDeCarrinhos(object):
 			message = []
 			message.append(type(e))
 			message.append(e)
-			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+			self.feedback(metodo="Monitor", status =2, message = message, erro = False, comments ="L154"  )
 			message = None
 		finally:
 			return
