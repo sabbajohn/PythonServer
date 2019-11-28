@@ -192,7 +192,6 @@ class Manager(Initialize):
 			self.Controle.servicos.SRC.keepAlive=False
 			self.Controle.servicos.SRC.stop=True
 
-	
 	def run(self,s):
 		if "src" in s:
 				loop = asyncio.new_event_loop()
