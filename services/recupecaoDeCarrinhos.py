@@ -163,9 +163,10 @@ class recuperacaoDeCarrinhos(object):
 			try:
 				self.mandrill_client = mandrill.Mandrill(self.mandrill_key)
 				return True
-			except:
+			except Exception as e:
 				message = []
-				message.append( sys.exc_info())
+				message.append(type(e))
+				message.append(e)
 				self.feedback(metodo="Monitor", status =2, message = message, erro = True )
 				message = None
 				
@@ -225,33 +226,34 @@ class recuperacaoDeCarrinhos(object):
 					except:
 						pass
 					
-					message = []
-					message.append("{0} email's foram enviados".format(p['cont'] ))
-					self.feedback(metodo="send", status =5, message = message, erro = True, comments = "Email's de recuperação de carrinho" )
-					message = None
+					messages = []
+					messages.append("{0} email's foram enviados".format(p['cont'] ))
+					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
+					messages = None
 					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
 					return True
 			except mandrill.Error as e:
 				
 				
-				message = []
-				message.append( type(e))
-				message.append(e)
-				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Provavelmente algum erro no mandrill" )
-				message = None
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =2, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
+				messages = None
 				
 				return False
 	
 			except Exception as e:
-				message.append( type(e))
-				message.append(e)
-				self.feedback(metodo="send", status =2, message = message, erro = True)
-				message = None
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =2, message = messages, erro = True)
+				messages = None
 		else:
-				message = []
-				message.append( "Não foi Possivel validara a Chave API")
-				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Chave Mandrill" )
-				message = None
+				messages = []
+				messages.append( "Não foi Possivel validara a Chave API")
+				self.feedback(metodo="send", status =2, message = messages, erro = True, comments = "Chave Mandrill" )
+				messages = None
 				return False
 
 	def feedback(self,*args, **kwargst):
