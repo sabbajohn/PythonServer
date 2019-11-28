@@ -152,14 +152,14 @@ class API(Controle):
 		def __init__(self,Controle):
 			self.tag="COMTELE"
 			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
-			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
+			self.enviados=int(Controle.Config_ENV.get(self.tag,"enviados"))
 		
 			
 	class mandrill:
 		def __init__(self,Controle):
 			self.tag="MANDRILL"
 			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
-			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
+			self.enviados=int(Controle.Config_ENV.get(self.tag,"enviados"))
 		
 	class hubd:
 		def __init__(self,Controle):

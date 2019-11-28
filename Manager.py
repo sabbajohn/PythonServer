@@ -607,8 +607,8 @@ class Manager(Initialize):
 			'47988948000',
 			'47991566969'
 		]
-		for x in e['controle']:
-			e['controle'][x] = str(x)
+		for x in e['Controle']:
+			e['Controle'][x] = str(x)
 		log = logging.getLogger("Manager")
 		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
 		log.info(e)
