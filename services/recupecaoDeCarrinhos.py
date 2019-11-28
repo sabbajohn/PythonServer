@@ -278,7 +278,7 @@ class recuperacaoDeCarrinhos(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))

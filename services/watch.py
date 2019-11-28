@@ -44,6 +44,7 @@ class Watch(object):
 		self.server_loop()
 	
 	def server_loop(self):
+
 		#TODO: RESTART Watch caso de falha de endereço em uso
 		# if no target is defined we listen on all interfaces
 		if not len(self.target):
@@ -334,7 +335,7 @@ class Watch(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))
