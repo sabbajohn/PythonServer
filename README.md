@@ -12,9 +12,21 @@ TODO:
 
 	* Carregar todas as Variaveis de ambiente para memória para evitar a necessidade de esta lendo arquivos
 		- FAZENDO
-	* Re-Analizar as tratativas de erros e exceções, assim como os metos callback e Exceptions
+	* Callback e Exceptions
+	 	- Re-Analizar as tratativas de erros e exceçõe
+		- Quase tudo tratado, alguns pontos a serem definidos. 
+		- status 3 Encerrar serviço ou tentar conectar novamente com BD?!
+	
+	* WATCH e CWATCH 
 
-	* Implementar mecanismos de deploy
+	 -	Poder setar configurações de Query e Delay atraves do cwhatch,
+	 -	Status geral do sistemas
+	 -	Ultimos Registros
+	 -	
+
+
+
+	* Implementar Deploy
 		- utilizar modulo Chapter 7 como base
 
 	* Desenvolver Interface gráfica
