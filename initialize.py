@@ -64,7 +64,7 @@ class Initialize:
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
 		betas						= ["237.29", "192.168.", "10.8.0"]
-		prods						= ["242.11","242.52"]
+		prods						= ["10.255.242","242.52"]
 		cenv_editado				= False
 		self.Config					= configparser.ConfigParser()
 		self.Config_ENV				= configparser.ConfigParser()
