@@ -28,7 +28,7 @@ class recuperacaoDeCarrinhos(object):
 		self.cont 				= self.src_api.mandrill.enviados
 
 	def start(self, stop):
-		schedule.every().minute.at(":00").do(self.db_monitor)
+		schedule.every().hour.at(":00").do(self.db_monitor)
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
