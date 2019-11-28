@@ -222,7 +222,7 @@ class recuperacaoDeCarrinhos(object):
 					self.cont = p['cont'] 
 					self.Manager.configFile()
 					message = []
-					message.append("{} email's foram enviados")
+					message.append("{} email's foram enviados".format(self.cont))
 					self.feedback(metodo="send", status =5, message = message, erro = True, comments = "Email's de recuperação de carrinho" )
 					message = None
 					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
@@ -246,7 +246,7 @@ class recuperacaoDeCarrinhos(object):
 		else:
 				message = []
 				message.append( "Não foi Possivel validara a Chave API")
-				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Algo não panejado" )
+				self.feedback(metodo="send", status =2, message = message, erro = True, comments = "Chave Mandrill" )
 				message = None
 				return False
 
