@@ -138,9 +138,9 @@ class Initialize:
 					print(sys.exc_info()[0])
 					sys.exit("Erro ao definir env")
 				
-				with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
-					self.Config.write(configfile)
-	
+			with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
+				self.Config.write(configfile)
+
 		except Exception as e:
 			print(type(e))
 			print(e)
