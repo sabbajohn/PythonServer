@@ -232,13 +232,7 @@ class recuperacaoDeCarrinhos(object):
 				message = None
 				
 				return False
-			except not mandrill.Error:
-				message = []
-				message.append( "SMS:{0}".format(['Message']))
-				self.feedback(metodo="send", status =5, message = message, erro = False)
-				message = None
-
-				return False
+	
 			except Exception as e:
 				message.append( type(e))
 				message.append(e)
