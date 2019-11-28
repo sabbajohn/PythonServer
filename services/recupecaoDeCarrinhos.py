@@ -46,12 +46,14 @@ class recuperacaoDeCarrinhos(object):
 			self.feedback(metodo="start", status =5, message = message, erro = False, comments = "Finalizado via Watcher" )
 			message = None
 			sys.exit()
-		else:
+		except Exception as e:
 			
 			message = []
-			message.append( "{0}".format(sys.exc_info()))
+			message.append( type(e))
+			message.append(e)
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
+		
 		
 
 		pass
