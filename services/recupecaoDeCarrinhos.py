@@ -249,6 +249,7 @@ class recuperacaoDeCarrinhos(object):
 				messages.append(e)
 				self.feedback(metodo="send", status =2, message = messages, erro = True)
 				messages = None
+				return False
 		else:
 				messages = []
 				messages.append( "Não foi Possivel validara a Chave API")
