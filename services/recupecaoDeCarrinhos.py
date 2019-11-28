@@ -28,7 +28,7 @@ class recuperacaoDeCarrinhos(object):
 		self.cont 				= self.src_api.mandrill.enviados
 
 	def start(self, stop):
-		schedule.every().minute.at(":00").do(self.db_monitor)
+		schedule.every().minute.at(":00").do(self.db_monitor(stop))
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
@@ -110,51 +110,51 @@ class recuperacaoDeCarrinhos(object):
 		message = None
 		escreveu = False
 	
-		while True:
-			if stop():
-				break
+		
 			
-			try:
-				result = None
-				
+		try:
+			result = None
 			
-				result = self.database.execute("R",self.query)
-			
-				if len(result)>0:
-					self.src_service.lasttimerunning =str( datetime.datetime.now())
-					if(escreveu == True):
-						message = []
-						message.append( "Novos carrinhos encontrados!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
-						message = None
-
+		
+			result = self.database.execute("R",self.query)
+		
+			if len(result)>0:
+				self.src_service.lasttimerunning =str( datetime.datetime.now())
+				if(escreveu == True):
 					message = []
-					message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+					message.append( "Novos carrinhos encontrados!")
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 					message = None
-	
-					params = self.emailParams(result)
-					self.send(params)
-					time.sleep(self.delay)
-					
-				else: 
-					if(escreveu == False):
-						message = []
-						message.append( "Nenhum carrinho abandonado no momento!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
-						message = None
-						escreveu= True
-					else:
-						pass
-					time.sleep(self.delay)
-			except: 
+
 				message = []
-				message.append( sys.exc_info())
-				self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-			finally:
-				pass
-		sys.exit()
+
+				params = self.emailParams(result)
+				self.send(params)
+				time.sleep(self.delay)
+				
+			else: 
+				if(escreveu == False):
+					message = []
+					message.append( "Nenhum carrinho abandonado no momento!")
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					message = None
+					escreveu= True
+				else:
+					pass
+				return
+				#time.sleep(self.delay)
+		except: 
+			message = []
+			message.append( sys.exc_info())
+			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+			message = None
+		finally:
+			return
+			pass
+
 
 	def checkAPI(self):
 		if self.mandrill_client is None:
