@@ -133,7 +133,6 @@ class recuperacaoDeCarrinhos(object):
 				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
 				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-
 				params = self.emailParams(result)
 				self.send(params)
 				return
@@ -145,8 +144,7 @@ class recuperacaoDeCarrinhos(object):
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
 					message = None
 					escreveu= True
-				else:
-					pass
+				
 				return
 				#time.sleep(self.delay)
 		except Exception as e :
@@ -157,7 +155,7 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 		finally:
 			return
-			pass
+		
 
 
 	def checkAPI(self):
