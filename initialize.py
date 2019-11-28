@@ -23,6 +23,7 @@ from services.watch import Watch
 from services.recupecaoDeCarrinhos import recuperacaoDeCarrinhos
 from utils.db import DB
 from controle import Controle
+from termcolor import colored
 
 
 class Initialize:
@@ -57,19 +58,37 @@ class Initialize:
 		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
 		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
-	
-	
+
 	def __cfg(self):
+		
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
+		betas						= ["237.29", "192.168.", "10.8.0"]
+		prods						= ["242.11","242.52"]
+		cenv_editado				= False
 		self.Config					= configparser.ConfigParser()
 		self.Config_ENV				= configparser.ConfigParser()
 		self.Config._interpolation	= configparser.ExtendedInterpolation()
+		
 		try:
 			self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
-		except Exception as e:
-			print(type(e))
-			print(e)
+		except:# CRIA O ARQUIVO DEFAULT
+			try:
+				os.system("cp {0}/config/DEFAULT.ini.sample {0}/config/DEFAULT.ini".format(DIR))
+			except Exception as e:
+				print("Não foi possivel Criar um arquivo a partir da amostra DEFAULT.ini.sample")
+				print(type(e))
+				print(e)
+			else:
+				try:
+					self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
+				except Exception as e:
+					print("Verifique o arquivo {0}/config/DEFAULT.ini".format(DIR))
+					print(type(e))
+					print(e)
+				else:
+					pass
+
 
 		try:
 			self.Config.set("KEY", "root", DIR)
@@ -79,24 +98,25 @@ class Initialize:
 		except Exception as e:
 			print(type(e))
 			print(e)
+		
 		try:
 			s	= socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			s.connect(("8.8.8.8", 80))
 			IP	= s.getsockname()[0]
 			s.close()
-
 		except Exception as e:
 
 			print(type(e))
 			print(e)
 	
 		#DEFINE ENV
-		betas=["237.29","192.168.", "10.8.0"]
+		
 		try:	
-			if any(beta in IP for beta in betas) :
+
+			if any(beta in IP for beta in betas):
 				self.Config.set("KEY", "env", "BETA")
 
-			elif "242.11" in IP or "242.52" in IP:
+			elif any(prod in IP for prod in prods):
 				self.Config.set("KEY", "env", "PROD")
 			else:
 				print("Não foi Possivel identivicar o ambiente!")
@@ -126,10 +146,63 @@ class Initialize:
 			print(e)
 		try:
 			 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
-		except  Exception as e:
+		except:
+			print("O ARQUIVO config/{0}.ini não existe.".format(self.Config.get("KEY", "env")))
+			print("Iremos cria-lo")
+			try: #TENTA CRIAR
+				os.system("cp {0}/config/BETA_PROD.ini.sample {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
+			except Exception as e: #CASO DE ERRO
+				print("Não foi possivel Criar um arquivo a partir da amostra BETA_PROD.ini.sample")
 				print(type(e))
 				print(e)
-	
+			else: #CASO NÂO
+				try:#TENTA LÊ
+				 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+				except:#CASO FALHE
+					print("Verifique o arquivo {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
+					print(type(e))
+					print(e)
+				else:
+					pass 
+		# SE NÂO VERIFICA OS CAMPOS...
+		try:
+			for each_section in self.Config_ENV.sections():
+				for(each_key, each_val) in self.Config_ENV.items(each_section):
+					if each_val is None or "" :
+						print("Os valores de {0}, da sessão {1} não foram definidos!".format(each_key,each_section))
+						print("Insira os valores para{0}->{1}: ".format(each_section,each_key))
+						val = input()
+						self.Config_ENV.set(each_section, each_key, val)
+						cenv_editado = True
+						pass
+			if(cenv_editado):
+				with open("config/{0}.ini".format(self.Config.get("KEY", "env")), "w+") as configfile:
+					self.Config.write(configfile)
+			""" print(colored("\nVerifique se os valores definidos estão corretos.\n", "blue"))
+			for each_section in self.Config_ENV.sections():
+				print("[{0}]".format(each_section))
+				for(each_key, each_val) in self.Config_ENV.items(each_section):
+					 print ("{0} : {1}\n".format(each_key, each_val))
+			print("Se Ok aperte S para continuar")
+
+			if "S" in input():
+
+				pass
+			else:
+				print("Você pode ajustar suas configurações manualemnte em {0}/config/".format(DIR))
+				print("Bye!")
+				sys.exit()
+			
+			
+ """
+		except:
+			pass
+		
+		return
+
+
+
+
 	def todict(self,obj, classkey=None):
 		if isinstance(obj, dict):
 			data = {}
@@ -176,7 +249,7 @@ class Initialize:
 		
 		with open("{0}/config/BETA.ini".format(self.Controle.Key.root), "w+") as configfile:		
 			self.Config_ENV.write(configfile)	
- """
+ 	"""
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,
@@ -206,6 +279,8 @@ class Initialize:
 			return self.Controle.servicos.SDU
 		elif 'link' in module.casefold():
 			return self.Controle.LINK
+		elif 'watch' in module.casefold():
+			return self.Controle.servicos.WATCH
 	
 			
 		self.controle	
@@ -242,4 +317,3 @@ class Initialize:
 				print(type(e))
 				print(e)
 				return False
-		

@@ -152,14 +152,14 @@ class API(Controle):
 		def __init__(self,Controle):
 			self.tag="COMTELE"
 			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
-			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
+			self.enviados=int(Controle.Config_ENV.get(self.tag,"enviados"))
 		
 			
 	class mandrill:
 		def __init__(self,Controle):
 			self.tag="MANDRILL"
 			self.api_key=Controle.Config_ENV.get(self.tag,"api_key")
-			self.enviados=Controle.Config_ENV.get(self.tag,"enviados")
+			self.enviados=int(Controle.Config_ENV.get(self.tag,"enviados"))
 		
 	class hubd:
 		def __init__(self,Controle):
@@ -209,11 +209,12 @@ class servicos(Controle):
 		self.SVC = self.SVC(Controle)
 		self.SDU = self.SDU(Controle)
 		self.SRC = self.SRC(Controle)
+		self.WATCH = self.WATCH(Controle)
 
 	class WATCH:
 		def __init__(self,Controle):
-			self.addr				=  Controle.Config.getboolean("WATCH","addr")
-			self.port				=  int(Controle.Config.getboolean("WATCH","port"))
+			self.addr				=  Controle.Config.get("WATCH","addr")
+			self.port				=  int(Controle.Config.get("WATCH","port"))
 	class SMS:
 		def __init__(self,Controle):
 		  
@@ -259,10 +260,11 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= float(Controle.Config.get("SRC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning	= None
-			self.nextrun			= None
-			self.firstTime			= True
-			self.stop				= False
+			self.lasttimerunning	=None
+			self.nextrun			=None
+			self.firstTime			=True
+			self.stop				=False
 			self.querys				= Controle.Config.get("SRC","query")
+	
 
  

@@ -1,7 +1,7 @@
 [KEY]
-env = BETA
-root = /home/objetiva/PythonServer
-user = objetiva
+env = 
+root = 
+user = 
 
 [LOGS]
 manager_log = ${KEY:root}/logs/manager.log
@@ -32,9 +32,9 @@ set = 1
 sdu_init = True
 
 [SRC]
-src_init = False
+src_init = True
 delay = 3600
-query = SELECT cli.Email, cli.Nome, c.DHCarrinho FROM cliente cli INNER JOIN carrinho c ON c.id_cliente = cli.id INNER JOIN edicao e ON e.id = c.id_edicao WHERE c.Status <> 2 AND e.StatusEdicao = 'A' AND c.DHCarrinho > DATE_SUB(NOW(), INTERVAL 2 HOUR) AND c.DHCarrinho < DATE_SUB(NOW(), INTERVAL 0 HOUR) AND e.DHInicioVendas < NOW() AND e.DHEncerramentoVendas > NOW() ORDER BY c.DHCarrinho
+query = SELECT cli.Email, cli.Nome, c.DHCarrinho FROM cliente cli INNER JOIN carrinho c ON c.id_cliente = cli.id INNER JOIN edicao e ON e.id = c.id_edicao WHERE c.Status = 0 AND e.StatusEdicao = 'A' AND c.DHCarrinho > DATE_SUB(NOW(), INTERVAL 2 HOUR) AND c.DHCarrinho < DATE_SUB(NOW(), INTERVAL 0 HOUR) AND e.DHInicioVendas < NOW() AND e.DHEncerramentoVendas > NOW() and Email is not NULL and Nome is not NULL ORDER BY c.DHCarrinho
 enviados = 120
 assunto = Tem certeza que você vai fazer isso, [nome]?
 

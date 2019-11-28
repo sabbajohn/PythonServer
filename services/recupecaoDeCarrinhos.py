@@ -12,28 +12,34 @@ import threading
 import mandrill
 import configparser	
 import asyncio
+import schedule
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 	
-		self.Manager = M
-		self.database = self.Manager.database
-		self.mandrill_client = None
-		self.src_api =self.Manager.getControle('api')
-		self.src_service =self.Manager.getControle('src')
-		self.src_link =self.Manager.getControle('link')
-		self.query = 	self.src_service.querys
-		self.delay = self.src_service.delay
-		self.mandrill_key = self.src_api.mandrill.api_key
-		self.cont = self.src_api.mandrill.enviados
+		self.Manager 			= M
+		self.database 			= self.Manager.database
+		self.mandrill_client 	= None
+		self.src_api 			= self.Manager.getControle('api')
+		self.src_service 		= self.Manager.getControle('src')
+		self.src_link 			= self.Manager.getControle('link')
+		self.query 				= self.src_service.querys
+		self.delay 				= self.src_service.delay
+		self.mandrill_key 		= self.src_api.mandrill.api_key
+		self.cont 				= self.src_api.mandrill.enviados
 
 	def start(self, stop):
+		schedule.every().hour.at(":00").do(self.db_monitor)
 		try:
 			message = []
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-
-			self.db_monitor(stop)
+			while True:
+				if stop():
+					break
+				schedule.run_pending()
+				time.sleep(1)
+			
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")
@@ -63,7 +69,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.database.execute("R",self.query)
 			
 				if len(result)>0:
-					self.Manager.Variaveis_de_controle["SRC"]['lasttimerunning'] =str( datetime.datetime.now())
+					self.self.src_service.lasttimerunning =str( datetime.datetime.now())
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -97,59 +103,59 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			return False
 
-	def db_monitor(self,stop):
+	def db_monitor(self):
 		message = []
 		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 		message = None
 		escreveu = False
 	
-		while True:
-			if stop():
-				break
+		
 			
-			try:
-				result = None
-				
+		try:
+			result = None
 			
-				result = self.database.execute("R",self.query)
-			
-				if len(result)>0:
-				
-					self.src_service.lasttimerunning = datetime.datetime.now()
-					if(escreveu == True):
-						message = []
-						message.append( "Novos carrinhos encontrados!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
-						message = None
-
+		
+			result = self.database.execute("R",self.query)
+		
+			if len(result)>0:
+				self.src_service.lasttimerunning =str( datetime.datetime.now())
+				if(escreveu == True):
 					message = []
-					message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+					message.append( "Novos carrinhos encontrados!")
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 					message = None
-	
-					params = self.emailParams(result)
-					self.send(params)
-					time.sleep(self.delay)
-					
-				else: 
-					if(escreveu == False):
-						message = []
-						message.append( "Nenhum carrinho abandonado no momento!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
-						message = None
-						escreveu= True
-					else:
-						pass
-					time.sleep(self.delay)
-			except: 
+
 				message = []
-				message.append( sys.exc_info())
-				self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-			finally:
-				pass
-		sys.exit()
+
+				params = self.emailParams(result)
+				self.send(params)
+				return
+				
+			else: 
+				if(escreveu == False):
+					message = []
+					message.append( "Nenhum carrinho abandonado no momento!")
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					message = None
+					escreveu= True
+				else:
+					pass
+				return
+				#time.sleep(self.delay)
+		except: 
+			message = []
+			message.append( sys.exc_info())
+			self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+			message = None
+		finally:
+			return
+			pass
+
+
 	def checkAPI(self):
 		if self.mandrill_client is None:
 			try:
@@ -183,7 +189,7 @@ class recuperacaoDeCarrinhos(object):
 		merge_vars = []
 		keys_to = [ "email","name"]
 		template_content =  [{'content': 'example content', 'name': 'example name'}]# faço nem ideia do que seja isso
-		global_merge_vars=  [{'content':  self.src_link.link_site, 'name': 'link_site'},{'content':  self.src_link.contact_mail, 'name': 'CONTACT_MAIL'},{'content':  self.src_link.link_de_compra , 'name': 'link_de_compra'}]
+		global_merge_vars=  [{'content':  self.src_link.link_site, 'name': 'link_site'},{'content': self.src_link.contact_mail, 'name': 'CONTACT_MAIL'},{'content':  self.src_link.link_de_compra, 'name': 'link_de_compra'}]
 		for x in result:
 			merge_vars.append({'rcpt':x[0],'vars': [{'content': x[1], 'name':'Nome'}]})
 			to.append(dict(zip(keys_to, x)))
@@ -215,7 +221,7 @@ class recuperacaoDeCarrinhos(object):
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.cont = p['cont'] 
 					self.Manager.configFile()
-					self.Manager.Variaveis_de_controle["SRC"]['nextrun'] = str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
+					self.src_service.nextrun= str(datetime.datetime.fromtimestamp(time.time()+float(self.delay)))
 					return True
 			except mandrill.Error as e:
 				
@@ -278,7 +284,7 @@ class recuperacaoDeCarrinhos(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))

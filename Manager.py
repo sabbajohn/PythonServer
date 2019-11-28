@@ -16,16 +16,17 @@ import asyncio.coroutines
 import logging
 from comtele_sdk.textmessage_service import TextMessageService
 from initialize import Initialize
+from termcolor import colored
 
 
 class Manager(Initialize):
 	# Status
 	# -1 - NIVEL LOG 				INICIALIZANDO 					[...]
-	#  0 - NIVEL LOG 				TAREFA CONCLUIDA'				[OK]
-	#  1 - NIVEL EXCEPT - 			ERRO							[X]				Notificar-me	->	Pausar Thread
+	#  0 - NIVEL LOG 				TAREFA CONCLUIDA				[OK]
+	#  1 - NIVEL EXCEPT - 			ERRO COMUM						[X]				Notificar-me	->	Pausar Thread
 	#  2 - NIVEL EXCEPT - 			WARNING							[!]
-	#  3 - NIVEL EXCEPT - 			DIE 							[DIE]			Notificar-me	->	Pausar Thread
-	#  4 - NIVEL EXCEPT - 			ATTETION (Erro não tratado) 	[!!!]			Notificar-me	->	Pausar Thread
+	#  3 - NIVEL EXCEPT - 			ERRO DADOS						[SQL ERRO]		Notificar-me	->	Pausar Thread
+	#  4 - NIVEL EXCEPT - 										 	[!!!]			Notificar-me	->	Pausar Thread
 	#  5 - NIVEL INFO - 			""								[INFO]
 	#	
 	# e = {
@@ -54,7 +55,6 @@ class Manager(Initialize):
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
 		self.inicializando(self.Controle.servicos)#So precisa de modulos, so vai modulos!
-	
 	
 	def inicializando(self, modulos):
 		
@@ -97,7 +97,7 @@ class Manager(Initialize):
 				"class":"???",
 				"metodo":"Se eu não sei nem a classe...",
 				"status":4,
-				"message":json.dumps(sys.exc_info()),
+				"message": [err, type(err)],
 				"erro":True,
 				"comments":"Arrumar uma forma de identificar melhor tais erros...",
 				"time":datetime.datetime.now()
@@ -170,12 +170,28 @@ class Manager(Initialize):
 				self.Controle.servicos.SDU.keepAlive=False
 				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SDU"].raise_exception()
+			else:
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
+
 		if "svc" in servico:
 			if self.Jobs['SVC'].isAlive():
 				self.Controle.servicos.SDU.keepAlive=False
 				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SVC"].raise_exception()
-	
+			else:
+				self.Controle.servicos.SDU.keepAlive=False
+				self.Controle.servicos.SDU.stop=True
+		if "sms" in servico:
+		
+			self.Controle.servicos.SMS.keepAlive=False
+			self.Controle.servicos.SMS.stop=True
+
+				
+		if "src" in servico:
+			self.Controle.servicos.SRC.keepAlive=False
+			self.Controle.servicos.SRC.stop=True
+
 	def run(self,s):
 		if "src" in s:
 				loop = asyncio.new_event_loop()
@@ -191,7 +207,7 @@ class Manager(Initialize):
 		if "sdu" in servico:
 			if self.Controle.servicos.SDU.firstTime:
 				self.Controle.servicos.SDU.init_time =datetime.datetime.now()
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 				self.Controle.servicos.SDU.keepAlive=True
 				self.Controle.servicos.SDU.stop=False
 				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
@@ -207,13 +223,13 @@ class Manager(Initialize):
 		if "svc" in servico:
 			if self.Controle.servicos.SVC.firstTime:
 					self.Controle.servicos.SVC.init_time =datetime.datetime.now()
-					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 					self.Controle.servicos.SVC.keepAlive=True
 					self.Controle.servicos.SVC.stop=False
 					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 					self.Jobs['SVC'].start()
 			else:
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+float(self.Config.get("SVC","delay")))
+				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
 				self.Controle.servicos.SVC.keepAlive=True
 				self.Controle.servicos.SVC.stop=False
 				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
@@ -229,6 +245,9 @@ class Manager(Initialize):
 			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 			self.Jobs['SRC'].start()
 
+	# SE vou tratar todo mundo igual porque tantons casos?
+	# Verificar a prioridade entres os serviçoes e se havera tratativas diferentes 
+	# entre os serviços
 	def callback(self,e):
 		
 		if e['class'] == 'SMS':
@@ -236,7 +255,6 @@ class Manager(Initialize):
 				self.Logs(e)
 			elif e['status']== 0:
 				self.Logs(e)
-				
 			elif e['status']== 1:
 				self.Exceptions(e)
 			elif e['status']== 2:
@@ -386,104 +404,124 @@ class Manager(Initialize):
 			pass
 
 	def Exceptions(self, e):
-	
+		""" TODO: 
+		! revisar erros e execeções!
+		"""
 		
 		#DOS SERVIÇOS
-		if e['class'] == 'SMS':
-			
-			
+		if e['class'] == 'SMS':	
 			if e['status']== 1:
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
+				self.Notificar(e)
+				self.finaliza('sms')
 
 			elif e['status']== 2:
-				e["Controle"]=self.controle['SMS']
-				self.controle['SMS']['keepAlive'] = False
+			
 				self.Logs(e)
-				self.Notificar(e)
+				
 				
 			elif e['status']== 3:
-				self.controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.controle['SMS']
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
 				self.Logs(e)
 				self.Notificar(e)
-				
-			elif e['status']== 4:
-				self.controle['SMS']['keepAlive'] = False
-				e["Controle"]=self.controle['SMS']
-				self.Logs(e)
-				self.Notificar(e)
+				self.finaliza('sms')
 				sys.exit()
+			elif e['status']== 4:
+				e["Controle"]=self.Controle.servicos.SMS.__dict__
+				self.Controle.servicos.SMS.keepAlive = False
+				self.Controle.servicos.SMS.stop = True
+				self.Logs(e)
+				self.finaliza('sms')
+				
 				
 			pass
 		elif e['class'] == 'recuperacaoDeCarrinhos':
-			
-			
+
 			if e['status']== 1:
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
+				self.Controle.servicos.SRC.keepAlive = False
 				self.Logs(e)
+				self.Notificar(e)
+				self.finaliza('src')
+				
 
 			elif e['status']== 2:
-				e["Controle"]=self.controle['SRC']
-				self.controle['SRC']['keepAlive'] = False
 				self.Logs(e)
-				self.Notificar(e)
 				
 			elif e['status']== 3:
-				self.controle['SRC']['keepAlive'] = False
-				e["Controle"]=self.controle['SRC']
+				self.Controle.servicos.SRC.keepAlive = False
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
-				
-			elif e['status']== 4:
-				self.controle['SRC']['keepAlive'] = False
-				e["Controle"]=self.controle['SRC']
-				self.Logs(e)
-				self.Notificar(e)
+				self.finaliza('src')
 				sys.exit()
+
+			elif e['status']== 4:
+				self.Controle.servicos.SRC.keepAlive = False
+				e["Controle"]=self.Controle.servicos.SRC.__dict__
+				self.Logs(e)
+				self.finaliza('src')
+				
 				
 			pass
 		elif e['class'] == 'servicoDeValidacao':
 			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.controle['SVC']
+				self.Controle.servicos.SVC.keepAlive = False
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("svc")
+				
+			elif e['status']== 2:
+				self.Logs(e)
 			
 			elif e['status']== 3:
-				self.controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.controle['SVC']
+				self.Controle.servicos.SVC.keepAlive = False
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("svc")
+				sys.exit()
 				
 			elif e['status']== 4:
-				self.controle['SVC']['keepAlive'] = False
-				e["Controle"]=self.controle['SVC']
+				self.Controle.servicos.SVC.keepAlive = False
+				e["Controle"]=self.Controle.servicos.SVC.__dict__
 				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
+				self.finaliza("svc")
+				
 			pass
 		elif e['class'] == 'DataUpdate':
 			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.controle['SDU']
+				self.Controle.servicos.SDU.keepAlive = False
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("sdu")
+
+				
+			elif e['status']== 2:
+				self.Logs(e)
 			
 			elif e['status']== 3:
-				self.controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.controle['SDU']
+				self.Controle.servicos.SDU.keepAlive = False
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
 				self.Notificar(e)
+				self.finaliza("sdu")
+				sys.exit()
 			
 			elif e['status']== 4:
-				self.controle['SDU']['keepAlive'] = False
-				e["Controle"]=self.controle['SDU']
+				self.Controle.servicos.SDU.keepAlive = False
+				e["Controle"]=	self.Controle.servicos.SDU.__dict__
 				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
+				self.finaliza("sdu")
+
+				
 			pass
 
 		#DAS API'S	
@@ -554,7 +592,7 @@ class Manager(Initialize):
 			pass
 
 	def Logs(self, e):
-		e["ENV"] = self.Config.get("KEY", "env")
+		e["ENV"] = self.Controle.Key.env
 		log = logging.getLogger('{message:{fill}^{width}}'.format(message=e['class']+"."+e['metodo'],fill=" ",align="^",width=50	))
 		for msg in e['message']:
 			if msg is not None and msg != "":
@@ -563,11 +601,14 @@ class Manager(Initialize):
 			log.info(" {0} ".format(e['comments']))
 
 	def Notificar(self, e):
+		e["AMBIENTE"]= self.Controle.Key.env
 		administradores = [
 			'47997619694',
 			'47988948000',
 			'47991566969'
 		]
+		for x in e['Controle']:
+			e['Controle'][x] = str(x)
 		log = logging.getLogger("Manager")
 		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
 		log.info(e)
@@ -579,11 +620,13 @@ class Manager(Initialize):
 		try:
 			result = textmessage_service.send('MS_.Manager - Error', json.dumps(e), administradores)
 			log.info( '{0}[!]Notificação de Falha enviada!!'.format(datetime.datetime.now()))
-		except :
-			log.info( '{0}[!!!]Não foi ossivel notificar!'.format(datetime.datetime.now()))
+		except Exception as e :
+			log.info( '{0}[!!!]Não foi possivel notificar!'.format(datetime.datetime.now()))
+			log.info( '{0}[!!!]{1}'.format(datetime.datetime.now(),e))
 			
+		return
 			
-		pass
+		
 
 
 	

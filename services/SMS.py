@@ -19,13 +19,11 @@ class SMS(object):
 	
 	def __init__(self, M):
 		self.Manager = M
-		self._stop_event = threading.Event()
-		self._lock = threading.Lock()
+		
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
 		self.sms_api = self.Manager.getControle("api")
-		
-	
+		self.sms_files = self.Manager.getControle("files") 
 
 	def start(self, stop):
 		
@@ -154,15 +152,16 @@ class SMS(object):
 					else:
 						pass
 					time.sleep(5)
-			except: 
+			except Exception as e:
+
 				message = []
-				message.append( sys.exc_info())
-				self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+				message.append(type(e))
+				message.append(e)
+				self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
 				message = None
 			finally:
 				pass
 		sys.exit()
-
 
 	def send(self,cliente):
 
@@ -176,14 +175,16 @@ class SMS(object):
 		textmessage_service = TextMessageService(self.sms_api.comtele.api_key)
 		Receivers = []
 		Receivers.append(str(cliente[2]))
-		try:
+		try:		
 			result = textmessage_service.send('MS_.{}'.format(cliente[3]), cliente[4], Receivers)
-		except :
+		except Exception as e :
 			
 			
 			message = []
-			message.append( "Oops!{0}occured.".format(sys.exc_info()[0]))
-			self.feedback(metodo="send", status =4, message = message, erro = True, comments = "Algo não panejado" )
+			message.append(type(e))
+			message.append(e)
+			
+			self.feedback(metodo="send", status =1, message = message, erro = True, comments = "Erro ao enviar SMS" )
 			message = None
 			
 			return True
@@ -198,41 +199,52 @@ class SMS(object):
 			self.update(result, cliente)
 			return
 
-	def update(self,result, cliente):
-		
-		
+	def update(self,result, cliente, tentativa=0):
+				
 		
 		message = []
 		message.append( "Atualizando infromações na base de dados.")
 		self.feedback(metodo="update", status =5, message = message, erro = False)
 		message = None
 		try:
-			with open("/home/"+self.USER+"/PythonServer/responses/response_sms.json","a+") as f: #Analizar Resposatas e Gerar Querys 
+			with open(self.sms_files.responses_sms, "+a") as f: #Registra solicitações
 				agora = datetime.datetime.now()
 				f.write("{0}:{1}\n".format(agora ,result))
-
-			
-			agora = datetime.datetime.now()
-			""" handler_w = self.database.getConn("W")
-			cursor_w = self.database.getCursor("W") """
-			query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
-			try:
-				""" with self._lock: """
-				self.database.execute("W",query, commit=True)
-				""" handler_w.commit() """
-				return True
-			except :
-				message = []
-				message.append( "{0}".format(sys.exc_info()[0]))
-				self.feedback(metodo="update", status =1, message = message, erro = True)
-				message = None
-				#sys.exit() Nao matar o sistema!!
-		except:
-			#Se não tem arquivo de log ainda da pra trabalhar...
+		except FileNotFoundError:
+			#Se não tem arquivo de log ainda da pra trabalhar... status 2
 			message = []
 			message.append( "[!]:Arquivo não encontrado")
+			message.append( "[!]:Criaremos um novo arquivo...")
 			self.feedback(metodo="update", status =2, message = message, erro = True)
 			message = None
+			
+			try:
+				os.system("touch {0}".format(self.sms_files.responses_sms) )
+				return True 
+			except Exception as e: #tenta criar se não der tudo bem ainda da pra trabalhar status 2
+				message = []
+				message.append(type(e))
+				message.append(e)							
+				self.feedback(metodo="update", status =2, message = message, erro = True, comments="Falha ao encontrar arquivo você deve gera-lo manualmente!")
+				message = None
+				pass 
+
+		agora = datetime.datetime.now()
+		query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
+		try:
+		
+			self.database.execute("W",query, commit=True)
+		
+			return True
+		except Exception as e :
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo="update", status =3, message = message, erro = True, comments="Falha ao atualizar base de dados:\n{0}".format(query))
+			message = None
+			
+		
+				
 		
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
@@ -267,7 +279,7 @@ class SMS(object):
 				feedback["message"].append('[!]:{0}'.format(msg))
 		elif feedback['status']== 3:
 			for msg in message:
-				feedback["message"].append( '[DIE]:{0}'.format(msg))
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
 		elif feedback['status']== 4:
 			for msg in message:
 				feedback["message"].append('[!!!]:{0}'.format(msg))
