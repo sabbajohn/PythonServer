@@ -219,7 +219,7 @@ class recuperacaoDeCarrinhos(object):
 		
 		if(self.checkAPI()):
 			try:
-				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], asy=True, ip_pool='Main Pool')
+				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.src_api.mandrill.enviados += p['cont'] 
 					try:
