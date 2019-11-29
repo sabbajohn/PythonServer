@@ -219,7 +219,7 @@ class SMS(object):
 			message = None
 			
 			try:
-				os.system("touch {0}".format(self.sms_files.responses_sms) )
+				os.system("sudo touch {0}".format(self.sms_files.responses_sms) )
 				return True 
 			except Exception as e: #tenta criar se não der tudo bem ainda da pra trabalhar status 2
 				message = []
