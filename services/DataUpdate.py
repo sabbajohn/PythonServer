@@ -104,8 +104,8 @@ class DataUpdate(object):
 		if result > 0:
 			try:
 
-				os.system("sudo mv {0} {1}/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ".format(self.sdu_files.query, self.Manager.Controle.Key))
-				os.system("sudo touch {0}".format(self.sdu_files.query))
+				os.system("mv {0} {1}/queries/query_old-"+str(agora.hour)+":"+str(agora.minute)+".txt ".format(self.sdu_files.query, self.Manager.Controle.Key))
+				os.system("touch {0}".format(self.sdu_files.query))
 			except Exception as e:
 				message = []
 				message.append("Falha ao mover arquivos query")

@@ -74,7 +74,7 @@ class Initialize:
 			self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
 		except:# CRIA O ARQUIVO DEFAULT
 			try:
-				os.system("sudo cp {0}/config/DEFAULT.ini.sample {0}/config/DEFAULT.ini".format(DIR))
+				os.system(" cp {0}/config/DEFAULT.ini.sample {0}/config/DEFAULT.ini".format(DIR))
 			except Exception as e:
 				print("Não foi possivel Criar um arquivo a partir da amostra DEFAULT.ini.sample")
 				print(type(e))
@@ -150,7 +150,7 @@ class Initialize:
 			print("O ARQUIVO config/{0}.ini não existe.".format(self.Config.get("KEY", "env")))
 			print("Iremos cria-lo")
 			try: #TENTA CRIAR
-				os.system("sudo cp {0}/config/BETA_PROD.ini.sample {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
+				os.system(" cp {0}/config/BETA_PROD.ini.sample {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
 			except Exception as e: #CASO DE ERRO
 				print("Não foi possivel Criar um arquivo a partir da amostra BETA_PROD.ini.sample")
 				print(type(e))
