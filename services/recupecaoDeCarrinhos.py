@@ -35,7 +35,7 @@ class recuperacaoDeCarrinhos(object):
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
 			schedule.every().hour.at(":00").do(self.db_monitor)
-			self.src_service.nextrun = schedule.jobs[0].next_run 
+			self.src_service.nextrun = schedule.jobs[0].next_run
 			while True:
 				if stop():
 					break
