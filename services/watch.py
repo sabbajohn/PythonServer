@@ -287,8 +287,8 @@ class Watch(object):
 			 self.controle_api.viacep.consultas,
 			 self.controle_api.hubd.consultas,
 			 self.controle_api.soa.consultas,
-			 self.controle_api.comtele.enviados,
 			 self.controle_api.mandrill.enviados,
+			 self.controle_api.comtele.enviados,
 			),'utf-8')
 		elif 'SELFDESTROY' in service :
 			message = []
