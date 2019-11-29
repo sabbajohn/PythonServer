@@ -3,7 +3,7 @@ then
    echo 'Ja em Execucao!'  
 else
 
-    python3 /home/ubuntu/PythonServer/Manager.py & 
+    sudo python3 /etc/PythonServer/Manager.py & 
 fi
 
 

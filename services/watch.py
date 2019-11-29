@@ -296,7 +296,7 @@ class Watch(object):
 			self.feedback(metodo="job_info", status =5, message = message, erro = False)
 			message = None
 			self.feedback()
-			os.system("pkill python3")
+			os.system("sudo pkill python3")
 		elif service == '' or len(service)<3:
 			return ''
 		else:
