@@ -19,7 +19,7 @@ class Watch(object):
 		self.controle 		= self.Manager.getControle('modulos')
 		self.controle_api	= self.Manager.getControle('api')
 		self.watch_vars		= self.Manager.getControle('watch')
-		self.services=['sms','svc','src','sdu','api']
+		self.services=['sms','svc','src','sdu','api','SELFDESTROY']
 		
 		try:
 			self.target				= self.watch_vars.addr
