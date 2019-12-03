@@ -194,10 +194,10 @@ class Manager(Initialize):
 
 	def run(self,s):
 		if "src" in s:
-				loop = asyncio.new_event_loop()
-				return_value = loop.run_until_complete(self.recuperacaoDeCarrinhos.runNow())
-			
-				return return_value
+			loop = asyncio.new_event_loop()
+			return_value = loop.run_until_complete(self.recuperacaoDeCarrinhos.runNow())
+		
+			return return_value
 		if "sms" in s:
 			loop = asyncio.new_event_loop()
 			return_value = loop.run_until_complete(self.SMS.runNow())
