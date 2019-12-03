@@ -62,7 +62,7 @@ class recuperacaoDeCarrinhos(object):
 	
 	async def runNow(self):
 		message = []
-		message.append( "Icializando Consulta não agendada")
+		message.append( "Inicializando Consulta não agendada")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 		message = None
 		escreveu = False
