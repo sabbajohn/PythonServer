@@ -253,6 +253,7 @@ class Watch(object):
 			if "mode" in service:
 				if "up" in service:
 					self.controle.SRC.keepAlive = True
+					self.controle.SRC.stop = False
 					self.Manager.verifica()
 				elif "down" in service:
 					self.controle.SRC.keepAlive = False
