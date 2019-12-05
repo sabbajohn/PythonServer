@@ -16,11 +16,11 @@ import asyncio.coroutines
 import getpass
 import socket
 import config
-from services.servicodevalidacao import servicoDeValidacao
-from services.DataUpdate import DataUpdate
-from services.SMS import SMS
-from services.watch import Watch
-from services.recupecaoDeCarrinhos import recuperacaoDeCarrinhos
+from services.SVC.servicodevalidacao import servicoDeValidacao
+from services.SDU.DataUpdate import DataUpdate
+from services.SMS.SMS import SMS
+from services.WATCH.watch import Watch
+from services.SRC.recupecaoDeCarrinhos import recuperacaoDeCarrinhos
 from utils.db import DB
 from controle import Controle
 from termcolor import colored
@@ -79,15 +79,14 @@ class Initialize:
 				print("Não foi possivel Criar um arquivo a partir da amostra DEFAULT.ini.sample")
 				print(type(e))
 				print(e)
-			else:
-				try:
-					self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
-				except Exception as e:
-					print("Verifique o arquivo {0}/config/DEFAULT.ini".format(DIR))
-					print(type(e))
-					print(e)
-				else:
-					pass
+			
+			try:
+				self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
+			except Exception as e:
+				print("Verifique o arquivo {0}/config/DEFAULT.ini".format(DIR))
+				print(type(e))
+				print(e)
+
 
 
 		try:
