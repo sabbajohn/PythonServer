@@ -1,5 +1,4 @@
 # PythonServer
-README
 
 This README would normally document whatever steps are necessary to get your application up and running.
 What is this repository for?
@@ -29,7 +28,7 @@ Contribution guidelines
     Other guidelines
 	
 	Configurar "Get started quickly"
-		-https://bitbucket.org/objetiva/python-services/src
+		-https://bitbucket.org/sabbajohn/pythonserver/src/master/
 
 	Callback e Exceptions
 		- Re-Analizar as tratativas de erros e exceçõe
