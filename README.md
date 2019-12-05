@@ -1,35 +1,56 @@
 # PythonServer
-# algumas coisas ainda por fazer...
-# TODO:
-* Configurar "Get started quickly"
-	-https://bitbucket.org/objetiva/python-services/src
-* Carregar todas as Variaveis de ambiente para memória para evitar a necessidade de esta lendo arquivos
-	- FAZENDO
-* Callback e Exceptions
-	- Re-Analizar as tratativas de erros e exceçõe
-	- Quase tudo tratado, alguns pontos a serem definidos. 
-	- status 3 Encerrar serviço ou tentar conectar novamente com BD?!
+README
+
+This README would normally document whatever steps are necessary to get your application up and running.
+What is this repository for?
+
+    Gerenciador de Serviços, sendo eles atualmente:
+        Validação de Cadastro de Clientes (SVC)
+        Atualização de Registros no Banco de Dados (SDU)
+        Encaminhamento de SMS (SMS)
+        Recuperação de Carrinhos Abandonados (SRC)
+
+    Version 4.01b
+    Learn Markdown
+
+How do I get set up?
+
+    Summary of set up
+    Configuration
+    Dependencies
+    Database configuration
+    How to run tests
+    Deployment instructions
+
+Contribution guidelines
+ 	
+	Writing tests
+    Code review
+    Other guidelines
 	
-* WATCH e CWATCH 
+	Configurar "Get started quickly"
+		-https://bitbucket.org/objetiva/python-services/src
 
- -	Poder setar configurações de Query e Delay atraves do cwhatch,
- -	Status geral do sistemas
- -	Ultimos Registros
+	Callback e Exceptions
+		- Re-Analizar as tratativas de erros e exceçõe
+		- Quase tudo tratado, alguns pontos a serem definidos. 
+		- status 3 Encerrar serviço ou tentar conectar novamente com BD?!
+
+	 WATCH e CWATCH 
+		 - Poder setar configurações de Query e Delay atraves do cwhatch,
+		 - Status geral do sistemas
+		 - Ultimos Registros
 	
 
 
-* Implementar Deploy e Mecanismo de Balanceamento
+	Implementar Deploy e Mecanismo de Balanceamento
+		- utilizar modulo Chapter 7 como base
+	Desenvolver Interface gráfica para modulo cwatch.py
+   
 
-	- utilizar modulo Chapter 7 como base
+Who do I talk to?
 
-* Desenvolver Interface gráfica
-
-	
-[!]BONUS[!] : 
-	* Multithreads vs Multi Process
-
-
-
-
+    Repo owner or admin
+    Other community or team contact
 
 
