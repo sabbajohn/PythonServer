@@ -29,7 +29,7 @@ Contribution guidelines
     Other guidelines
 	
 	Configurar "Get started quickly"
-		-https://bitbucket.org/objetiva/pythonserver/src
+		-https://bitbucket.org/sabbajohn/pythonserver/src/master/
 
 	Callback e Exceptions
 		- Re-Analizar as tratativas de erros e exceçõe
