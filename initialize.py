@@ -274,19 +274,6 @@ class Initialize:
 			
 		self.controle	
 	
-	def reloadControle(self, module = "all"):
-		if "all" in module:
-			
-			pass
-		elif "svc" in module:
-			pass
-		elif "sdu" in module:
-			pass
-		elif "src" in module:
-			pass
-		elif "sms" in module:
-			pass
-	
 	def setConfigFile(self, conf):
 		
 		if "DEFAULT".casefold() in conf.casefold():

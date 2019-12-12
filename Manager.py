@@ -190,7 +190,7 @@ class Manager(Initialize):
 			self.Controle.servicos.SRC.keepAlive=False
 			self.Controle.servicos.SRC.stop=True
 		
- 		elif "all" in servico:
+		elif "all" in servico:
 			if self.Jobs['SDU'].isAlive():
 				self.Controle.servicos.SDU.keepAlive=False
 				self.Controle.servicos.SDU.stop=True

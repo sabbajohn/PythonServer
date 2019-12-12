@@ -147,7 +147,6 @@ class Watch(object):
 				message.append("Comando não contem nenhum serviço conhecido:{0}".format(cmd_buffer))
 				self.feedback(metodo="client_handler", status =5, message = message, erro = False)
 				message = None
-				self.feedback()
 				client_socket.sendall('help'.encode())
 				time.sleep(3)
 				continue
@@ -354,17 +353,29 @@ class Watch(object):
 		self.Manager.callback(feedback)
 
 	def reload(self,service = "all"):
-		if "all" in service:
+		message = []
+		message.append("Recarregando configurações e parametros. Modulo:{0}".format(service))
+		self.feedback(metodo="reload", status =5, message = message, erro = False)
+		message = None
+		try:
+			# Registrar Logs
 			# Pausa todo mundo, recarrega a classe Controle e re-atribui os valores
 			# para os serviços
-			pass
-		elif "svc" in service:
-			pass
-		elif "sdu" in service:
-			pass
-		elif "src" in service:
-			pass
-		elif "sms" in service:
-			pass
-
+			self.Manager.finaliza(service)
+			self.Manager.Controle(self.Manager,service)
+			self.Manager.inicia(service)
+			message = []
+			message.append("Configurações e Parametros Recarregados:{0}".format(service))
+			self.feedback(metodo="reload", status =5, message = message, erro = False)
+			message = None
+			return True
+		except Exception as e:
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo="reload", status =5, message = message, erro = False)
+			message = None
+			self.feedback()
+			return False
+		
 		
