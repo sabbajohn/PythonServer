@@ -225,7 +225,7 @@ class Initialize:
 
 		contrle_dict =  self.todict(self.Controle)
 		for mod in contrle_dict:
-
+			#TODO: Concluir este metodo, iserindo todas as classes
 			if 'api' in mod.casefold():
 				for x in contrle_dict[mod]:
 					if any(api in  x.casefold() for api in ["comtele", "mandrill"]):
@@ -273,6 +273,19 @@ class Initialize:
 	
 			
 		self.controle	
+	
+	def reloadControle(self, module = "all"):
+		if "all" in module:
+			
+			pass
+		elif "svc" in module:
+			pass
+		elif "sdu" in module:
+			pass
+		elif "src" in module:
+			pass
+		elif "sms" in module:
+			pass
 	
 	def setConfigFile(self, conf):
 		

@@ -19,7 +19,7 @@ class Watch(object):
 		self.controle 		= self.Manager.getControle('modulos')
 		self.controle_api	= self.Manager.getControle('api')
 		self.watch_vars		= self.Manager.getControle('watch')
-		self.services=['sms','svc','src','sdu','api','SELFDESTROY']
+		self.services=['sms','svc','src','sdu','api','SELFDESTROY', 'reload']
 		
 		try:
 			self.target				= self.watch_vars.addr
@@ -352,3 +352,19 @@ class Watch(object):
 		feedback['time'] =str( datetime.datetime.now())
 
 		self.Manager.callback(feedback)
+
+	def reload(self,service = "all"):
+		if "all" in service:
+			# Pausa todo mundo, recarrega a classe Controle e re-atribui os valores
+			# para os serviços
+			pass
+		elif "svc" in service:
+			pass
+		elif "sdu" in service:
+			pass
+		elif "src" in service:
+			pass
+		elif "sms" in service:
+			pass
+
+		
