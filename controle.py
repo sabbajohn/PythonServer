@@ -265,7 +265,7 @@ class servicos(Controle):
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
-			self.query 				= Controle.Config.get("SVC",Controle.Config.get("SVC", "set")) 	
+			self.query				= Controle.Config.get("SVC",Controle.Config.get("SVC", "set")) 	
 			
 	class SDU:
 			
