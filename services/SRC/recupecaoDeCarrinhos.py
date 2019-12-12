@@ -25,7 +25,6 @@ class recuperacaoDeCarrinhos(object):
 		self.query 				= self.src_service.querys
 		self.delay 				= self.src_service.delay
 		self.mandrill_key 		= self.src_api.mandrill.api_key
-		
 
 	def start(self, stop):
 	
@@ -59,7 +58,7 @@ class recuperacaoDeCarrinhos(object):
 		
 
 		pass
-	
+
 	async def runNow(self):
 		message = []
 		message.append( "Inicializando Consulta não agendada")
@@ -156,8 +155,6 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 		finally:
 			return
-		
-
 
 	def checkAPI(self):
 		if self.mandrill_client is None:
@@ -311,7 +308,3 @@ class recuperacaoDeCarrinhos(object):
 		feedback['time'] = datetime.datetime.now()
 	
 		self.Manager.callback(feedback)
-
-	
-
-	

@@ -144,7 +144,7 @@ class Initialize:
 			print(type(e))
 			print(e)
 		try:
-			 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+			self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
 		except:
 			print("O ARQUIVO config/{0}.ini não existe.".format(self.Config.get("KEY", "env")))
 			print("Iremos cria-lo")
@@ -156,7 +156,7 @@ class Initialize:
 				print(e)
 			else: #CASO NÂO
 				try:#TENTA LÊ
-				 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+					self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
 				except:#CASO FALHE
 					print("Verifique o arquivo {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
 					print(type(e))
@@ -181,7 +181,7 @@ class Initialize:
 			for each_section in self.Config_ENV.sections():
 				print("[{0}]".format(each_section))
 				for(each_key, each_val) in self.Config_ENV.items(each_section):
-					 print ("{0} : {1}\n".format(each_key, each_val))
+					print ("{0} : {1}\n".format(each_key, each_val))
 			print("Se Ok aperte S para continuar")
 
 			if "S" in input():
@@ -192,8 +192,7 @@ class Initialize:
 				print("Bye!")
 				sys.exit()
 			
-			
- """
+			"""
 		except:
 			pass
 		
@@ -237,18 +236,9 @@ class Initialize:
 		with open("{0}/config/{1}.ini".format(self.Controle.Key.root,self.Controle.Key.env ), "w+") as configfile:		
 			self.Config_ENV.write(configfile)
 
-	#TODO, metodo para atualizar configurações
-	""" def setMyself(self, module):
-		modulo = self.getControle(module)
-
-		api_dict = modulo.__dict__
-		for x in api_dict:
-
-			self.Config_ENV.set(api_dict[x].tag, api_dict[x].__dict__)
-		
-		with open("{0}/config/BETA.ini".format(self.Controle.Key.root), "w+") as configfile:		
-			self.Config_ENV.write(configfile)	
- 	"""
+	#TODO: metodo para atualizar configurações
+	#TODO: Metodo para RELOAD das configurações cajo hajam modificações durante a execução
+	
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,

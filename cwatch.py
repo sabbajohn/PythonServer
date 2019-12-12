@@ -184,8 +184,6 @@ def usage():
 	print(colored("	#> SELFDESTROY			-> Finalizará todos os serviços Imediatamente!\n", "red"))
 	return
 
-
-	
 def exit_gracefully(signum, frame):
 	lock_= threading.Lock()
 	signal.signal(signal.SIGINT, original_sigint)
@@ -211,7 +209,6 @@ def exit_gracefully(signum, frame):
 
 	# restore the exit gracefully handler here    
 	signal.signal(signal.SIGINT, exit_gracefully)
-	
 
 def main():
 		
