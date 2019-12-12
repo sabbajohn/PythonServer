@@ -14,13 +14,13 @@ import logging
 
 class Watch(object):
 	def __init__(self, M):
-	
+
 		self.Manager 		= M
 		self.controle 		= self.Manager.getControle('modulos')
 		self.controle_api	= self.Manager.getControle('api')
 		self.watch_vars		= self.Manager.getControle('watch')
 		self.services=['sms','svc','src','sdu','api','SELFDESTROY', 'reload']
-		
+
 		try:
 			self.target				= self.watch_vars.addr
 		except:
@@ -29,12 +29,12 @@ class Watch(object):
 			self.port				= self.watch_vars.port
 		except:
 			self.port = 5000
-		
+
 
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input
 		# to stdin
-	
+
 	def start(self):
 		message = []
 		message.append("Inicializando Watcher")
@@ -42,7 +42,7 @@ class Watch(object):
 		message = None
 		self.feedback()
 		self.server_loop()
-	
+
 	def server_loop(self):
 
 		#TODO: RESTART Watch caso de falha de endereço em uso
@@ -377,5 +377,3 @@ class Watch(object):
 			message = None
 			self.feedback()
 			return False
-		
-		
