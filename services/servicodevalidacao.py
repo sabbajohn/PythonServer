@@ -32,7 +32,7 @@ class servicoDeValidacao(object):
 			async with s.get(url) as r:
 				endereco = await r.read()
 				endereco =json.loads(endereco)
-				self.contador_ViaCep = self.contador_ViaCep + 1
+				self.svc_api.viacep.consultas += 1
 				return endereco
 
 
@@ -48,7 +48,7 @@ class servicoDeValidacao(object):
 			else:
 				response['viaCep'] = False
 			if len(response)>0:
-				self.contador_hd = self.contador_hd+1 
+				self.svc_api.hubd.consultas += 1 
 				await self.query_generator(response)
 			
 			else:
@@ -61,10 +61,10 @@ class servicoDeValidacao(object):
 		self.feedback(metodo="failsafe_api_validation_request", status =5, message = message )
 		message = None
 
-		self.contador_failsafe = self.contador_failsafe+1
+		self.svc_api.soa.consultas += 1
 		
 		
-		url = self.svc_api.soa.url
+		
 		data={
 		'Credenciais': {
 			'Email': self.svc_api.soa.user,
@@ -75,7 +75,7 @@ class servicoDeValidacao(object):
 			
 		body = json.dumps(data).encode('utf8')
 		async with aiohttp.ClientSession() as s:
-			async with s.post(url, data=body) as r:
+			async with s.post(self.svc_api.soa.url, data=body) as r:
 
 				response =  await r.read()
 				response=json.loads(response)
@@ -250,12 +250,8 @@ class servicoDeValidacao(object):
 											f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
 							else:
 								if self.result[item2['index']][3] == None or self.result[item2['index']][3] == '':
-
 									try:
-
-
 										d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
-
 										sixteenyearsago  = date.today()
 										sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
 										sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
@@ -276,13 +272,11 @@ class servicoDeValidacao(object):
 								else:
 									try:
 
-
 											d2 = time.mktime(datetime.datetime.strptime(item2['result']['data_nascimento'], "%d/%m/%Y").timetuple())
 
 											sixteenyearsago  = date.today()
 											sixteenyearsago = sixteenyearsago.replace(year =sixteenyearsago.year -16 )
 											sixteenyearsago = time.mktime(sixteenyearsago.timetuple())
-
 
 									except:
 										pass
@@ -378,7 +372,7 @@ class servicoDeValidacao(object):
 
 										
 									elif  "Token Inválido ou sem saldo para a consulta." in item2['message'] :
-										self.contador_hd = self.contador_hd -1 
+										self.svc_api.hubd.consultas -= 1 
 										message = []
 										message.append('Token Inválido ou sem saldo para a consulta."')
 										self.feedback(metodo="Runner",status=1,message = message)
@@ -550,14 +544,11 @@ class servicoDeValidacao(object):
 			
 			
 			message = []
-			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(self.contador_failsafe))
-			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.contador_hd))
+			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(self.svc_api.soa.consultas - self.contador_failsafe))
+			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.svc_api.hubd.consultas - self.contador_hd))
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
-			message.append("Foram realizadas {0} ao Via Cep".format(self.contador_ViaCep))
+			message.append("Foram realizadas {0} ao Via Cep".format(self.svc_api.viacep.consultas - self.contador_ViaCep))
 			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds") 
-			self.svc_api.hubd.consultas += self.contador_hd
-			self.svc_api.soa.consultas += self.contador_failsafe
-			self.svc_api.viacep.consultas += self.contador_ViaCep
 			self.Manager.configFile()
 			
 			
@@ -567,7 +558,7 @@ class servicoDeValidacao(object):
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
 			sleep(15)
-			return self.end()
+		
 
 	def feedback(self,*args, **kwargst):
 		message = kwargst.get('message')
@@ -627,16 +618,15 @@ class servicoDeValidacao(object):
 		self.responses = []
 		self.pendentes_f = []
 		self.result=None	
-		self.contador_failsafe = 0
-		self.contador_hd = 0
-		self.contador_dispensadas = 0
-		self.contador_ViaCep = 0
 		self.Manager = M
 		self.database = self.Manager.database
 		self.svc_files = self.Manager.getControle('files')
 		self.svc_conf = self.Manager.getControle('svc')
 		self.svc_api = self.Manager.getControle('api')
-	
+		self.contador_failsafe = self.svc_api.soa.consultas
+		self.contador_hd =self.svc_api.hubd.consultas
+		self.contador_dispensadas = 0
+		self.contador_ViaCep = self.svc_api.viacep.consultas
 	def get_id(self): 
 		
 		# returns id of the respective thread 
