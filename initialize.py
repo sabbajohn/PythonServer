@@ -198,9 +198,6 @@ class Initialize:
 		
 		return
 
-
-
-
 	def todict(self,obj, classkey=None):
 		if isinstance(obj, dict):
 			data = {}
