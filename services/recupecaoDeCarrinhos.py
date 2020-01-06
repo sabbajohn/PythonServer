@@ -13,6 +13,7 @@ import mandrill
 import configparser	
 import asyncio
 import schedule
+from decimal import Decimal
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 	
@@ -197,7 +198,7 @@ class recuperacaoDeCarrinhos(object):
 		global_merge_vars=  [{'content':  self.src_link.link_site, 'name': 'link_site'},{'content': self.src_link.contact_mail, 'name': 'CONTACT_MAIL'},{'content':  self.src_link.link_de_compra, 'name': 'link_de_compra'}]
 		for x in result:
 			nome = x[1].split(" ",1)
-			vlbilhete = str(x[2]).replace(".",",")
+			vlbilhete = format(x[2], '.2f').replace(".",",")
 			merge_vars.append({'rcpt':x[0],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'}]})
 
 			to.append(dict(zip(keys_to, x)))
