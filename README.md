@@ -36,7 +36,7 @@ Contribution guidelines
 		- status 3 Encerrar serviço ou tentar conectar novamente com BD?!
 
 	 WATCH e CWATCH 
-		 - Poder setar configurações de Query e Delay atraves do cwhatch,
+		 - Poder setar configurações de Query e Delay atraves do cwatch,
 		 - Status geral do sistemas
 		 - Ultimos Registros
 	
