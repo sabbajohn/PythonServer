@@ -45,7 +45,8 @@ Contribution guidelines
 	Implementar Deploy e Mecanismo de Balanceamento
 		- utilizar modulo Chapter 7 como base
 	Desenvolver Interface gráfica para modulo cwatch.py
-   
+    
+    Assegurar que independente do erro o Manager jamais se encerre, assim como o WATCH, para garantir que os serviços possam ser gerenciados via cwatch, e reinicializados caso necessário.
 
 Who do I talk to?
 
