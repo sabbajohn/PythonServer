@@ -452,7 +452,7 @@ class servicoDeValidacao(object):
 					checa_cpfcnpj = cpf.isCpfValid(x[0])
 
 				if checa_cpfcnpj==True:
-					lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=63764620RjLiAJcVnv115125088".format(x[0], x[1].strftime("%d/%m/%Y"))
+					lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=74621930qftLuSWHmA134727632".format(x[0], x[1].strftime("%d/%m/%Y"))
 				else:
 					
 					data = {}
