@@ -42,6 +42,7 @@ class DataUpdate(object):
 				try:
 					if(rest == 30):
 						rest = 0
+						message = []
 						message.append("Standy by 1s")
 						self.feedback(metodo ='start', status =5, message=message, erro = False)
 						message = None
