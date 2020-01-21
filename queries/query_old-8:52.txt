@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'VINICIUS CASAGRANDE MANICA' , motivo ='VINICIUS CASAGRANDE MANICA verificado via API em 08:51:53 às 15/01/2020', Cidade='Marau', SgUF='RS',DtNascimento ='1995-04-16', Endereco='', Bairro=''  WHERE CPFCNPJ = '032.326.800-54';

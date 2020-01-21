@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'RITA DE CASSIA SILVA' , motivo ='RITA DE CASSIA SILVA verificado via API em 23:01:53 às 15/01/2020', Cidade='Taboão da Serra', SgUF='SP',DtNascimento ='1965-02-15', Endereco='Rua Manoel Ferreira Júnior', Bairro='Parque São Joaquim'  WHERE CPFCNPJ = '07920116864';

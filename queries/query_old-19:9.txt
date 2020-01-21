@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'VIVIAN BASTO' , motivo ='VIVIAN BASTO verificado via API em 19:08:52 às 17/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1983-07-24', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '325.139.468-12';

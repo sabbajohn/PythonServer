@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'JOANA D ARC BOROTTO VITULIO' , motivo ='JOANA D ARC BOROTTO VITULIO verificado via API em 22:10:45 às 16/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1954-03-15', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '027.763.488-19';

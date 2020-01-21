@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'ERICK PINTO MANCINI' , motivo ='ERICK PINTO MANCINI verificado via API em 07:40:00 às 14/01/2020', Cidade='Belford Roxo', SgUF='RJ',DtNascimento ='1992-04-24', Endereco='Rua Concílio Ecumênico', Bairro='São Vicente'  WHERE CPFCNPJ = '105.620.427-33';

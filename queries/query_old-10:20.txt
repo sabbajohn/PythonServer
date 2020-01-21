@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'LUIZ FRANCISCO MARCATTO' , motivo ='LUIZ FRANCISCO MARCATTO verificado via API em 10:16:40 às 17/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1959-12-19', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '97925993804';

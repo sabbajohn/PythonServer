@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'DIOGENES COSTA GOMES FERREIRA' , motivo ='DIOGENES COSTA GOMES FERREIRA verificado via API em 13:53:42 às 19/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1984-09-14', Endereco='Rua do Lavapés', Bairro='Cambuci'  WHERE CPFCNPJ = '32578194807';

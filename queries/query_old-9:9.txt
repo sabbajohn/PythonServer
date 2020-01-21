@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'MARCIA MARIA BISPO' , motivo ='MARCIA MARIA BISPO verificado via API em 09:05:27 às 19/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1982-11-13', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '33145655850';

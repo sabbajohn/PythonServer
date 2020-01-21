@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'APARECIDA DE FATIMA CAMILO' , motivo ='APARECIDA DE FATIMA CAMILO verificado via API em 17:57:24 às 18/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1982-01-02', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '394.268.538-80';

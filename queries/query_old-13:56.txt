@@ -1,0 +1,1 @@
+UPDATE cliente SET id_status='1', Nome = 'CRISTIANE DA SILVA NUNES' , motivo ='CRISTIANE DA SILVA NUNES verificado via API em 13:55:48 às 18/12/2019', Cidade='Jundiaí', SgUF='SP',DtNascimento ='1982-04-08', Endereco='Rua Coriolano de Marins e Dias Filho', Bairro='Vila Nova Esperia'  WHERE CPFCNPJ = '297.450.918-55';
