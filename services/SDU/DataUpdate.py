@@ -41,6 +41,7 @@ class DataUpdate(object):
 				line = line.replace('\n','')
 				try:
 					if(rest == 30):
+						message = []
 						rest = 0
 						message.append("Standy by 1s")
 						self.feedback(metodo ='start', status =5, message=message, erro = False)
