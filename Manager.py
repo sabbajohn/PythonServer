@@ -69,7 +69,7 @@ class Manager(Initialize):
 				self.Jobs['SRC'].start()
 				modulos.SRC.init_time = datetime.datetime.now()
 
-			if modulos.SDU.init is True:
+			if modulos.SVC.init is True:
 				self.ValidacaoEUpdate(self.Controle.servicos.SVC, self.Controle.servicos.SDU)
 
 
