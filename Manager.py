@@ -85,6 +85,20 @@ class Manager(Initialize):
 		self.inicializando()#So precisa de modulos, so vai modulos!
 	
 	def update_info():
+		#SET
+		self.SMS_controle.setControle(self.SMS_info)
+		self.SVC_controle.setControle(self.SVC_info)
+		self.SDU_controle.setControle(self.SDU_info)
+		self.SRC_controle.setControle(self.SRC_info)
+		
+		self.VIACEP_controle.setControle(self.VIACEP_info)
+		self.MANDRILL_controle.setControle(self.MANDRILL_info)
+		self.COMTELE_controle.setControle(self.COMTELE_info)
+		self.SOA_controle.setControle(self.SOA_info)
+		self.HUBD_controle.setControle(self.HUBD_info)
+
+		
+		#GET
 		self.SMS_info = self.SMS_controle.getControle()
 		self.SVC_info = self.SVC_controle.getControle()
 		self.SDU_info = self.SDU_controle.getControle()
