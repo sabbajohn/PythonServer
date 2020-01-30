@@ -19,11 +19,9 @@ class SMS(object):
 	
 	def __init__(self, M):
 		self.Manager = M
-		
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		self.sms_api = self.Manager.getControle("api")
-		self.sms_files = self.Manager.getControle("files") 
+		self.sms_files = self.Manager.Files['responses_sms']
 
 	def start(self, stop):
 		
@@ -57,14 +55,13 @@ class SMS(object):
 		message = None
 		escreveu = False
 		#quem sabe botar isso dentro de um try
-		
+		self.Manage.update_info()
 		
 	
 		try:
 			result = None
-			query = "SELECT * FROM sms WHERE sent_at is NULL"
-		
-			result = self.database.execute("R",query)
+			
+			result = self.database.execute("R",self.Manager.SMS_info['query'])
 		
 			if len(result)>0:
 				if(escreveu == True):
@@ -115,14 +112,13 @@ class SMS(object):
 		
 		
 		while True:
+			self.Manager.update_info()
 			if stop():
 				break
 			
 			try:
 				result = None
-				query = "SELECT * FROM sms WHERE sent_at is NULL"
-			
-				result = self.database.execute("R",query)
+				result = self.database.execute("R",self.Manager.SMS_info['query'])
 			
 				if len(result)>0:
 					if(escreveu == True):
@@ -149,18 +145,17 @@ class SMS(object):
 						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
 						message = None
 						escreveu= True
-					else:
-						pass
+				
+					self.Manager.Controle.writeConfigFile()
 					time.sleep(5)
 			except Exception as e:
-
+				self.Manager.Controle.writeConfigFile()
 				message = []
 				message.append(type(e))
 				message.append(e)
 				self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
 				message = None
-			finally:
-				pass
+		self.Manager.Controle.writeConfigFile()
 		sys.exit()
 
 	def send(self,cliente):
@@ -172,7 +167,7 @@ class SMS(object):
 		message = None
 		
 	
-		textmessage_service = TextMessageService(self.sms_api.comtele.api_key)
+		textmessage_service = TextMessageService(self.Manager.COMTELE_info['api_key'])
 		Receivers = []
 		Receivers.append(str(cliente[2]))
 		try:		
@@ -193,8 +188,9 @@ class SMS(object):
 			message.append( "SMS:{0}".format(result['Message']))
 			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
-			self.sms_api.comtele.enviados +=1
-			self.Manager.configFile()
+			self.Manager.COMTELE_info['enviados'] +=1
+			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info)
+			self.Manager.update_info()
 
 			self.update(result, cliente)
 			return
@@ -229,8 +225,8 @@ class SMS(object):
 				message = None
 				pass 
 
-		agora = datetime.datetime.now()
-		query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
+		
+		query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(datetime.datetime.now(), cliente[0])
 		try:
 		
 			self.database.execute("W",query, commit=True)

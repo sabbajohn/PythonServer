@@ -53,21 +53,50 @@ class Manager(Initialize):
 		
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
-		self.SMS_controle = self.Controle.servicos.SMS
-		self.SVC_controle = self.Controle.servicos.SVC
-		self.SDU_controle = self.Controle.servicos.SDU
-		self.SRC_controle = self.Controle.servicos.SRC
-		self.SMS_info = self.SMS_c.getControle()
-		self.SVC_info = self.SVC_c.getControle()
-		self.SDU_info = self.SDU_c.getControle()
-		self.SRC_info = self.SRC_c.getControle()
+		#Serviços
+		self.SMS_controle 		= self.Controle.servicos.SMS
+		self.SVC_controle 		= self.Controle.servicos.SVC
+		self.SDU_controle 		= self.Controle.servicos.SDU
+		self.SRC_controle 		= self.Controle.servicos.SRC
+	
+		self.SMS_info 			= self.SMS_controle.getControle()
+		self.SVC_info 			= self.SVC_controle.getControle()
+		self.SDU_info 			= self.SDU_controle.getControle()
+		self.SRC_info 			= self.SRC_controle.getControle()
+		#API
+		self.VIACEP_controle 	= self.Controle.API.viacep
+		self.MANDRILL_controle 	= self.Controle.API.mandrill
+		self.COMTELE_controle 	= self.Controle.API.comtele
+		self.SOA_controle 		= self.Controle.API.soa
+		self.HUBD_controle 		= self.Controle.API.hubd
+
+		self.VIACEP_info		= self.VIACEP_controle.getControle()
+		self.MANDRILL_info		= self.MANDRILL_controle.getControle()
+		self.COMTELE_info		= self.COMTELE_controle.getControle()
+		self.SOA_info			= self.SOA_controle.getControle()
+		self.HUBD_info			= self.HUBD_controle.getControle()
+
+		#LINK
+		self.LINK_controle 		= self.Controle.LINK
+		self.LINK_info			= selfself.Controle.LINK.getControle()
+		
+		
+		self.Files				= self.Controle.files.getControle()
 		self.inicializando()#So precisa de modulos, so vai modulos!
 	
 	def update_info():
-		self.SMS_info = self.SMS_c.getControle()
-		self.SVC_info = self.SVC_c.getControle()
-		self.SDU_info = self.SDU_c.getControle()
-		self.SRC_info = self.SRC_c.getControle()
+		self.SMS_info = self.SMS_controle.getControle()
+		self.SVC_info = self.SVC_controle.getControle()
+		self.SDU_info = self.SDU_controle.getControle()
+		self.SRC_info = self.SRC_controle.getControle()
+
+		self.VIACEP_info		= self.VIACEP_controle.getControle()
+		self.MANDRILL_info		= self.MANDRILL_controle.getControle()
+		self.COMTELE_info		= self.COMTELE_controle.getControle()
+		self.SOA_info			= self.SOA_controle.getControle()
+		self.HUBD_info			= self.HUBD_controle.getControle()
+
+		self.LINK_info			= selfself.Controle.LINK.getControle()
 
 	def inicializando(self):
 		self.update_info()

@@ -17,8 +17,9 @@ class DataUpdate(object):
 	def __init__(self, M):
 		self.Manager = M
 		self.database = self.Manager.database
-		self.sdu_files = self.Manager.getControle("files")
-		self.sdu_servico = self.Manager.getControle("sdu")
+		self.sdu_files = self.Manager.Files['query']
+		
+		self.sdu_servico 
 
 	def QueryRunner(self, database):
 		n_updates = 0
@@ -81,8 +82,8 @@ class DataUpdate(object):
 	def start(self):
 		
 
-	
-		self.sdu_servico.lasttimerunning = datetime.datetime.now()
+		
+		self.SDU_controle.setControle(dict('lasttimerunning': datetime.datetime.now()))
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
@@ -105,8 +106,8 @@ class DataUpdate(object):
 		if result > 0:
 			try:
 
-				os.system("mv {0} {1}/queries/query_old-{2}:{3}.txt".format(self.sdu_files.query, self.Manager.Controle.Key.root, str(agora.hour), str(agora.minute)))
-				os.system("touch {0}".format(self.sdu_files.query))
+				os.system("mv {0} {1}/queries/query_old-{2}:{3}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(agora.hour), str(agora.minute)))
+				os.system("touch {0}".format(self.sdu_files))
 			except Exception as e:
 				message = []
 				message.append("Falha ao mover arquivos query")

@@ -19,12 +19,11 @@ class recuperacaoDeCarrinhos(object):
 		self.Manager 			= M
 		self.database 			= self.Manager.database
 		self.mandrill_client 	= None
-		self.src_api 			= self.Manager.getControle('api')
+		
 		self.src_service 		= self.Manager.getControle('src')
-		self.src_link 			= self.Manager.getControle('link')
-		self.query 				= self.src_service.querys
-		self.delay 				= self.src_service.delay
-		self.mandrill_key 		= self.src_api.mandrill.api_key
+		
+		
+		
 
 	def start(self, stop):
 	
@@ -34,11 +33,16 @@ class recuperacaoDeCarrinhos(object):
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
 			schedule.every().hour.at(":00").do(self.db_monitor)
-			self.src_service.nextrun = schedule.jobs[0].next_run
+			self.Manager.SRC_info['nextrun'] = schedule.jobs[0].next_run
+			self.Manager.SRC_controle.setControle(self.Manager.SRC_info)
 			while True:
+				self.Manager.update_info()
 				if stop():
 					break
 				schedule.run_pending()
+				self.Manager.SRC_info['lasttimerunning'] = datetime.datetime.now()
+				self.Manager.SRC_controle.setControle(self.Manager.SRC_info)
+				self.Manager.Controle.writeConfigFile()
 				time.sleep(1)
 			
 		except SystemExit:
@@ -69,10 +73,10 @@ class recuperacaoDeCarrinhos(object):
 				result = None
 				
 			
-				result = self.database.execute("R",self.query)
+				result = self.database.execute("R",self.Manager.SRC_info['query'])
 			
 				if len(result)>0:
-					self.src_service.lasttimerunning =str( datetime.datetime.now())
+					
 					if(escreveu == True):
 						message = []
 						message.append( "Novos carrinhos encontrados!")
@@ -119,10 +123,10 @@ class recuperacaoDeCarrinhos(object):
 			result = None
 			
 		
-			result = self.database.execute("R",self.query)
+			result = self.database.execute("R",self.self.Manager.SRC_info['query'])
 		
 			if len(result)>0:
-				self.src_service.lasttimerunning =str( datetime.datetime.now())
+			
 				if(escreveu == True):
 					message = []
 					message.append( "Novos carrinhos encontrados!")
@@ -159,7 +163,7 @@ class recuperacaoDeCarrinhos(object):
 	def checkAPI(self):
 		if self.mandrill_client is None:
 			try:
-				self.mandrill_client = mandrill.Mandrill(self.mandrill_key)
+				self.mandrill_client = mandrill.Mandrill(self.Manager.MANDRILL_info['api_key'])
 				return True
 			except Exception as e:
 				message = []
@@ -175,7 +179,7 @@ class recuperacaoDeCarrinhos(object):
 					return True
 			except:
 				try:
-					self.mandrill_client = mandrill.Mandrill(self.mandrill_key)
+					self.mandrill_client = mandrill.Mandrill(self.Manager.MANDRILL_info['api_key'])
 					return True
 				except Exception as e :
 					message = []
@@ -191,7 +195,7 @@ class recuperacaoDeCarrinhos(object):
 		merge_vars = []
 		keys_to = [ "email","name","VlBilhete"]
 		template_content =  [{'content': 'example content', 'name': 'example name'}]# faço nem ideia do que seja isso
-		global_merge_vars=  [{'content':  self.src_link.link_site, 'name': 'link_site'},{'content': self.src_link.contact_mail, 'name': 'CONTACT_MAIL'},{'content':  self.src_link.link_de_compra, 'name': 'link_de_compra'}]
+		global_merge_vars=  [{'content':  self.Manager.LINK_info['link_site'], 'name': 'link_site'},{'content': self.Manager.LINK_info['contact_mail'], 'name': 'CONTACT_MAIL'},{'content':  self.Manager.LINK_info['link_de_compra'], 'name': 'link_de_compra'}]
 		for x in result:
 			nome = x[1].split(" ",1)
 			vlbilhete = str(x[2]).replace(".",",")
@@ -222,9 +226,9 @@ class recuperacaoDeCarrinhos(object):
 			try:
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
-					self.src_api.mandrill.enviados += p['cont'] 
-					try:
-						self.Manager.configFile()
+					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
+					self.MANDRILL_controle.setControle(self.Manager.MANDRILL_info)
+						
 					except:
 						pass
 					
@@ -232,7 +236,7 @@ class recuperacaoDeCarrinhos(object):
 					messages.append("{0} email's foram enviados".format(p['cont'] ))
 					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
 					messages = None
-					self.src_service.nextrun= datetime.datetime.fromtimestamp(time.time()+float(self.delay))
+					
 					return True
 			except mandrill.Error as e:
 				

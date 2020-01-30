@@ -19,8 +19,8 @@ class Controle(object):
 		! Concluir metodo get/set das variaveis de controle assim como escrita dela no arquivo de configuração
 	"""
 	
-	def getControle(self, parameter_list):
-		pass
+	
+	
 	def reloadControle(self,I, module = "all"):
 		#TODO: Registrar logs
 		if "all" in module:
@@ -46,6 +46,7 @@ class Controle(object):
 		elif "sms" in module:
 			self.servicos.SMS = self.servicos.SMS(self)
 			return
+
 	def writeConfigFile(self,*args, **kwargst):
 			try:
 				conf = kwargst['conf']
@@ -315,7 +316,35 @@ class LINK(Controle):
 		self.link_site		= Controle.Config_ENV.get("LINK","link_site")
 		self.link_de_compra	= Controle.Config_ENV.get("LINK","link_de_compra")
 		self.contact_mail	= Controle.Config_ENV.get("LINK","contact_mail")
-
+  
+	def setControle(self,*args, **kwargst):
+			try:
+				variavel = kwargst['vars']
+			except:
+				try:
+				variavel = args[0]
+				except:
+					return False
+			else:
+				keys = variavel.keys()
+				for key in keys:
+					if 'link_site' in key:
+						self.link_site = variavel['link_site']
+						Controle.Config_ENV.set('LINK', 'link_site',self.link_site )
+						return True
+					elif 'link_de_compra' in key:
+						self.link_de_compra = variavel['link_de_compra']
+						Controle.Config_ENV.set('LINK', 'link_de_compra',self.link_de_compra )
+					elif 'contact_mail' in key:
+						self.link_de_compra = variavel['contact_mail']
+						Controle.Config_ENV.set('LINK', 'contact_mail',self.contact_mail )
+						
+		def getControle(self,*args, **kwargst):
+				return var = {
+					"link_site":		self.link_site,
+					"link_de_compra":	self.link_de_compra,
+					"contact_mail":		self.contact_mail
+				}
 class logs(Controle):
 
 	def __init__(self,Controle):
@@ -335,7 +364,13 @@ class files(Controle):
 		self.responses		= Controle.Config.get("FILES","responses")
 		self.responses_api	= Controle.Config.get("FILES","responses_api")
 		self.responses_sms	= Controle.Config.get("FILES","responses_sms")
-
+	def getControle(self, parameter_list):
+		return var = {
+			'query' :self.query,
+			'responses' :self.responses,
+			'responses_api' :self.responses_api,
+			'responses_sms' :self.responses_sms	
+		}
 class servicos(Controle):
 	def __init__(self,Controle):
 
@@ -361,6 +396,8 @@ class servicos(Controle):
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
+			self.query				= Controle.Config.get("SMS",'query')
+			
 
 		def setControle(self,*args, **kwargst):
 
@@ -412,7 +449,8 @@ class servicos(Controle):
 					'lasttimerunning': 	self.lasttimerunning,
 					'nextrun': 			self.nextrun,
 					'firstTime': 		self.firstTime,
-					'stop': 			self.stop
+					'stop': 			self.stop,
+					'query':			self.query
 			}
 		
 	class SVC:
