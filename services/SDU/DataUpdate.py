@@ -80,9 +80,9 @@ class DataUpdate(object):
 
 	def start(self):
 		
-		self._lock =threading.Lock()
-		self._stop_event = threading.Event()
-		self.USER =getpass.getuser()
+
+	
+		self.sdu_servico.lasttimerunning = datetime.datetime.now()
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
@@ -164,7 +164,7 @@ class DataUpdate(object):
 			feedback["comments"] = ""
 		
 		feedback['time'] =str(datetime.datetime.now())
-		#with self._lock:
+	
 		self.Manager.callback(feedback)
 
 	def get_id(self): 

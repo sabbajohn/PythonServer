@@ -513,9 +513,8 @@ class servicoDeValidacao(object):
 		return lista 	
 
 	def start(self):
-	
+		self.svc_conf.lasttimerunning = datetime.datetime.now()
 		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
-		
 		
 		executor = concurrent.futures.ThreadPoolExecutor(
 		max_workers=1,
@@ -627,6 +626,7 @@ class servicoDeValidacao(object):
 		self.contador_hd =self.svc_api.hubd.consultas
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = self.svc_api.viacep.consultas
+	
 	def get_id(self): 
 		
 		# returns id of the respective thread 
