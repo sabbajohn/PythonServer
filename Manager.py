@@ -54,37 +54,12 @@ class Manager(Initialize):
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
 		#Serviços
-		self.SMS_controle 		= self.Controle.servicos.SMS
-		self.SVC_controle 		= self.Controle.servicos.SVC
-		self.SDU_controle 		= self.Controle.servicos.SDU
-		self.SRC_controle 		= self.Controle.servicos.SRC
-	
-		self.SMS_info 			= self.SMS_controle.getControle()
-		self.SVC_info 			= self.SVC_controle.getControle()
-		self.SDU_info 			= self.SDU_controle.getControle()
-		self.SRC_info 			= self.SRC_controle.getControle()
-		#API
-		self.VIACEP_controle 	= self.Controle.API.viacep
-		self.MANDRILL_controle 	= self.Controle.API.mandrill
-		self.COMTELE_controle 	= self.Controle.API.comtele
-		self.SOA_controle 		= self.Controle.API.soa
-		self.HUBD_controle 		= self.Controle.API.hubd
-
-		self.VIACEP_info		= self.VIACEP_controle.getControle()
-		self.MANDRILL_info		= self.MANDRILL_controle.getControle()
-		self.COMTELE_info		= self.COMTELE_controle.getControle()
-		self.SOA_info			= self.SOA_controle.getControle()
-		self.HUBD_info			= self.HUBD_controle.getControle()
-
-		#LINK
-		self.LINK_controle 		= self.Controle.LINK
-		self.LINK_info			= selfself.Controle.LINK.getControle()
 		
 		
-		self.Files				= self.Controle.files.getControle()
+  
 		self.inicializando()#So precisa de modulos, so vai modulos!
 	
-	def update_info():
+	def update_info(self):
 		#SET
 		self.SMS_controle.setControle(self.SMS_info)
 		self.SVC_controle.setControle(self.SVC_info)
@@ -110,12 +85,12 @@ class Manager(Initialize):
 		self.SOA_info			= self.SOA_controle.getControle()
 		self.HUBD_info			= self.HUBD_controle.getControle()
 
-		self.LINK_info			= selfself.Controle.LINK.getControle()
+		self.LINK_info			= self.Controle.LINK.getControle()
 
 	def inicializando(self):
 		self.update_info()
 		try:
-			self.Jobs['WATCH'].start()
+			#self.Jobs['WATCH'].start()
 			
 			if self.SMS_info["init"] is True:
 				self.Jobs['SMS'].start()
@@ -173,54 +148,56 @@ class Manager(Initialize):
 		self.SDU_controle.setControle(self.SDU_info) 
 		schedule.every(3).minutes.do(self.inicia, "svc")
 		schedule.every(3).minutes.do(self.inicia, "sdu")
-		self.SVC_controle.setControle(dict('nextrun': schedule.jobs[0].next_run))
-		self.SDU_controle.setControle(dict('nextrun': schedule.jobs[0].next_run))
+		setting = {"nextrun": schedule.jobs[0].next_run}
+		self.SVC_controle.setControle(setting)
+		self.SDU_controle.setControle(setting)
 		
 			
-		while SVC_c.keepAlive is True:
+		while self.SVC_info['keepAlive'] is True:
 					schedule.run_pending()
 					time.sleep(1)
 
 	def verifica(self):
 		self.update_info()
+		setting ={'init_time': datetime.datetime.now()}
 		if not self.Jobs['WATCH'].isAlive():
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
 		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
 			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
 			self.Jobs['SMS'].start()
-			self.SMS_controle.setControle(dict('init_time': datetime.datetime.now()))
+			self.SMS_controle.setControle(setting)
 		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
 			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
 			self.Jobs['SRC'].start()
-			self.SRC_controle.setControle(dict('init_time': datetime.datetime.now()))
+			self.SRC_controle.setControle(setting)
 
 	def finaliza(self, servico):
+		setting = {
+			'stop':True,
+			'keepAlive:': False
+		}
 		if "sdu" in servico:
-			self.SDU_controle.setControle(dict("keepAlive":False))
-			self.SDU_controle.setControle(dict("stop":True))
+			self.SDU_controle.setControle(setting)
 			self.update_info()
 			if self.Jobs['SDU'].isAlive():
 				self.Jobs["SDU"].raise_exception()
 				
 
 		elif "svc" in servico:
-			self.SVC_controle.setControle(dict("keepAlive":False))
-			self.SVC_controle.setControle(dict("stop":True))
+			self.SVC_controle.setControle(setting)
 			self.update_info()
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
 			
 		elif "sms" in servico:
 		
-			self.SMS_controle.setControle(dict("keepAlive":False))
-			self.SMS_controle.setControle(dict("stop":True))
+			self.SMS_controle.setControle(setting)
 			self.update_info()
 
 				
 		elif "src" in servico:
-			self.SRC_controle.setControle(dict("keepAlive":False))
-			self.SRC_controle.setControle(dict("stop":True))
+			self.SRC_controle.setControle(setting)
 			self.update_info()
 		
 		elif "all" in servico:
@@ -229,17 +206,10 @@ class Manager(Initialize):
 			if self.Jobs['SDU'].isAlive():
 				self.Jobs["SDU"].raise_exception()
 
-			self.SVC_controle.setControle(dict("keepAlive":False))
-			self.SVC_controle.setControle(dict("stop":True))
-
-			self.SDU_controle.setControle(dict("keepAlive":False))
-			self.SDU_controle.setControle(dict("stop":True))
-
-			self.SMS_controle.setControle(dict("keepAlive":False))
-			self.SMS_controle.setControle(dict("stop":True))
-
-			self.SRC_controle.setControle(dict("keepAlive":False))
-			self.SRC_controle.setControle(dict("stop":True))
+			self.SVC_controle.setControle(setting)
+			self.SDU_controle.setControle(setting)
+			self.SMS_controle.setControle(setting)
+			self.SRC_controle.setControle(setting)
 			self.update_info()
 
 	def run(self,s):
@@ -260,38 +230,41 @@ class Manager(Initialize):
 			return False
 
 	def inicia(self, servico):
-		
-		elif "svc" in servico:
+		setting = {
+			'stop':False,
+			'keepAlive:': True
+		}
+		if "svc" in servico:
 			
-			self.SVC_controle.setControle(dict('keepAlive': True))
-			self.SVC_controle.setControle(dict('stop': False))
+			self.SVC_controle.setControle(setting)
+			
 		elif "sms" in servico:
-			self.SMS_controle.setControle(dict('keepAlive': True))
-			self.SMS_controle.setControle(dict('stop': False))
+			self.SMS_controle.setControle(setting)
+			
 			self.verifica()
 
 		elif "src" in servico:
-			self.SRC_controle.setControle(dict('keepAlive': True))
-			self.SRC_controle.setControle(dict('stop': False))
+			self.SRC_controle.setControle(setting)
+		
 			self.verifica()
 
 		elif "all" in servico:
-			self.SVC_controle.setControle(dict('keepAlive': True))
-			self.SVC_controle.setControle(dict('stop': False))
-
-			self.SMS_controle.setControle(dict('keepAlive': True))
-			self.SMS_controle.setControle(dict('stop': False))
+			self.SVC_controle.setControle(setting)
 			
-			self.SRC_controle.setControle(dict('keepAlive': True))
-			self.SRC_controle.setControle(dict('stop': False))
+
+			self.SMS_controle.setControle(setting)
+			
+			
+			self.SRC_controle.setControle(setting)
+			
 			self.inicializando()
 
 	def callback(self,e):
 		
-		if any(status in e['status'] for status in ['1','2','3','4'] ):
+		if any(status in str(e['status']) for status in ['1','2','3','4'] ) and not str(e['status']) =='-1':
 			self.Exceptions(e)
 		else:
-			self.logs(e)
+			self.Logs(e)
 
 	def Exceptions(self, e):
 		self.update_info()
@@ -306,7 +279,7 @@ class Manager(Initialize):
 			self.SMS_controle.setControle(self.SMS_info)
 			self.Logs(e)
 			
-			if  any(status in e['status'] for status in ['1','3','4'] ):
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('sms')
 			else:
@@ -321,7 +294,7 @@ class Manager(Initialize):
 			self.SRC_controle.setControle(self.SRC_info)
 			self.Logs(e)
 			
-			if  any(status in e['status'] for status in ['1','3','4'] ):
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('src')
 			else:
@@ -334,7 +307,7 @@ class Manager(Initialize):
 			self.SVC_controle.setControle(self.SVC_info)
 			self.Logs(e)
 			
-			if  any(status in e['status'] for status in ['1','3','4'] ):
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('svc')
 			else:
@@ -344,10 +317,10 @@ class Manager(Initialize):
 			e["Controle"]=self.SDU_info
 			self.SDU_info['keepAlive'] = False
 			self.SDU_info['stop'] = True
-			self.SDU_controle.setControle(self.SDu_info)
+			self.SDU_controle.setControle(self.SDU_info)
 			self.Logs(e)
 			
-			if  any(status in e['status'] for status in ['1','3','4'] ):
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('sdu')
 			else:
@@ -355,7 +328,7 @@ class Manager(Initialize):
 
 		elif 'DB' in e['class'] :
 			self.Logs(e)
-			if  any(status in e['status'] for status in ['1','3','4'] ):
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('src')
 			else:

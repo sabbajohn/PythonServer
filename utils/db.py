@@ -17,12 +17,11 @@ class DB:
 		message.append("Iniciando conexões com o Banco de Dados!")
 		self.feedback(metodo="__init__", status =5, message = message, erro = False)
 		message = None
-		self.feedback()
-		db_conf = self.Manager.getControle("db")
+	
 		
-		db_w= db_conf.MYSQL_W.__dict__
+		db_w= self.Manager.Controle.DB.MYSQL_W.getControle()
 		db_w["raise_on_warnings"] = bool(db_w["raise_on_warnings"] )
-		db_r=db_conf.MYSQL_R.__dict__
+		db_r=self.Manager.Controle.DB.MYSQL_R.getControle()
 		db_r["raise_on_warnings"] = bool(db_w["raise_on_warnings"] )
 	
 	

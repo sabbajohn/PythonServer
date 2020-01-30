@@ -123,7 +123,16 @@ class DB(Controle):
 			self.passwd				= Controle.Config_ENV.get("MYSQL_R","passwd")
 			self.database			= Controle.Config_ENV.get("MYSQL_R","database")
 			self.raise_on_warnings	= Controle.Config_ENV.get("MYSQL_R","raise_on_warnings")
-
+		
+		def getControle(self):
+			var = {
+				'host'				:self.host,
+				'user'				:self.user,
+				'passwd'			:self.passwd,
+				'database'			:self.database,
+				'raise_on_warnings'	:self.raise_on_warnings
+			}
+			return var
 	class MYSQL_W(object):
 		def __init__(self,Controle):
 			
@@ -132,6 +141,16 @@ class DB(Controle):
 			self.passwd				= Controle.Config_ENV.get("MYSQL_W","passwd")
 			self.database			= Controle.Config_ENV.get("MYSQL_W","database")
 			self.raise_on_warnings	= Controle.Config_ENV.get("MYSQL_W","raise_on_warnings")
+
+		def getControle(self):
+			var = {
+				'host'				:self.host,
+				'user'				:self.user,
+				'passwd'			:self.passwd,
+				'database'			:self.database,
+				'raise_on_warnings'	:self.raise_on_warnings
+			}
+			return var
 
 class API(Controle):
 	def __init__(self,Controle):
@@ -155,7 +174,7 @@ class API(Controle):
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -168,9 +187,10 @@ class API(Controle):
 					else:
 						return False
 		def getControle(self,*args, **kwargst):
-				return var = {
-					"consultas":self.consultas
+			var  = {
+				"consultas":self.consultas
 				}
+			return var
 			
 	class comtele:
 		def __init__(self,Controle):
@@ -183,7 +203,7 @@ class API(Controle):
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -198,10 +218,11 @@ class API(Controle):
 						Controle.Config_ENV.set(self.tag, 'api_key',self.consultas )
 						
 		def getControle(self,*args, **kwargst):
-				return var = {
-					"enviados":self.enviados,
-					"api_key":self.api_key
+			var = {
+				"enviados":self.enviados,
+				"api_key":self.api_key
 				}
+			return var
 			
 	class mandrill:
 		def __init__(self,Controle):
@@ -213,7 +234,7 @@ class API(Controle):
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -228,10 +249,11 @@ class API(Controle):
 						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
 						
 		def getControle(self,*args, **kwargst):
-				return var = {
-					"enviados":self.enviados,
-					"api_key":self.api_key
+			var = {
+				"enviados":self.enviados,
+				"api_key":self.api_key
 				}
+			return var
 	class hubd:
 		def __init__(self,Controle):
 			self.tag		= "HUBD"
@@ -243,7 +265,7 @@ class API(Controle):
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -262,11 +284,12 @@ class API(Controle):
 					
 						
 		def getControle(self,*args, **kwargst):
-				return var = {
-					"url":			self.url,
-					"api_key":		self.api_key,
-					"consultas":	self.consultas
+			var = {
+				"url":			self.url,
+				"api_key":		self.api_key,
+				"consultas":	self.consultas
 				}
+			return var
 	class soa:
 		def __init__(self,Controle):
 			self.tag		= "SOA"
@@ -280,7 +303,7 @@ class API(Controle):
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -302,13 +325,14 @@ class API(Controle):
 					
 						
 		def getControle(self,*args, **kwargst):
-				return var = {
-					"url":			self.url
-					"user":			self.url
-					"key":			self.enviados,
-					"consultas":	self.consultas
+			var = {
+				"url":			self.url,
+				"user":			self.user,
+				"key":			self.key,
+				"consultas":	self.consultas
 				
-				}
+			}
+			return var
 
 class LINK(Controle):
 	def __init__(self,Controle):
@@ -316,13 +340,13 @@ class LINK(Controle):
 		self.link_site		= Controle.Config_ENV.get("LINK","link_site")
 		self.link_de_compra	= Controle.Config_ENV.get("LINK","link_de_compra")
 		self.contact_mail	= Controle.Config_ENV.get("LINK","contact_mail")
-  
+
 	def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
 			except:
 				try:
-				variavel = args[0]
+					variavel = args[0]
 				except:
 					return False
 			else:
@@ -339,12 +363,13 @@ class LINK(Controle):
 						self.link_de_compra = variavel['contact_mail']
 						Controle.Config_ENV.set('LINK', 'contact_mail',self.contact_mail )
 						
-		def getControle(self,*args, **kwargst):
-				return var = {
-					"link_site":		self.link_site,
-					"link_de_compra":	self.link_de_compra,
-					"contact_mail":		self.contact_mail
-				}
+	def getControle(self,*args, **kwargst):
+		var = {
+			"link_site":		self.link_site,
+			"link_de_compra":	self.link_de_compra,
+			"contact_mail":		self.contact_mail
+			}
+		return var
 class logs(Controle):
 
 	def __init__(self,Controle):
@@ -364,13 +389,14 @@ class files(Controle):
 		self.responses		= Controle.Config.get("FILES","responses")
 		self.responses_api	= Controle.Config.get("FILES","responses_api")
 		self.responses_sms	= Controle.Config.get("FILES","responses_sms")
-	def getControle(self, parameter_list):
-		return var = {
+	def getControle(self):
+		var = {
 			'query' :self.query,
 			'responses' :self.responses,
 			'responses_api' :self.responses_api,
 			'responses_sms' :self.responses_sms	
 		}
+		return var
 class servicos(Controle):
 	def __init__(self,Controle):
 
@@ -441,17 +467,18 @@ class servicos(Controle):
 				return True
 		
 		def getControle(self):
-			return var = {
-					'init': 			self.init,
-					'init_time': 		self.init_time,
-					'delay': 			self.delay,
-					'keepAlive': 		self.keepAlive,
-					'lasttimerunning': 	self.lasttimerunning,
-					'nextrun': 			self.nextrun,
-					'firstTime': 		self.firstTime,
-					'stop': 			self.stop,
-					'query':			self.query
+			var = {
+				'init': 			self.init,
+				'init_time': 		self.init_time,
+				'delay': 			self.delay,
+				'keepAlive': 		self.keepAlive,
+				'lasttimerunning': 	self.lasttimerunning,
+				'nextrun': 			self.nextrun,
+				'firstTime': 		self.firstTime,
+				'stop': 			self.stop,
+				'query':			self.query
 			}
+			return var
 		
 	class SVC:
 		def __init__(self,Controle):
@@ -496,7 +523,7 @@ class servicos(Controle):
 						
 					elif 'delay' in key:
 						self.delay = variavel[key]
-					Controle.Config.set("SVC","delay", self.init) 
+						Controle.Config.set("SVC","delay", self.init) 
 						
 					elif 'keepAlive' in key:
 						self.keepAlive = variavel[key]
@@ -516,7 +543,7 @@ class servicos(Controle):
 					elif 'query' in key:
 						
 						if len(variavel[key]) > self.query:
-								self.query = list(set().union(self.query,variavel[key])) 
+							self.query = list(set().union(self.query,variavel[key])) 
 							for i, x in enumerate(self.query):
 								Controle.Config.set("SVC",i, x)
 						else:
@@ -534,18 +561,19 @@ class servicos(Controle):
 				return True
 		
 		def getControle(self,*args, **kwargst):
-			return var = {
-					'init': 			self.init,
-					'init_time': 		self.init_time,
-					'delay': 			self.delay,
-					'keepAlive': 		self.keepAlive,
-					'lasttimerunning': 	self.lasttimerunning,
-					'nextrun': 			self.nextrun,
-					'firstTime': 		self.firstTime,
-					'stop': 			self.stop
-					'query_set':		self.query_set
-					'query':			self.query
+			var = {
+				'init': 			self.init,
+				'init_time': 		self.init_time,
+				'delay': 			self.delay,
+				'keepAlive': 		self.keepAlive,
+				'lasttimerunning': 	self.lasttimerunning,
+				'nextrun': 			self.nextrun,
+				'firstTime': 		self.firstTime,
+				'stop': 			self.stop,
+				'query_set':		self.query_set,
+				'query':			self.query
 			}
+			return var
 		
 	class SDU:
 			
@@ -601,16 +629,17 @@ class servicos(Controle):
 				return True
 		
 		def getControle(self):
-			return var = {
-					'init': 			self.init,
-					'init_time': 		self.init_time,
-					'delay': 			self.delay,
-					'keepAlive': 		self.keepAlive,
-					'lasttimerunning': 	self.lasttimerunning,
-					'nextrun': 			self.nextrun,
-					'firstTime': 		self.firstTime,
-					'stop': 			self.stop
+			var = {
+				'init': 			self.init,
+				'init_time': 		self.init_time,
+				'delay': 			self.delay,
+				'keepAlive': 		self.keepAlive,
+				'lasttimerunning': 	self.lasttimerunning,
+				'nextrun': 			self.nextrun,
+				'firstTime': 		self.firstTime,
+				'stop': 			self.stop
 			}
+			return var
 		
 	class SRC:
 		
@@ -623,7 +652,7 @@ class servicos(Controle):
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
-			self.querys				= Controle.Config.get("SRC","query")
+			self.query				= Controle.Config.get("SRC","query")
 		
 		def setControle(self,*args, **kwargst):
 
@@ -671,17 +700,18 @@ class servicos(Controle):
 				return True
 		
 		def getControle(self):
-			return var = {
-					'init': 			self.init,
-					'init_time': 		self.init_time,
-					'delay': 			self.delay,
-					'keepAlive': 		self.keepAlive,
-					'lasttimerunning': 	self.lasttimerunning,
-					'nextrun': 			self.nextrun,
-					'firstTime': 		self.firstTime,
-					'stop': 			self.stop,
-					'query':			self.query
+			var = {
+				'init': 			self.init,
+				'init_time': 		self.init_time,
+				'delay': 			self.delay,
+				'keepAlive': 		self.keepAlive,
+				'lasttimerunning': 	self.lasttimerunning,
+				'nextrun': 			self.nextrun,
+				'firstTime': 		self.firstTime,
+				'stop': 			self.stop,
+				'query':			self.query
 			}
+			return var
 		
 
 

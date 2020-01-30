@@ -20,7 +20,7 @@ class recuperacaoDeCarrinhos(object):
 		self.database 			= self.Manager.database
 		self.mandrill_client 	= None
 		
-		self.src_service 		= self.Manager.getControle('src')
+
 		
 		
 		
@@ -229,8 +229,6 @@ class recuperacaoDeCarrinhos(object):
 					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
 					self.MANDRILL_controle.setControle(self.Manager.MANDRILL_info)
 						
-					except:
-						pass
 					
 					messages = []
 					messages.append("{0} email's foram enviados".format(p['cont'] ))

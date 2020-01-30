@@ -32,9 +32,8 @@ class servicoDeValidacao(object):
 		self.result=None	
 		self.Manager = M
 		self.database = self.Manager.database
-		self.svc_files = self.Manager.getControle('files')
-		self.svc_conf = self.Manager.getControle('svc')
-		self.svc_api = self.Manager.getControle('api')
+		
+		
 		self.contador_failsafe = self.Manager.SOA_info['consultas']
 		self.contador_hd =self.Manager.HUBD_info['consultas']
 		self.contador_dispensadas = 0
@@ -95,7 +94,8 @@ class servicoDeValidacao(object):
 		message = None
 		for query in self.Manager.SVC_info['query']:
 			try:
-				self.result=database.execute("R", query)
+				self.result=list(set().union(self.result,database.execute("R", query))) 
+				
 			except Exception as e:
 				message = []
 				message.append(type(e))
@@ -103,88 +103,88 @@ class servicoDeValidacao(object):
 				self.feedback(metodo ='list_generator', status =3, message=message)
 				message = None
 				
-			if len(self.result) > 0:
-				message = []
-				message.append('{0} itens serão analisados.'.format(len(self.result)))
-				self.feedback(metodo ='list_generator', status =5, message=message)
-				message = None
-			else:
-				message = []
-				message.append('Não há itens pendentes no momento!')
-				message.append("Encerrando serviço.")
-				self.feedback(metodo ='list_generator', status =0, message=message)
-				message = None
-				return []
-			lista = {}
-			lista['pendentes']={}
-			i = 0
-			for x in self.result:
+		if len(self.result) > 0:
+			message = []
+			message.append('{0} itens serão analisados.'.format(len(self.result)))
+			self.feedback(metodo ='list_generator', status =5, message=message)
+			message = None
+		else:
+			message = []
+			message.append('Não há itens pendentes no momento!')
+			message.append("Encerrando serviço.")
+			self.feedback(metodo ='list_generator', status =0, message=message)
+			message = None
+			return []
+		lista = {}
+		lista['pendentes']={}
+		i = 0
+		for x in self.result:
 
-				if x[0]!= None and x[1]!=None:
+			if x[0]!= None and x[1]!=None:
 
-					if len(x[0]) > 11:
-						checa_cpfcnpj = cpf.isCnpjValid(x[0])
-					else:
-						checa_cpfcnpj = cpf.isCpfValid(x[0])
-
-					if checa_cpfcnpj==True:
-						lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={2}".format(x[0], x[1].strftime("%d/%m/%Y"), self.Manager.HUBD_info['api_key'])
-					else:
-						
-						data = {}
-						data['status'] = False
-						data['id'] = x[2]
-						data['code'] = 1
-						data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} está incorreto ".format(x[2],x[0])
-						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-							data['viaCep']=True
-							data['CEP'] = x[6]
-						else:
-							data['viaCep']=False
-						self.contador_dispensadas += 1 
-						await self.query_generator(data)
+				if len(x[0]) > 11:
+					checa_cpfcnpj = cpf.isCnpjValid(x[0])
 				else:
-					if x[0]== None:
-						data = {}
-						data['status'] = False
-						data['id'] = x[2]
-						data['code'] = 2
-						data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ está em branco'.format(x[2])
-						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-							data['viaCep']=True
-							data['CEP'] = x[6]
-						else:
-							data['viaCep']=False
-						self.contador_dispensadas += self.contador_dispensadas 
-						await self.query_generator(data)
-						
-					else:	
-						if( x[1]== None and (x[3]==None or x[3]=="" )):
-							
-							params={}
-							params['CPF']=x[0]
-							if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-								params['viaCep']=True
-								params['CEP'] = x[6]
-							else:
-								params['viaCep']=False
+					checa_cpfcnpj = cpf.isCpfValid(x[0])
 
-							await self.failsafe_api_validation_request(params)
-						else:	
-							if	x[1]== None:
-								data = {}
-								data['status'] = False
-								data['id'] = x[2]
-								data['code'] = 3
-								data['message'] ="Cliente {0} não foi validado pois o campo data de nascimento está em branco".format(x[2])
-								if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-									data['viaCep']=True
-									data['CEP'] = x[6]
-								else:
-									data['viaCep']=False
-								self.contador_dispensadas == self.contador_dispensadas
-								await self.query_generator(data)
-				i += 1		
+				if checa_cpfcnpj==True:
+					lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={2}".format(x[0], x[1].strftime("%d/%m/%Y"), self.Manager.HUBD_info['api_key'])
+				else:
+					
+					data = {}
+					data['status'] = False
+					data['id'] = x[2]
+					data['code'] = 1
+					data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} está incorreto ".format(x[2],x[0])
+					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+						data['viaCep']=True
+						data['CEP'] = x[6]
+					else:
+						data['viaCep']=False
+					self.contador_dispensadas += 1 
+					await self.query_generator(data)
+			else:
+				if x[0]== None:
+					data = {}
+					data['status'] = False
+					data['id'] = x[2]
+					data['code'] = 2
+					data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ está em branco'.format(x[2])
+					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+						data['viaCep']=True
+						data['CEP'] = x[6]
+					else:
+						data['viaCep']=False
+					self.contador_dispensadas += self.contador_dispensadas 
+					await self.query_generator(data)
+					
+				else:	
+					if( x[1]== None and (x[3]==None or x[3]=="" )):
+						
+						params={}
+						params['CPF']=x[0]
+						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+							params['viaCep']=True
+							params['CEP'] = x[6]
+						else:
+							params['viaCep']=False
+
+						await self.failsafe_api_validation_request(params)
+					else:	
+						if	x[1]== None:
+							data = {}
+							data['status'] = False
+							data['id'] = x[2]
+							data['code'] = 3
+							data['message'] ="Cliente {0} não foi validado pois o campo data de nascimento está em branco".format(x[2])
+							if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+								data['viaCep']=True
+								data['CEP'] = x[6]
+							else:
+								data['viaCep']=False
+							self.contador_dispensadas == self.contador_dispensadas
+							await self.query_generator(data)
+			i += 1		
 			
 		return lista 	
 

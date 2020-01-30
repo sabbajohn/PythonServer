@@ -19,8 +19,7 @@ class DataUpdate(object):
 		self.database = self.Manager.database
 		self.sdu_files = self.Manager.Files['query']
 		
-		self.sdu_servico 
-
+		
 	def QueryRunner(self, database):
 		n_updates = 0
 		rest = 0
@@ -82,8 +81,8 @@ class DataUpdate(object):
 	def start(self):
 		
 
-		
-		self.SDU_controle.setControle(dict('lasttimerunning': datetime.datetime.now()))
+		setting = {"lasttimerunning":datetime.datetime.now()}
+		self.SDU_controle.setControle(setting)
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)

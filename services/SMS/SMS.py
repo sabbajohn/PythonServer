@@ -21,12 +21,12 @@ class SMS(object):
 		self.Manager = M
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		self.sms_files = self.Manager.Files['responses_sms']
+		
 
 	def start(self, stop):
 		
 		
-		
+		self.sms_files = self.Manager.Files['responses_sms']
 		try:
 			message = []
 			message.append( "Inicializando SMS")
@@ -48,7 +48,7 @@ class SMS(object):
 		
 	async def runNow(self):
 
-	
+		self.sms_files = self.Manager.Files['responses_sms']
 		message = []
 		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
@@ -288,7 +288,7 @@ class SMS(object):
 		except:
 			feedback["comments"] = ""
 		
-		feedback['time'] = datetime.datetime.now()
+		feedback['time'] = str(datetime.datetime.now())
 		#with self._lock:
 		self.Manager.callback(feedback)
 
