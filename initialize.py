@@ -217,7 +217,7 @@ class Initialize:
 			return data
 		else:
 			return obj
-
+#Metodo meio idiota
 	def configFile(self):
 
 		contrle_dict =  self.todict(self.Controle)
@@ -245,7 +245,7 @@ class Initialize:
 			'SRC':self.job_src
 		}
 		return jobs
-	
+	#Metodo meio idiota
 	def getControle(self, module):
 		if "db" in module.casefold():
 			return self.Controle.DB
