@@ -259,7 +259,6 @@ class Manager(Initialize):
 		""" TODO: 
 		! revisar erros e execeções!
 		"""
-		
 		#DOS SERVIÇOS
 		if 'SMS' in e['class']:	
 			e["Controle"]=self.SMS_info
@@ -273,8 +272,7 @@ class Manager(Initialize):
 				self.finaliza('sms')
 			else:
 				self.Logs(e)
-				
-				
+
 			
 		elif 'recuperacaoDeCarrinhos' in e['class']  :
 
@@ -289,9 +287,7 @@ class Manager(Initialize):
 				self.finaliza('src')
 			else:
 				self.Logs(e)
-				
-				
-			
+
 		elif 'servicoDeValidacao' in e['class'] :
 			e["Controle"]=self.SVC_info
 			self.SVC_info['keepAlive'] = False
@@ -304,8 +300,7 @@ class Manager(Initialize):
 				self.finaliza('svc')
 			else:
 				self.Logs(e)
-				
-		
+
 		elif 'DataUpdate' in e['class']:
 			e["Controle"]=self.SDU_info
 			self.SDU_info['keepAlive'] = False
@@ -319,8 +314,6 @@ class Manager(Initialize):
 			else:
 				self.Logs(e)
 
-				
-		
 		elif 'DB' in e['class'] :
 			self.Logs(e)
 			if  any(status in e['status'] for status in ['1','3','4'] ):
