@@ -42,10 +42,7 @@ class Manager(Initialize):
 	# 	}
 	#
 	
-	def __init__(self):
-		time.time() 
-		
-		
+	def __init__(self): 
 		try:
 			super().__init__(self)
 	
@@ -65,14 +62,15 @@ class Manager(Initialize):
 		self.SDU_info = self.SDU_c.getControle()
 		self.SRC_info = self.SRC_c.getControle()
 		self.inicializando()#So precisa de modulos, so vai modulos!
+	
 	def update_info():
 		self.SMS_info = self.SMS_c.getControle()
 		self.SVC_info = self.SVC_c.getControle()
 		self.SDU_info = self.SDU_c.getControle()
 		self.SRC_info = self.SRC_c.getControle()
+
 	def inicializando(self):
 		self.update_info()
-		
 		try:
 			self.Jobs['WATCH'].start()
 			
@@ -140,7 +138,6 @@ class Manager(Initialize):
 					schedule.run_pending()
 					time.sleep(1)
 
-
 	def verifica(self):
 		self.update_info()
 		if not self.Jobs['WATCH'].isAlive():
@@ -201,6 +198,7 @@ class Manager(Initialize):
 			self.SRC_controle.setControle(dict("keepAlive":False))
 			self.SRC_controle.setControle(dict("stop":True))
 			self.update_info()
+
 	def run(self,s):
 		if "src" in s:
 			loop = asyncio.new_event_loop()
@@ -217,7 +215,7 @@ class Manager(Initialize):
 			self.Jobs['SDU'].start()
 		else :
 			return False
-	
+
 	def inicia(self, servico):
 		
 		elif "svc" in servico:
@@ -245,17 +243,15 @@ class Manager(Initialize):
 			self.SRC_controle.setControle(dict('stop': False))
 			self.inicializando()
 
-	# SE vou tratar todo mundo igual porque tantons casos?
-	# Verificar a prioridade entres os serviçoes e se havera tratativas diferentes 
-	# entre os serviços
 	def callback(self,e):
+		
 		if any(status in e['status'] for status in ['1','2','3','4'] ):
 			self.Exceptions(e)
 		else:
 			self.logs(e)
 
-
 	def Exceptions(self, e):
+		self.update_info()
 		""" TODO: 
 		! revisar erros e execeções!
 		"""
@@ -322,7 +318,6 @@ class Manager(Initialize):
 			else:
 				self.Logs(e)
 
-
 	def Logs(self, e):
 		e["ENV"] = self.Controle.Key.env
 		log = logging.getLogger('{message:{fill}^{width}}'.format(message=e['class']+"."+e['metodo'],fill=" ",align="^",width=50	))
@@ -333,6 +328,7 @@ class Manager(Initialize):
 			log.info(" {0} ".format(e['comments']))
 
 	def Notificar(self, e):
+		Comtele = self.Controle.API.comtele.getControle()
 		e["AMBIENTE"]= self.Controle.Key.env
 		administradores = [
 			'47997619694',
@@ -345,8 +341,8 @@ class Manager(Initialize):
 		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
 		log.info(e)
 		
-		__api_key = '3aa20522-7c0a-4562-b25d-70ffc3f27f8e'
-		textmessage_service = TextMessageService(__api_key)
+		
+		textmessage_service = TextMessageService(Comtele['api_key'])
 		
 		
 		try:
