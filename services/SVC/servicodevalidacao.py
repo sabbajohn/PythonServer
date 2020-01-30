@@ -35,22 +35,20 @@ class servicoDeValidacao(object):
 		self.svc_files = self.Manager.getControle('files')
 		self.svc_conf = self.Manager.getControle('svc')
 		self.svc_api = self.Manager.getControle('api')
-		self.contador_failsafe = self.svc_api.soa.consultas
-		self.contador_hd =self.svc_api.hubd.consultas
+		self.contador_failsafe = self.Manager.SOA_info['consultas']
+		self.contador_hd =self.Manager.HUBD_info['consultas']
 		self.contador_dispensadas = 0
-		self.contador_ViaCep = self.svc_api.viacep.consultas
+		self.contador_ViaCep = self.Manager.VIACEP_info['consultas']
 
 	def start(self):
-		self.svc_conf.lasttimerunning = datetime.datetime.now()
+		self.Manager.SVC_inf['lasttimerunning'] = datetime.datetime.now()
 		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		
 		executor = concurrent.futures.ThreadPoolExecutor(
 		max_workers=1,
 		)
 		self.event_loop = asyncio.new_event_loop()
-
 		start_time = time.time()
-
 		loop = asyncio.new_event_loop()
 		
 		self.pendentes=loop.run_until_complete(self.list_generator(self.database))
@@ -71,12 +69,15 @@ class servicoDeValidacao(object):
 			
 			
 			message = []
-			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(self.svc_api.soa.consultas - self.contador_failsafe))
-			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.svc_api.hubd.consultas - self.contador_hd))
+			message.append("Foram efetuadas {0} requisições à API Soawebservices".format(self.Manager.SOA_info['consultas'] - self.contador_failsafe))
+			message.append("Foram efetuadas {0} requisições à API HubdoDesenvolvedor".format(self.Manager.HUBD_info['consultas'] - self.contador_hd))
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
-			message.append("Foram realizadas {0} ao Via Cep".format(self.svc_api.viacep.consultas - self.contador_ViaCep))
+			message.append("Foram realizadas {0} ao Via Cep".format(self.Manager.VIACEP_info['consultas'] - self.contador_ViaCep))
 			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds") 
-			self.Manager.configFile()
+			self.Manager.SOA_controle.setControle(self.Manager.SOA_info)
+			self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info)
+			self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info)
+			self.Manager.Controle.writeConfigFile()
 			
 			
 
@@ -92,110 +93,104 @@ class servicoDeValidacao(object):
 		message.append("Buscando registros pendentes na base de dados. Aguarde!")
 		self.feedback(metodo ='list_generator', status =5, message=message)
 		message = None
-		query= self.svc_conf.query
-		try:
-			self.result=database.execute("R", query)
-		except Exception as e:
-			message = []
-			message.append(type(e))
-			message.append(e)
-			self.feedback(metodo ='list_generator', status =3, message=message)
-			message = None
-			
-		if len(self.result) > 0:
-			message = []
-			message.append('{0} itens serão analisados.'.format(len(self.result)))
-			self.feedback(metodo ='list_generator', status =5, message=message)
-			message = None
-		else:
-			message = []
-			message.append('Não há itens pendentes no momento!')
-			message.append("Encerrando serviço.")
-			self.feedback(metodo ='list_generator', status =0, message=message)
-			message = None
-			return []
-			
-			
-
-		
-		lista = {}
-		lista['pendentes']={}
-		i = 0
-		for x in self.result:
-
-			if x[0]!= None and x[1]!=None:
+		for query in self.Manager.SVC_info['query']:
+			try:
+				self.result=database.execute("R", query)
+			except Exception as e:
+				message = []
+				message.append(type(e))
+				message.append(e)
+				self.feedback(metodo ='list_generator', status =3, message=message)
+				message = None
 				
-					
-					
-				if len(x[0]) > 11:
-					checa_cpfcnpj = cpf.isCnpjValid(x[0])
-				else:
-					checa_cpfcnpj = cpf.isCpfValid(x[0])
-
-				if checa_cpfcnpj==True:
-					lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token=74621930qftLuSWHmA134727632".format(x[0], x[1].strftime("%d/%m/%Y"))
-				else:
-					
-					data = {}
-					data['status'] = False
-					data['id'] = x[2]
-					data['code'] = 1
-					data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} está incorreto ".format(x[2],x[0])
-					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-						data['viaCep']=True
-						data['CEP'] = x[6]
-					else:
-						data['viaCep']=False
-					self.contador_dispensadas = self.contador_dispensadas+1 
-					await self.query_generator(data)
+			if len(self.result) > 0:
+				message = []
+				message.append('{0} itens serão analisados.'.format(len(self.result)))
+				self.feedback(metodo ='list_generator', status =5, message=message)
+				message = None
 			else:
-				if x[0]== None:
-					data = {}
-					data['status'] = False
-					data['id'] = x[2]
-					data['code'] = 2
-					data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ está em branco'.format(x[2])
-					if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-						data['viaCep']=True
-						data['CEP'] = x[6]
-					else:
-						data['viaCep']=False
-					self.contador_dispensadas = self.contador_dispensadas+1 
-					await self.query_generator(data)
-					
-				else:	
-					if( x[1]== None and (x[3]==None or x[3]=="" )):
-						
-						params={}
-						params['CPF']=x[0]
-						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-							params['viaCep']=True
-							params['CEP'] = x[6]
-						else:
-							params['viaCep']=False
+				message = []
+				message.append('Não há itens pendentes no momento!')
+				message.append("Encerrando serviço.")
+				self.feedback(metodo ='list_generator', status =0, message=message)
+				message = None
+				return []
+			lista = {}
+			lista['pendentes']={}
+			i = 0
+			for x in self.result:
 
-						await self.failsafe_api_validation_request(params)
+				if x[0]!= None and x[1]!=None:
+
+					if len(x[0]) > 11:
+						checa_cpfcnpj = cpf.isCnpjValid(x[0])
+					else:
+						checa_cpfcnpj = cpf.isCpfValid(x[0])
+
+					if checa_cpfcnpj==True:
+						lista['pendentes'][i]="https://ws.hubdodesenvolvedor.com.br/v2/cpf/?cpf={0}&data={1}&token={2}".format(x[0], x[1].strftime("%d/%m/%Y"), self.Manager.HUBD_info['api_key'])
+					else:
+						
+						data = {}
+						data['status'] = False
+						data['id'] = x[2]
+						data['code'] = 1
+						data['message'] ="Cliente {0} não foi validado pois o CPF/CNPJ: {1} está incorreto ".format(x[2],x[0])
+						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+							data['viaCep']=True
+							data['CEP'] = x[6]
+						else:
+							data['viaCep']=False
+						self.contador_dispensadas += 1 
+						await self.query_generator(data)
+				else:
+					if x[0]== None:
+						data = {}
+						data['status'] = False
+						data['id'] = x[2]
+						data['code'] = 2
+						data['message'] ='Cliente {0} não foi validado pois o CPF/CNPJ está em branco'.format(x[2])
+						if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+							data['viaCep']=True
+							data['CEP'] = x[6]
+						else:
+							data['viaCep']=False
+						self.contador_dispensadas += self.contador_dispensadas 
+						await self.query_generator(data)
+						
 					else:	
-						if	x[1]== None:
-							data = {}
-							data['status'] = False
-							data['id'] = x[2]
-							data['code'] = 3
-							data['message'] ="Cliente {0} não foi validado pois o campo data de nascimento está em branco".format(x[2])
+						if( x[1]== None and (x[3]==None or x[3]=="" )):
+							
+							params={}
+							params['CPF']=x[0]
 							if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
-								data['viaCep']=True
-								data['CEP'] = x[6]
+								params['viaCep']=True
+								params['CEP'] = x[6]
 							else:
-								data['viaCep']=False
-							self.contador_dispensadas = self.contador_dispensadas+1 
-							await self.query_generator(data)
-			i = i+1		
-		
+								params['viaCep']=False
+
+							await self.failsafe_api_validation_request(params)
+						else:	
+							if	x[1]== None:
+								data = {}
+								data['status'] = False
+								data['id'] = x[2]
+								data['code'] = 3
+								data['message'] ="Cliente {0} não foi validado pois o campo data de nascimento está em branco".format(x[2])
+								if ((x[4] == "" or x[4] == None) and (x[5] == "" or x[5] == None)) and (x[6] !="" and x[6] !=None):
+									data['viaCep']=True
+									data['CEP'] = x[6]
+								else:
+									data['viaCep']=False
+								self.contador_dispensadas == self.contador_dispensadas
+								await self.query_generator(data)
+				i += 1		
+			
 		return lista 	
 
 	async def runner(self,executor):
 		message = []
-		message.append('[INFO]:Iniciando Solicitações a API hubdodesenvolvedor ')
+		message.append('Iniciando Solicitações a API hubdodesenvolvedor ')
 		self.feedback(metodo="Runner",status=5,message = message)
 		message = None
 		index = 0
@@ -212,8 +207,9 @@ class servicoDeValidacao(object):
 				await asyncio.gather(*tasks, return_exceptions=True)
 			
 				message = []
-				message.append( '[INFO]:	Exiting ')
+				message.append('Exiting ')
 				self.feedback(metodo="Runner",status=0,message = message)
+		return
 
 	async def viaCEP(self,CEP):
 
@@ -222,7 +218,7 @@ class servicoDeValidacao(object):
 			async with s.get(url) as r:
 				endereco = await r.read()
 				endereco =json.loads(endereco)
-				self.svc_api.viacep.consultas += 1
+				self.Manager.VIACEP_info['consultas'] += 1
 				return endereco
 
 	async def api_validation_request(self,session, url,index):
@@ -237,7 +233,7 @@ class servicoDeValidacao(object):
 			else:
 				response['viaCep'] = False
 			if len(response)>0:
-				self.svc_api.hubd.consultas += 1 
+				self.Manager.HUBD_info['consultas'] += 1 
 				await self.query_generator(response)
 			
 			else:
@@ -249,21 +245,21 @@ class servicoDeValidacao(object):
 		self.feedback(metodo="failsafe_api_validation_request", status =5, message = message )
 		message = None
 
-		self.svc_api.soa.consultas += 1
+		self.Manager.SOA_info['consultas'] += 1
 		
 		
 		
 		data={
 		'Credenciais': {
-			'Email': self.svc_api.soa.user,
-			'Senha': self.svc_api.soa.key
+			'Email':self.Manager.SOA_info['user'],
+			'Senha':self.Manager.SOA_info['key']
 		},
 		"Documento": str(params['CPF'])
 		}
 			
 		body = json.dumps(data).encode('utf8')
 		async with aiohttp.ClientSession() as s:
-			async with s.post(self.svc_api.soa.url, data=body) as r:
+			async with s.post(self.Manager.SOA_info['url'], data=body) as r:
 
 				response =  await r.read()
 				response=json.loads(response)
@@ -290,11 +286,11 @@ class servicoDeValidacao(object):
 					if(resp['failsafe']==True):
 						failsafe.append(resp)
 
-						with open(self.svc_files.responses,"a+") as f: #Analizar Resposatas e Gerar Querys
+						with open(self.Manager.Files['responses'],"a+") as f: #Analizar Resposatas e Gerar Querys
 							for item in failsafe:
 								agora = datetime.datetime.now()
 								f.write("{0}:{1}\n".format(agora ,item))
-						with open(self.svc_files.query,"a+") as f:
+						with open(self.Manager.Files['query'],"a+") as f:
 							for item in failsafe:
 								if item['viaCep'] == True:
 									endereco =  await self.viaCEP(item["CEP"])
@@ -368,12 +364,12 @@ class servicoDeValidacao(object):
 			except:
 
 				data.append(resp)
-				with open(self.svc_files.responses,"a+") as f: #Analizar Resposatas e Gerar Querys
+				with open(self.Manager.Files['responses'],"a+") as f: #Analizar Resposatas e Gerar Querys
 					for item2 in data:
 						agora = datetime.datetime.now()
 						f.write("{0}:{1}\n".format(agora ,item2))
 
-				with open(self.svc_files.query,"a+") as f:
+				with open(self.Manager.Files['query'],"a+") as f:
 					for item2 in data:
 						try:
 							r = item2['result']['numero_de_cpf']
