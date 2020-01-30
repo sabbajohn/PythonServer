@@ -177,22 +177,6 @@ class Initialize:
 			if(cenv_editado):
 				with open("config/{0}.ini".format(self.Config.get("KEY", "env")), "w+") as configfile:
 					self.Config.write(configfile)
-			""" print(colored("\nVerifique se os valores definidos estão corretos.\n", "blue"))
-			for each_section in self.Config_ENV.sections():
-				print("[{0}]".format(each_section))
-				for(each_key, each_val) in self.Config_ENV.items(each_section):
-					print ("{0} : {1}\n".format(each_key, each_val))
-			print("Se Ok aperte S para continuar")
-
-			if "S" in input():
-
-				pass
-			else:
-				print("Você pode ajustar suas configurações manualemnte em {0}/config/".format(DIR))
-				print("Bye!")
-				sys.exit()
-			
-			"""
 		except:
 			pass
 		
@@ -217,25 +201,7 @@ class Initialize:
 			return data
 		else:
 			return obj
-#Metodo meio idiota
-	def configFile(self):
 
-		contrle_dict =  self.todict(self.Controle)
-		for mod in contrle_dict:
-			#TODO: Concluir este metodo, iserindo todas as classes
-			if 'api' in mod.casefold():
-				for x in contrle_dict[mod]:
-					if any(api in  x.casefold() for api in ["comtele", "mandrill"]):
-						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"enviados",str(contrle_dict[mod][x]['enviados']))
-					else:
-						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"consultas",str(contrle_dict[mod][x]['consultas']))
-		
-		with open("{0}/config/{1}.ini".format(self.Controle.Key.root,self.Controle.Key.env ), "w+") as configfile:		
-			self.Config_ENV.write(configfile)
-
-	#TODO: metodo para atualizar configurações
-	#TODO: Metodo para RELOAD das configurações cajo hajam modificações durante a execução
-	
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,
@@ -245,61 +211,3 @@ class Initialize:
 			'SRC':self.job_src
 		}
 		return jobs
-	#Metodo meio idiota
-	def getControle(self, module):
-		if "db" in module.casefold():
-			return self.Controle.DB
-		elif 'files' in module.casefold():
-			return self.Controle.files
-		elif 'api' in module.casefold():
-			return self.Controle.API
-		elif 'modulos' in module.casefold():
-			return self.Controle.servicos
-		elif 'sms' in module.casefold():
-			return self.Controle.servicos.SMS
-		elif 'svc' in module.casefold():
-			return self.Controle.servicos.SVC
-		elif 'src' in module.casefold():
-			return self.Controle.servicos.SRC
-		elif 'sdu' in module.casefold():
-			return self.Controle.servicos.SDU
-		elif 'link' in module.casefold():
-			return self.Controle.LINK
-		elif 'watch' in module.casefold():
-			return self.Controle.servicos.WATCH
-	
-			
-		self.controle	
-	
-	def setConfigFile(self, conf):
-		
-		if "DEFAULT".casefold() in conf.casefold():
-			try:
-				with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config.write(configfile)
-					return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
-		
-		if "BETA".casefold() in conf.casefold():
-			try:
-				with open("{0}/config/BETA.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config_ENV.write(configfile)
-					return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
-
-		elif "PROD".casefold() in conf.casefold():
-			try:
-				
-				with open("{0}/config/PROD.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config_ENV.write(configfile)
-				return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
