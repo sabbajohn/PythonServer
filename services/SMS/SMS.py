@@ -21,7 +21,7 @@ class SMS(object):
 		self.Manager = M
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		self.Manager.Agenda['SMS'] = schedule_sms.every(10).minutes.do(self.db_monitor_sms).tag("SMS")
+		self.Manager.Agenda['SMS'] = schedule_sms.every(1).minutes.do(self.db_monitor_sms).tag("SMS")
 		self.Manager.SMS_info['next_run'] = self.Manager.Agenda["SMS"].next_run
 		self.Manager.SMS_controle.setControle(self.Manager.SMS_info, self.Manager)
 
@@ -148,7 +148,7 @@ class SMS(object):
 				
 				for x in result:
 					self.send(x)
-				
+				return
 				
 			else: 
 				if(escreveu == False):
@@ -157,9 +157,9 @@ class SMS(object):
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
 					message = None
 					escreveu= True
-			
+					return
 				
-				time.sleep(5)
+				
 		except Exception as e:
 			self.Manager.update_info()
 			
@@ -168,6 +168,7 @@ class SMS(object):
 			message.append(e)
 			self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
 			message = None
+			return
 		
 		return
 
@@ -244,14 +245,15 @@ class SMS(object):
 		
 			self.database.execute("W",query, commit=True)
 		
-			return True
+			
 		except Exception as e :
 			message = []
 			message.append(type(e))
 			message.append(e)
 			self.feedback(metodo="update", status =3, message = message, erro = True, comments="Falha ao atualizar base de dados:\n{0}".format(query))
 			message = None
-			
+			return False
+		return True
 		
 				
 		
