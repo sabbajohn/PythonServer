@@ -41,50 +41,50 @@ class Initialize:
 		)
 		#Definindo objeto dos Serviços
 		self.Controle = Controle(self)
-		self.SMS_controle 		= self.Controle.servicos.SMS
-		self.SVC_controle 		= self.Controle.servicos.SVC
-		self.SDU_controle 		= self.Controle.servicos.SDU
-		self.SRC_controle 		= self.Controle.servicos.SRC
+		self.SMS_controle 			= self.Controle.servicos.SMS
+		self.SVC_controle 			= self.Controle.servicos.SVC
+		self.SDU_controle 			= self.Controle.servicos.SDU
+		self.SRC_controle 			= self.Controle.servicos.SRC
 	
-		self.SMS_info 			= self.SMS_controle.getControle()
-		self.SVC_info 			= self.SVC_controle.getControle()
-		self.SDU_info 			= self.SDU_controle.getControle()
-		self.SRC_info 			= self.SRC_controle.getControle()
+		self.SMS_info 				= self.SMS_controle.getControle()
+		self.SVC_info 				= self.SVC_controle.getControle()
+		self.SDU_info 				= self.SDU_controle.getControle()
+		self.SRC_info 				= self.SRC_controle.getControle()
 		#API
-		self.VIACEP_controle 	= self.Controle.API.viacep
-		self.MANDRILL_controle 	= self.Controle.API.mandrill
-		self.COMTELE_controle 	= self.Controle.API.comtele
-		self.SOA_controle 		= self.Controle.API.soa
-		self.HUBD_controle 		= self.Controle.API.hubd
+		self.VIACEP_controle 		= self.Controle.API.viacep
+		self.MANDRILL_controle 		= self.Controle.API.mandrill
+		self.COMTELE_controle 		= self.Controle.API.comtele
+		self.SOA_controle 			= self.Controle.API.soa
+		self.HUBD_controle 			= self.Controle.API.hubd
 
-		self.VIACEP_info		= self.VIACEP_controle.getControle()
-		self.MANDRILL_info		= self.MANDRILL_controle.getControle()
-		self.COMTELE_info		= self.COMTELE_controle.getControle()
-		self.SOA_info			= self.SOA_controle.getControle()
-		self.HUBD_info			= self.HUBD_controle.getControle()
+		self.VIACEP_info			= self.VIACEP_controle.getControle()
+		self.MANDRILL_info			= self.MANDRILL_controle.getControle()
+		self.COMTELE_info			= self.COMTELE_controle.getControle()
+		self.SOA_info				= self.SOA_controle.getControle()
+		self.HUBD_info				= self.HUBD_controle.getControle()
 
 		#LINK
-		self.LINK_controle 		= self.Controle.LINK
-		self.LINK_info			= self.Controle.LINK.getControle()
+		self.LINK_controle 			= self.Controle.LINK
+		self.LINK_info				= self.Controle.LINK.getControle()
 		
 		
-		self.Files				= self.Controle.files.getControle()
-		self.servicos = self.Controle.servicos
-		self.database = DB(self)
+		self.Files					= self.Controle.files.getControle()
+		self.servicos 				= self.Controle.servicos
+		self.database 				= DB(self)
 
-		self.SMS = SMS(M)
+		self.SMS 					= SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
-		self.DataUpdate = DataUpdate(M)
-		self.servicoDeValidacao = servicoDeValidacao(M)
-		#self.Watch = Watch(M)
+		self.DataUpdate 			= DataUpdate(M)
+		self.servicoDeValidacao 	= servicoDeValidacao(M)
+		#self.Watch 				= Watch(M)
 
 		#Definindo objeto das API's
 		
-		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
-		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
-		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
-		#self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
+		self.job_sms 					= threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
+		self.job_src 					= threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
+		self.job_servico_de_validacao	= threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+		self.job_dataupdate 			= threading.Thread(target=self.DataUpdate.start, name="SDU")
+		#self.job_watch 				= threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
 
 	def __cfg(self):

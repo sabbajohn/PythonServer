@@ -105,7 +105,7 @@ class DataUpdate(object):
 		if result > 0:
 			try:
 
-				os.system("mv {0} {1}/queries/query_old-{2}:{3}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(agora.hour), str(agora.minute)))
+				os.system("mv {0} {1}/queries/query_old-{2}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(datetime.datetime.now())))
 				os.system("touch {0}".format(self.sdu_files))
 			except Exception as e:
 				message = []

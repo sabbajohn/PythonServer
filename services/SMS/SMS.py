@@ -203,7 +203,7 @@ class SMS(object):
 		self.feedback(metodo="update", status =5, message = message, erro = False)
 		message = None
 		try:
-			with open(self.sms_files.responses_sms, "+a") as f: #Registra solicitações
+			with open(self.sms_files, "+a") as f: #Registra solicitações
 				agora = datetime.datetime.now()
 				f.write("{0}:{1}\n".format(agora ,result))
 		except FileNotFoundError:
@@ -215,7 +215,7 @@ class SMS(object):
 			message = None
 			
 			try:
-				os.system(" touch {0}".format(self.sms_files.responses_sms) )
+				os.system(" touch {0}".format(self.sms_files) )
 				return True 
 			except Exception as e: #tenta criar se não der tudo bem ainda da pra trabalhar status 2
 				message = []
