@@ -152,7 +152,7 @@ class Watch(object):
 				continue
 
 	def job_info(self, service,client_socket ):
-		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
+		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'last_run':'{4}',  'next_run':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
 		response_api="'VIACEP_CONSULTAS':'{0}', 'HUBD_CONSULTAS':'{1}', 'SOA_CONSULTAS':'{2}', 'MANDRILL_ENVIOS': '{3}',  'COMTELE_ENVIOS':'{4}'"
 		
 		service = service.rstrip()
@@ -186,7 +186,7 @@ class Watch(object):
 				self.controle.SMS.init,
 				self.controle.SMS.init_time,
 				self.controle.SMS.keepAlive,
-				self.controle.SMS.lasttimerunning,
+				self.controle.SMS.last_run,
 				self.controle.SMS.nextrun,
 				self.controle.SMS.firstTime,
 				self.controle.SMS.stop),'utf-8')
@@ -220,7 +220,7 @@ class Watch(object):
 				self.controle.SVC.init,
 				self.controle.SVC.init_time,
 				self.controle.SVC.keepAlive,
-				self.controle.SVC.lasttimerunning,
+				self.controle.SVC.last_run,
 				self.controle.SVC.nextrun,
 				self.controle.SVC.firstTime,
 				self.controle.SVC.stop),'utf-8')
@@ -241,13 +241,14 @@ class Watch(object):
 					self.Manager.inicia("sdu")
 		
 			return bytearray(response.format(self.Manager.Jobs['SDU'].isAlive(),
-			 self.controle.SDU.init,
-			 self.controle.SDU.init_time,
-			 self.controle.SDU.keepAlive,
-			 self.controle.SDU.lasttimerunning,
-			 self.controle.SDU.nextrun,
-			 self.controle.SDU.firstTime,
-			 self.controle.SDU.stop),'utf-8')
+				self.controle.SDU.init,
+				self.controle.SDU.init_time,
+				self.controle.SDU.keepAlive,
+				self.controle.SDU.last_run,
+				self.controle.SDU.nextrun,
+				self.controle.SDU.firstTime,
+				self.controle.SDU.stop),'utf-8'
+			)
 		elif 'src' in service :
 			if "mode" in service:
 				if "up" in service:
@@ -278,7 +279,7 @@ class Watch(object):
 			 self.controle.SRC.init,
 			 self.controle.SRC.init_time,
 			 self.controle.SRC.keepAlive,
-			 self.controle.SRC.lasttimerunning,
+			 self.controle.SRC.last_run,
 			 self.controle.SRC.nextrun,
 			 self.controle.SRC.firstTime,
 			 self.controle.SRC.stop),'utf-8')

@@ -12,13 +12,15 @@ import threading
 import mandrill
 import configparser	
 import asyncio
-import schedule
+import schedule as schedule_src
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 	
 		self.Manager 			= M
 		self.database 			= self.Manager.database
 		self.mandrill_client 	= None
+		self.Manager.Agenda['SRC']=schedule_src.every().hour.at(":00").do(self.db_monitor_src).tag('SRC')
+		self.Manager.SRC_info['next_run'] =self.Manager.Agenda['SRC'].next_run
 		
 
 		
@@ -32,17 +34,17 @@ class recuperacaoDeCarrinhos(object):
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			schedule.every().hour.at(":00").do(self.db_monitor)
-			self.Manager.SRC_info['nextrun'] = schedule.jobs[0].next_run
-			self.Manager.SRC_controle.setControle(self.Manager.SRC_info)
 			while True:
-				self.Manager.update_info()
+				
 				if stop():
 					break
-				schedule.run_pending()
-				self.Manager.SRC_info['lasttimerunning'] = datetime.datetime.now()
-				self.Manager.SRC_controle.setControle(self.Manager.SRC_info)
-				self.Manager.Controle.writeConfigFile()
+				schedule_src.run_pending()
+				if self.Manager.Agenda['SRC'].last_run and self.Manager.Agenda['SRC'].last_run > self.Manager.SRC_info['last_run'] :
+					self.Manager.SRC_info['last_run'] = self.Manager.Agenda['SRC'].last_run
+					self.Manager.SRC_controle.setControle(self.Manager.SRC_info,self.Manager)
+					self.Manager.MANDRILL_controle.setControle(self.Manager.MANDRILL_info, self.Manager)
+					self.Manager.update_info()
+					
 				time.sleep(1)
 			
 		except SystemExit:
@@ -58,10 +60,10 @@ class recuperacaoDeCarrinhos(object):
 			message.append(e)
 			self.feedback(metodo="start", status =4, message = message, erro = True, comments = "Algo não panejado" )
 			message = None
-		
+		return
 		
 
-		pass
+		
 
 	async def runNow(self):
 		message = []
@@ -110,7 +112,7 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			return False
 
-	def db_monitor(self):
+	def db_monitor_src(self):
 		message = []
 		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
@@ -227,7 +229,7 @@ class recuperacaoDeCarrinhos(object):
 				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
-					self.MANDRILL_controle.setControle(self.Manager.MANDRILL_info)
+					
 						
 					
 					messages = []

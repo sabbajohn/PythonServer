@@ -18,6 +18,7 @@ import asyncio
 import aiohttp
 from aiofile import AIOFile, LineReader, Writer
 import ctypes 
+import schedule as schedule_svc
 #from Manager import Manager
 
 
@@ -29,23 +30,43 @@ class servicoDeValidacao(object):
 		self.failsafe_cpf = []
 		self.responses = []
 		self.pendentes_f = []
-		self.result=None	
+		self.result=[]	
 		self.Manager = M
 		self.database = self.Manager.database
-		
-		
 		self.contador_failsafe = self.Manager.SOA_info['consultas']
 		self.contador_hd =self.Manager.HUBD_info['consultas']
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = self.Manager.VIACEP_info['consultas']
 
-	def start(self):
-		self.Manager.SVC_inf['lasttimerunning'] = datetime.datetime.now()
-		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		
+		self.Manager.Agenda['SVC'] = schedule_svc.every(1).minutes.do(self.run).tag("SVC")
+		self.Manager.SVC_info['next_run']=  self.Manager.Agenda["SVC"].next_run
+	def start(self):
+		while True:
+				
+				
+				self.Manager.SVC_info['next_run'] = self.Manager.Agenda["SVC"].next_run
+				if self.Manager.SVC_info['stop']:
+					break
+				""" if self.Manager.Agenda['SVC'].next_run >= datetime.datetime.now() and  """
+				schedule_svc.run_pending()
+				if self.Manager.Agenda["SVC"].last_run and self.Manager.Agenda["SVC"].last_run > self.Manager.SVC_info['last_run']:
+					self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
+					self.Manager.SVC_controle.setControle(self.Manager.SVC_info,self.Manager)
+					self.Manager.SOA_controle.setControle(self.Manager.SOA_info,self.Manager)
+					self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info,self.Manager)
+					self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info,self.Manager)
+					self.Manager.SDU_controle.setControle(self.Manager.SDU_info,self.Manager)
+					self.Manager.update_info()
+				time.sleep(1)
+		return
+	def run(self):
+		
+		
+		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		executor = concurrent.futures.ThreadPoolExecutor(
-		max_workers=1,
-		)
+			max_workers=1,
+			)
 		self.event_loop = asyncio.new_event_loop()
 		start_time = time.time()
 		loop = asyncio.new_event_loop()
@@ -73,18 +94,27 @@ class servicoDeValidacao(object):
 			message.append("Foram dispensados {0} registros da validação online por falta de parametros".format(self.contador_dispensadas))
 			message.append("Foram realizadas {0} ao Via Cep".format(self.Manager.VIACEP_info['consultas'] - self.contador_ViaCep))
 			message.append(f"Total de {len(self.pendentes['pendentes'])} dados consultados em {duration} seconds") 
-			self.Manager.SOA_controle.setControle(self.Manager.SOA_info)
-			self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info)
-			self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info)
-			self.Manager.Controle.writeConfigFile()
 			
 			
 
-		
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
 			sleep(15)
+			message = []
+			message.append("Inicializaremos a Atualização do Banco em breve.")
+			self.feedback(metodo="start",status=0,message = message)
+			message = None
+			if (not self.Manager.Jobs['SDU'].isAlive()):
+				
+				self.Manager.SDU_info["init_time"]= datetime.datetime.now()
+				self.Manager.SDU_info["next_run"]=self.Manager.Agenda['SVC'].next_run
+				self.Manager.Jobs['SDU'].start()
+				self.Manager.Jobs['SDU'].join()
+				self.Manager.Jobs['SDU'] = threading.Thread(target=self.Manager.DataUpdate.start, name="SDU")
+			self.Manager.SVC_info['last_run'] = datetime.datetime.now()
+			return
+
 
 	async def list_generator(self,database):
 		self.result, self.contador_dispensadas
@@ -155,7 +185,7 @@ class servicoDeValidacao(object):
 						data['CEP'] = x[6]
 					else:
 						data['viaCep']=False
-					self.contador_dispensadas += self.contador_dispensadas 
+					self.contador_dispensadas += 1
 					await self.query_generator(data)
 					
 				else:	
@@ -182,7 +212,7 @@ class servicoDeValidacao(object):
 								data['CEP'] = x[6]
 							else:
 								data['viaCep']=False
-							self.contador_dispensadas == self.contador_dispensadas
+							self.contador_dispensadas += 1
 							await self.query_generator(data)
 			i += 1		
 			
@@ -316,17 +346,17 @@ class servicoDeValidacao(object):
 												status = 1
 												message = '{0} verificado via API em {1}'.format(item['Nome'], datetime.datetime.now())
 												item['DataNascimento'] = datetime.datetime.strptime(item['DataNascimento'], "%d/%m/%Y").strftime("%Y-%m-%d")
-												f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
+												f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'].replace('-','').replace('.',''),endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
 											else:# SE NAO, È MENOR. FINJO QUE NÂO VI
 												status = 2
 												message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
 												item['DataNascimento'] = self.result[item['index']][1].strftime("%Y-%m-%d")
-												f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
+												f.write("UPDATE cliente SET id_status='{8}', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}', Cidade = '{4}', SgUF='{5}', Endereco= '{6}', Bairro='{7}'   WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'].replace('-','').replace('.',''),endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro'],status))#Gerar query caso o TRUE
 										if item['Status'] == False:
-											f.write("UPDATE cliente SET id_status='3' , motivo ='{0}', Cidade = '{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))#Gerar query caso o TRUE
+											f.write("UPDATE cliente SET id_status='3' , motivo ='{0}', Cidade = '{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento'].replace('-','').replace('.',''),endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))#Gerar query caso o TRUE
 										else:
 											pass
-
+									#TODO ELSE do erro do via cep
 								else:
 									if item['Status'] == True:
 
@@ -353,9 +383,9 @@ class servicoDeValidacao(object):
 
 
 
-										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento']))#Gerar query caso o TRUE
+										f.write("UPDATE cliente SET id_status='1', Nome = '{0}' , motivo ='{1}', DtNascimento='{2}'  WHERE CPFCNPJ = '{3}';\n".format(item['Nome'],message,item['DataNascimento'], item['Documento'].replace('-','').replace('.','')))#Gerar query caso o TRUE
 									if item['Status'] == False:
-										f.write("UPDATE cliente SET id_status='3' , motivo ='{0}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento']))#Gerar query caso o TRUE
+										f.write("UPDATE cliente SET id_status='3' , motivo ='{0}'  WHERE CPFCNPJ = '{1}';\n".format(item['Mensagem'], item['Documento'].replace('-','').replace('.','')))#Gerar query caso o TRUE
 									else:
 										pass
 				else:
@@ -374,7 +404,7 @@ class servicoDeValidacao(object):
 						try:
 							r = item2['result']['numero_de_cpf']
 							if r:
-								item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')
+								item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace('.','').replace('-','')
 						except :
 							pass
 
@@ -432,6 +462,7 @@ class servicoDeValidacao(object):
 											message = 'Data de Nascimento divergente do informado pela Receita Federal {0}'.format( datetime.datetime.now())
 											item2['result']['data_nascimento'] = self.result[item2['index']][1].strftime("%Y-%m-%d")
 											f.write("UPDATE cliente SET id_status='{7}', motivo ='{0}', Cidade='{2}', SgUF='{3}',DtNascimento ='{4}', Endereco='{5}', Bairro='{6}'  WHERE CPFCNPJ = '{1}';\n".format(message,item2['result']['numero_de_cpf'],endereco['localidade'], endereco['uf'],item2['result']['data_nascimento'], endereco['logradouro'],status))#Gerar query caso o TRUE
+								#TODO ELSE do erro do via cep
 							else:
 								if self.result[item2['index']][3] == None or self.result[item2['index']][3] == '':
 									try:
@@ -487,6 +518,7 @@ class servicoDeValidacao(object):
 											err = endereco['erro']
 										except:
 											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
+											#TODO ELSE do erro do via cep
 									else:
 										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 								elif item2['code'] == 2:
@@ -496,6 +528,7 @@ class servicoDeValidacao(object):
 											err = endereco['erro']
 										except:
 											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco ='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
+											#TODO ELSE do erro do via cep
 									else:
 										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 								elif item2['code'] == 3:
@@ -505,6 +538,7 @@ class servicoDeValidacao(object):
 											err = endereco['erro']
 										except:
 											f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE id = {1};\n".format(item2['message'],item2['id'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
+										#TODO ELSE do erro do via cep
 									else:
 										f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE id = {1};\n".format(item2['message'],item2['id']))
 							except:
@@ -518,7 +552,7 @@ class servicoDeValidacao(object):
 												err = endereco['erro']
 											except:
 												f.write("UPDATE cliente SET id_status='3', motivo = '{0}', Cidade='{2}', SgUF='{3}', Endereco='{4}', Bairro='{5}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf'], endereco['logradouro'], endereco['bairro']))
-
+												#TODO ELSE do erro do via cep
 										else:
 											f.write("UPDATE cliente SET id_status='3', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
 									elif "Data Nascimento invalida." in item2['message']:
@@ -546,6 +580,7 @@ class servicoDeValidacao(object):
 														err = endereco['erro']
 													except:
 														f.write("UPDATE cliente SET id_status='2', motivo = '{0}', Cidade='{2}', SgUF='{3}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF'],endereco['localidade'], endereco['uf']))
+														#TODO ELSE do erro do via cep
 												else:
 													f.write("UPDATE cliente SET id_status='2', motivo = '{0}' WHERE CPFCNPJ = '{1}';\n".format(item2['message'],item2['CPF']))
 

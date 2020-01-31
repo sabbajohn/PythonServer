@@ -40,6 +40,7 @@ class Initialize:
 			#stream=sys.stderr,
 		)
 		#Definindo objeto dos Serviços
+
 		self.Controle = Controle(self)
 		self.SMS_controle 			= self.Controle.servicos.SMS
 		self.SVC_controle 			= self.Controle.servicos.SVC
@@ -71,11 +72,12 @@ class Initialize:
 		self.Files					= self.Controle.files.getControle()
 		self.servicos 				= self.Controle.servicos
 		self.database 				= DB(self)
-
+		self.Agenda = {}
 		self.SMS 					= SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
 		self.DataUpdate 			= DataUpdate(M)
 		self.servicoDeValidacao 	= servicoDeValidacao(M)
+		
 		#self.Watch 				= Watch(M)
 
 		#Definindo objeto das API's
@@ -239,3 +241,5 @@ class Initialize:
 			'SRC':self.job_src
 		}
 		return jobs
+	def ExportControle(self):
+		pass

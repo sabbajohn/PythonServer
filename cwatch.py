@@ -79,8 +79,8 @@ def client_sender(buffer):
 							else:
 								print(colored("keepAlive","blue"),colored(response['keepAlive'], "red"))
 							
-							print(colored("lasttimerunning","blue"),colored(response['lasttimerunning'], "blue"))
-							print(colored("nextrun","blue"),colored(response['nextrun'], "blue"))
+							print(colored("'last_run'","blue"),colored(response['last_run'], "blue"))
+							print(colored('next_run',"blue"),colored(response['next_run'], "blue"))
 							print(colored("firstTime","blue"),colored(response['firstTime'], "blue"))
 
 							if response['stop']== "True":

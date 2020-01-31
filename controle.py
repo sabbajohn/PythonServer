@@ -50,24 +50,29 @@ class Controle(object):
 	def writeConfigFile(self,*args, **kwargst):
 			try:
 				conf = kwargst['conf']
+				Controle =  kwargst['controle']
 			except:
+				conf = None
 				try:
-					conf = args[0]
+				
+					Controle =args[0]
 				except:
 					conf = None
-			finally:
+				else:
+					pass
+			if Controle:
 				if not conf or "all" in conf:
 					try:
-						with open("{0}/config/DEFAULT.ini".format(self.Key.root), "w+") as configfile:		
-							self.Config.write(configfile)
+						with open("{0}/config/DEFAULT.ini".format(Controle.Controle.Key.root), "w+") as configfile:		
+							Controle.Config.write(configfile)
 							return True
 					except Exception as e:
 						print(type(e))
 						print(e)
 						return False
 					try:
-						with open("{0}/config/{1}.ini".format(self.Key.root,self.Key.env), "w+") as configfile:		
-							self.Config.write(configfile)
+						with open("{0}/config/{1}.ini".format(Controle.Controle.Key.root,Controle.Controle.Key.env), "w+") as configfile:		
+							Controle.Config.write(configfile)
 							return True
 					except Exception as e:
 						print(type(e))
@@ -75,8 +80,8 @@ class Controle(object):
 						return False
 				elif "env" in conf:
 					try:
-						with open("{0}/config/{1}.ini".format(self.Key.root,self.Key.env), "w+") as configfile:		
-							self.Config.write(configfile)
+						with open("{0}/config/{1}.ini".format(Controle.Controle.Key.root,Controle.Controle.Key.env), "w+") as configfile:		
+							Controle.Config.write(configfile)
 							return True
 					except Exception as e:
 						print(type(e))
@@ -84,8 +89,8 @@ class Controle(object):
 						return False
 				elif "default" in conf:
 					try:
-						with open("{0}/config/DEFAULT.ini".format(self.Key.root), "w+") as configfile:		
-							self.Config.write(configfile)
+						with open("{0}/config/DEFAULT.ini".format(Controle.Controle.Key.root), "w+") as configfile:		
+							Controle.Config.write(configfile)
 							return True
 					except Exception as e:
 						print(type(e))
@@ -172,17 +177,21 @@ class API(Controle):
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'consultas' in key:
 						self.consultas = variavel['consultas']
-						Controle.Config_ENV.set(self.tag, 'consultas',self.consultas )
+						Controle.Config_ENV.set(self.tag, 'consultas',str(self.consultas ))
 						return True
 					else:
 						return False
@@ -201,21 +210,25 @@ class API(Controle):
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'enviados' in key:
 						self.enviados = variavel['enviados']
-						Controle.Config_ENV.set(self.tag, 'enviados',self.enviados )
+						Controle.Config_ENV.set(self.tag, 'enviados',str(self.enviados))
 						return True
 					elif 'api_key' in key:
 						self.consultas = variavel['consultas']
-						Controle.Config_ENV.set(self.tag, 'api_key',self.consultas )
+						Controle.Config_ENV.set(self.tag, 'api_key',str(self.consultas ))
 						
 		def getControle(self,*args, **kwargst):
 			var = {
@@ -232,17 +245,21 @@ class API(Controle):
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'enviados' in key:
 						self.enviados = variavel['enviados']
-						Controle.Config_ENV.set(self.tag, 'enviados',self.enviados )
+						Controle.Config_ENV.set(self.tag, 'enviados',str(self.enviados))
 						return True
 					elif 'api_key' in key:
 						self.api_key = variavel['api_key']
@@ -263,12 +280,16 @@ class API(Controle):
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'url' in key:
@@ -280,7 +301,7 @@ class API(Controle):
 						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
 					elif 'consultas' in key:
 						self.consultas = variavel['consultas']
-						Controle.Config_ENV.set(self.tag, 'consultas',self.consultas )
+						Controle.Config_ENV.set(self.tag, 'consultas',str(self.consultas ))
 					
 						
 		def getControle(self,*args, **kwargst):
@@ -301,12 +322,16 @@ class API(Controle):
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'url' in key:
@@ -321,7 +346,7 @@ class API(Controle):
 						Controle.Config_ENV.set(self.tag, 'user',self.user )
 					elif 'consultas' in key:
 						self.consultas = variavel['consultas']
-						Controle.Config_ENV.set(self.tag, 'consultas',self.consultas )
+						Controle.Config_ENV.set(self.tag, 'consultas',str(self.consultas ))
 					
 						
 		def getControle(self,*args, **kwargst):
@@ -344,12 +369,16 @@ class LINK(Controle):
 	def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
 					if 'link_site' in key:
@@ -418,7 +447,7 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= None
 			self.keepAlive			= True
-			self.lasttimerunning	= None
+			self.last_run			= None
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
@@ -426,21 +455,29 @@ class servicos(Controle):
 			
 
 		def setControle(self,*args, **kwargst):
-
+		
 			#  @param Dict{var:value}
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
-					if 'init' in key:
+					if 'init' == key:
 						self.init = variavel[key] 
-						Controle.Config.set("SMS","init", self.init)  
+						try:
+							Controle.Config.set("SMS","init", str(self.init))  
+						except Exception as e:
+							print(e)
+						
 					elif 'init_time' in key:
 						self.init_time = variavel[key]
 						
@@ -450,10 +487,10 @@ class servicos(Controle):
 					elif 'keepAlive' in key:
 						self.keepAlive = variavel[key]
 						
-					elif 'lasttimerunning' in key:
-						self.lasttimerunning = variavel[key]
+					elif 'last_run' in key:
+						self.last_run = variavel[key]
 						
-					elif 'nextrun' in key:
+					elif 'next_run' in key:
 						self.nextrun = variavel[key]
 						
 					elif 'firstTime' in key:
@@ -472,8 +509,8 @@ class servicos(Controle):
 				'init_time': 		self.init_time,
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'lasttimerunning': 	self.lasttimerunning,
-				'nextrun': 			self.nextrun,
+				'last_run': 		self.last_run,
+				'next_run': 		self.nextrun,
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query':			self.query
@@ -487,17 +524,16 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= float(Controle.Config.get("SVC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning	= None
+			self.last_run	= None
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
-			self.query_set			= None 
+			self.query_set			= [] 
 			self.query				= []
 
-			if "," in Controle.Config.get("SVC", "set"):
-				self.query_set = Controle.Config.get("SVC", "set").split(",")
-			else:
-				self.query_set = list(Controle.Config.get("SVC", "set").split(","))
+			
+			self.query_set = Controle.Config.get("SVC", "set").split(",")
+			
 			if isinstance(self.query_set, list):
 				for x in self.query_set:
 					self.query.append(Controle.Config.get("SVC",x))
@@ -507,31 +543,36 @@ class servicos(Controle):
 			#  @param Dict{var:value}
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
-					if 'init' in key:
+					if 'init' == key:
 						self.init = variavel[key] 
-						Controle.Config.set("SVC","init", self.init)  
+						Controle.Config.set("SVC","init", str(self.init))  
 					elif 'init_time' in key:
 						self.init_time = variavel[key]
 						
 					elif 'delay' in key:
 						self.delay = variavel[key]
-						Controle.Config.set("SVC","delay", self.init) 
+						Controle.Config.set("SVC","delay", str(self.delay)) 
 						
 					elif 'keepAlive' in key:
 						self.keepAlive = variavel[key]
 						
-					elif 'lasttimerunning' in key:
-						self.lasttimerunning = variavel[key]
+					elif 'last_run' in key:
+						self.last_run = variavel[key]
 						
-					elif 'nextrun' in key:
+					elif 'next_run' in key:
 						self.nextrun = variavel[key]
 						
 					elif 'firstTime' in key:
@@ -542,15 +583,15 @@ class servicos(Controle):
 					
 					elif 'query' in key:
 						
-						if len(variavel[key]) > self.query:
+						if len(variavel[key]) > len(self.query):
 							self.query = list(set().union(self.query,variavel[key])) 
 							for i, x in enumerate(self.query):
 								Controle.Config.set("SVC",i, x)
 						else:
 							self.query = variavel[key]
-					elif 'query_set' in key:
+					elif 'query_set' == key:
 						
-						if len(variavel[key]) > self.query_set:
+						if len(variavel[key]) > len(self.query_set):
 							self.query_set = list(set().union(self.query_set, variavel[key]))
 						else:
 							self.query = variavel[key]
@@ -559,15 +600,16 @@ class servicos(Controle):
 					else:
 						return False
 				return True
-		
+			else:
+				return False
 		def getControle(self,*args, **kwargst):
 			var = {
 				'init': 			self.init,
 				'init_time': 		self.init_time,
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'lasttimerunning': 	self.lasttimerunning,
-				'nextrun': 			self.nextrun,
+				'last_run': 	self.last_run,
+				'next_run': 			self.nextrun,
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query_set':		self.query_set,
@@ -582,7 +624,7 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= None
 			self.keepAlive			= True
-			self.lasttimerunning	= None
+			self.last_run	= None
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
@@ -592,17 +634,21 @@ class servicos(Controle):
 			#  @param Dict{var:value}
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
-					if 'init' in key:
+					if 'init' == key:
 						self.init = variavel[key] 
-						Controle.Config.set("SDU","init", self.init)  
+						Controle.Config.set("SDU","init", str(self.init))  
 					elif 'init_time' in key:
 						self.init_time = variavel[key]
 						
@@ -612,10 +658,10 @@ class servicos(Controle):
 					elif 'keepAlive' in key:
 						self.keepAlive = variavel[key]
 						
-					elif 'lasttimerunning' in key:
-						self.lasttimerunning = variavel[key]
+					elif 'last_run' in key:
+						self.last_run = variavel[key]
 						
-					elif 'nextrun' in key:
+					elif 'next_run' in key:
 						self.nextrun = variavel[key]
 						
 					elif 'firstTime' in key:
@@ -634,8 +680,8 @@ class servicos(Controle):
 				'init_time': 		self.init_time,
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'lasttimerunning': 	self.lasttimerunning,
-				'nextrun': 			self.nextrun,
+				'last_run': 	self.last_run,
+				'next_run': 			self.nextrun,
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop
 			}
@@ -648,7 +694,7 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= float(Controle.Config.get("SRC","delay"))
 			self.keepAlive			= True
-			self.lasttimerunning	= None
+			self.last_run	= None
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
@@ -659,31 +705,35 @@ class servicos(Controle):
 			#  @param Dict{var:value}
 			try:
 				variavel = kwargst['vars']
+				Controle = kwargst['controle']
 			except:
 				try:
 					variavel = args[0]
-				except:
+					Controle = args[1]
+				except Exception as e:
 					return False
-			else:
+				else:
+					pass
+			if Controle:
 				keys = variavel.keys()
 				for key in keys:
-					if 'init' in key:
+					if 'init' == key:
 						self.init = variavel[key] 
-						Controle.Config.set("SRC","init", self.init)  
+						Controle.Config.set("SRC","init", str(self.init))  
 					elif 'init_time' in key:
 						self.init_time = variavel[key]
 						
 					elif 'delay' in key:
 						self.delay = variavel[key]
-						Controle.Config.set("SRC","delay", self.delay) 
+						Controle.Config.set("SRC","delay", str(self.delay))
 						
 					elif 'keepAlive' in key:
 						self.keepAlive = variavel[key]
 						
-					elif 'lasttimerunning' in key:
-						self.lasttimerunning = variavel[key]
+					elif 'last_run' in key:
+						self.last_run = variavel[key]
 						
-					elif 'nextrun' in key:
+					elif 'next_run' in key:
 						self.nextrun = variavel[key]
 						
 					elif 'firstTime' in key:
@@ -705,8 +755,8 @@ class servicos(Controle):
 				'init_time': 		self.init_time,
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'lasttimerunning': 	self.lasttimerunning,
-				'nextrun': 			self.nextrun,
+				'last_run': 	self.last_run,
+				'next_run': 			self.nextrun,
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query':			self.query

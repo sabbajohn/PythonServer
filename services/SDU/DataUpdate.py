@@ -28,7 +28,7 @@ class DataUpdate(object):
 		message.append("Procurando Por Arquivo de Querys.")
 		self.feedback(metodo ='start', status =5, message=message, erro = False)
 		message = None
-		fname = self.sdu_files.query
+		fname = self.sdu_files
 		if os.path.isfile(fname):
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
@@ -70,7 +70,7 @@ class DataUpdate(object):
 		else:
 			message = []
 			message.append("Arquivo query não encontrado!")
-			message.append("Verificar Diretorio: {0}".format(self.sdu_files.query))
+			message.append("Verificar Diretorio: {0}".format(self.sdu_files))
 			self.feedback(metodo ='start', status =1, message=message, erro = True) #Arquivo de Query vazio....
 			message = None
 			return 0
@@ -81,8 +81,8 @@ class DataUpdate(object):
 	def start(self):
 		
 
-		setting = {"lasttimerunning":datetime.datetime.now()}
-		self.SDU_controle.setControle(setting)
+		setting = {"last_run":datetime.datetime.now()}
+		self.Manager.SDU_controle.setControle(setting,self.Manager)
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
@@ -98,21 +98,20 @@ class DataUpdate(object):
 		self.feedback(metodo ='list_generator', status =0, message=message, erro = False)
 		message = None
 		
-	
-	
-
 		agora = datetime.datetime.now()
 		if result > 0:
 			try:
-
-				os.system("mv {0} {1}/queries/query_old-{2}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(datetime.datetime.now())))
+				
+				os.system("mv {0} {1}/queries/query_old-{2}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(datetime.datetime.now()).replace(' ','')))
 				os.system("touch {0}".format(self.sdu_files))
+
 			except Exception as e:
 				message = []
 				message.append("Falha ao mover arquivos query")
-
 				self.feedback(metodo ='list_generator', status =4, message=message, erro = False, comments= "Executou as inserções, mas não criou arquivo de query para proximo turno e nem logs")
 				message = None
+				
+			return
 		return 
 		
 		

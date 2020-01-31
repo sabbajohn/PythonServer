@@ -11,7 +11,7 @@ import getpass
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
 import asyncio
-
+import schedule as schedule_sms
 
 
 
@@ -21,7 +21,9 @@ class SMS(object):
 		self.Manager = M
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		
+		self.Manager.Agenda['SMS'] = schedule_sms.every(10).minutes.do(self.db_monitor_sms).tag("SMS")
+		self.Manager.SMS_info['next_run'] = self.Manager.Agenda["SMS"].next_run
+		self.Manager.SMS_controle.setControle(self.Manager.SMS_info, self.Manager)
 
 	def start(self, stop):
 		
@@ -32,7 +34,18 @@ class SMS(object):
 			message.append( "Inicializando SMS")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			self.db_monitor(stop)
+			while True:
+				if stop():
+					break
+				schedule_sms.run_pending()
+				if self.Manager.Agenda['SMS'].last_run and self.Manager.Agenda['SMS'].last_run >self.Manager.SMS_info['last_run'] :
+					self.Manager.SMS_info['last_run'] = self.Manager.Agenda['SMS'].last_run
+					self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
+					self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
+					self.Manager.update_info()
+					
+				time.sleep(1)
+			#self.db_monitor()
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")
@@ -99,7 +112,7 @@ class SMS(object):
 		finally:
 			return False
 	
-	def db_monitor(self,stop):
+	def db_monitor_sms(self):
 
 	
 		message = []
@@ -111,59 +124,59 @@ class SMS(object):
 		
 		
 		
-		while True:
-			self.Manager.update_info()
-			if stop():
-				break
-			
-			try:
-				result = None
-				result = self.database.execute("R",self.Manager.SMS_info['query'])
-			
-				if len(result)>0:
-					if(escreveu == True):
-						message = []
-						message.append( "Novo sms encontrado!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
-						message = None
-
+		#while True:
+		
+		
+		
+		try:
+			result = None
+			result = self.database.execute("R",self.Manager.SMS_info['query'])
+		
+			if len(result)>0:
+				if(escreveu == True):
 					message = []
-					message.append( "{0} sms's a serem enviados!".format(len(result)))
+					message.append( "Novo sms encontrado!")
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 					message = None
-					
-					
-					
-					for x in result:
-						self.send(x)
-					
-					
-				else: 
-					if(escreveu == False):
-						message = []
-						message.append( "Nenhum SMS Pendente no momento!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
-						message = None
-						escreveu= True
-				
-					self.Manager.Controle.writeConfigFile()
-					time.sleep(5)
-			except Exception as e:
-				self.Manager.Controle.writeConfigFile()
+
 				message = []
-				message.append(type(e))
-				message.append(e)
-				self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
+				message.append( "{0} sms's a serem enviados!".format(len(result)))
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-		self.Manager.Controle.writeConfigFile()
-		sys.exit()
+				
+				
+				
+				for x in result:
+					self.send(x)
+				
+				
+			else: 
+				if(escreveu == False):
+					message = []
+					message.append( "Nenhum SMS Pendente no momento!")
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					message = None
+					escreveu= True
+			
+				
+				time.sleep(5)
+		except Exception as e:
+			self.Manager.update_info()
+			
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
+			message = None
+		
+		return
 
 	def send(self,cliente):
 
 		
 		message = []
 		message.append( 'Enviando SMS a:{0}'.format(cliente[2]))
-		self.feedback(metodo="send", status =5, message = message, erro = False, comments = "send" )
+		self.feedback(metodo="send", status =5, message = message, erro = False )
 		message = None
 		
 	
@@ -189,8 +202,8 @@ class SMS(object):
 			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
 			self.Manager.COMTELE_info['enviados'] +=1
-			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info)
-			self.Manager.update_info()
+			
+			
 
 			self.update(result, cliente)
 			return
