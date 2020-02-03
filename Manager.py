@@ -92,7 +92,7 @@ class Manager(Initialize):
 	def inicializando(self):
 		self.update_info()
 		try:
-			#self.Jobs['WATCH'].start()
+			self.Jobs['WATCH'].start()
 			
 			if self.SMS_info["init"] is True:
 				self.SMS_info['init_time']=datetime.datetime.now()

@@ -78,7 +78,7 @@ class Initialize:
 		self.DataUpdate 			= DataUpdate(M)
 		self.servicoDeValidacao 	= servicoDeValidacao(M)
 		
-		#self.Watch 				= Watch(M)
+		self.Watch 				= Watch(M)
 
 		#Definindo objeto das API's
 		
@@ -86,7 +86,7 @@ class Initialize:
 		self.job_src 					= threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
 		self.job_servico_de_validacao	= threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
 		self.job_dataupdate 			= threading.Thread(target=self.DataUpdate.start, name="SDU")
-		#self.job_watch 				= threading.Thread(target=self.Watch.start, name="WATCH")
+		self.job_watch 					= threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
 
 	def __cfg(self):
@@ -237,7 +237,7 @@ class Initialize:
 			'SMS': self.job_sms,
 			'SVC': self.job_servico_de_validacao,
 			'SDU': self.job_dataupdate,
-			#'WATCH':self.job_watch,
+			'WATCH':self.job_watch,
 			'SRC':self.job_src
 		}
 		return jobs
