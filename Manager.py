@@ -196,30 +196,30 @@ class Manager(Initialize):
 			'stop':True,
 			'keepAlive:': False
 		}
-		if "sdu" in servico:
+		if "SDU" in servico:
 			self.SDU_controle.setControle(setting,self)
 			self.update_info()
 			if self.Jobs['SDU'].isAlive():
 				self.Jobs["SDU"].raise_exception()
 				
 
-		elif "svc" in servico:
+		elif "SVC" in servico:
 			self.SVC_controle.setControle(setting,self)
 			self.update_info()
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
 			
-		elif "sms" in servico:
+		elif "SMS" in servico:
 		
 			self.SMS_controle.setControle(setting,self)
 			self.update_info()
 
 				
-		elif "src" in servico:
+		elif "SRC" in servico:
 			self.SRC_controle.setControle(setting,self)
 			self.update_info()
 		
-		elif "all" in servico:
+		elif "ALL" in servico:
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
 			if self.Jobs['SDU'].isAlive():
@@ -232,17 +232,17 @@ class Manager(Initialize):
 			self.update_info()
 
 	def run(self,s):
-		if "src" in s:
+		if "SRC" in s:
 			loop = asyncio.new_event_loop()
 			return_value = loop.run_until_complete(self.recuperacaoDeCarrinhos.runNow())
 		
 			return return_value
-		if "sms" in s:
+		if "SMS" in s:
 			loop = asyncio.new_event_loop()
 			return_value = loop.run_until_complete(self.SMS.runNow())
 			return return_value
 		
-		if "sdu" in s:
+		if "SDU" in s:
 			self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
 			self.Jobs['SDU'].start()
 		else :

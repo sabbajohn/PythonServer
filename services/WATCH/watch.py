@@ -11,6 +11,7 @@ import getopt
 import threading
 import subprocess
 import logging
+import json
 
 class Watch(object):
 	def __init__(self, M):
@@ -79,9 +80,15 @@ class Watch(object):
 			cmd_buffer = ""
 			while "\n" not in cmd_buffer:
 				try:
-					cmd_buffer += str(client.recv(4096),encoding="utf-8").rstrip()
+					cmd_buffer += str(client_socket.recv(4096),encoding="utf-8").rstrip()
 					if len(cmd_buffer):
-						print(cmd_buffer)
+						buffer = json.loads(cmd_buffer)
+						r = self.buffer_recv(buffer)
+						if(r):
+							client_socket.send(bytes(json.dumps(r).encode))
+							cmd_buffer = ''
+						else:
+							continue
 					break
 					
 				except TimeoutError:
@@ -103,27 +110,54 @@ class Watch(object):
 					message = None
 					
 				continue
+
+	def buffer_recv(self, buffer):
+		servico = buffer['servico']
+		action = buffer['action']
+		if "parar" in action:
+			self.Manager.finaliza(servico)
+		elif "up" in action:
+			self.Manager.inicia(servico)
+		elif "executar_agora" in action:
+			self.Manager.run(servico)
+		elif "info":
+			if 'SMS' in servico:	
+				self.Manager.SMS_info['init_time'] =str(self.Manager.SMS_info['init_time']) 
+				if self.Manager.SMS_info['last_run'] :
+					self.Manager.SMS_info['last_time'] =str(self.Manager.SMS_info['last_run']) 
+				self.Manager.SMS_info['next_run'] =str(self.Manager.SMS_info['next_run']) 
+				return self.Manager.SMS_info
+			elif 'SRC' in servico:
+				return self.Manager.SRC_info
+			elif 'SVC' in servico:
+				return self.Manager.SVC_info
+			elif 'SDU' in servico:
+				return self.Manager.SDU_info
+		elif "query" in action:
+			data = {}
+			data['query_set']= self.Manager.SVC_info['query_set']
+			data['query']= self.Manager.SVC_info['query']
+			client_socket.send(bytes(json.dumps(data).encode()))
 			
-	""" def buffer_recv(self, buffer):
-		if '1' in buffer:
-			self.sms()
-		elif '2' in buffer:
-			self.svc()
-		elif '3' in buffer:
-			self.sdu()
-		elif '4' in buffer:
-			self.src()
-		elif '5' in buffer:
-			self.reload()
-		elif '6' in buffer:
-			self.stop()
-		elif '0' in buffer:
-			client_socket.sendall("Finalizando cliente, até mais!".encode(encoding='utf-8'))
-			return False
-		else:
-			client_socket.sendall("Escolha uma opção!")
-			client_socket.sendall("Menu")
-			return "break" """
+			while recv_len:
+				data	 = str(client_socket.recv(4096),encoding="utf-8").rstrip()
+				recv_len = len(data)
+				response+= data
+		
+				if recv_len < 4096:
+					break
+			if len(response):
+				response = json.loads(response)
+				if "query_set" in response['action']:
+					self.Manager.SVC_info['query_set'] = response["value"].split(",")
+				elif 'query' in response['action']:
+					self.Manager.SVC_info['query_set'].append(response["value"])
+				else:
+					return False
+			
+			
+
+			
 
 	def job_info(self, service,client_socket ):
 		if 'sms' in service :

@@ -77,9 +77,9 @@ def formata(parameter_list):
 def query_svc():
 	data = {
 		"servico"	: servico,
-		"action"	: query_list
+		"action"	: "query_list"
 	}
-	client.send(data)
+	client.send(bytes(json.dumps(data).encode()))
 	while recv_len:
 		data	 = str(client.recv(4096),encoding="utf-8").rstrip()
 		recv_len = len(data)
@@ -88,17 +88,33 @@ def query_svc():
 		if recv_len < 4096:
 				break
 		if len(response):
-			print(response)
-	print(colored("Querys SVC", "Blue"))
+			keys = response.keys()
+		for key in keys:
+			print(colored("{}".format(key), "blue"))
+			for i, x in enumerate(response[key]):
+				print(colored("{}:{}".format(i,x), "green"))
+	print(colored("Querys SVC", "blue"))
 	print(colored("1) Definir Querys a serem executadas","cyan") )
 	print(colored("2) Adcionar nova Query","cyan") )
 	print(colored("3) Voltar ao menu do Serviço","cyan") )
 	print(colored("00) Voltar ao Menu Principal","cyan") )
 	buffer = input('')
 	if "1" in buffer:
-		pass
+		value = input('')
+		data = {
+		"servico"	: servico,
+		"action"	: "query_set",
+		"value"		: value
+	}
+		client.send(bytes(json.dumps(data).encode()))
 	elif "2" in buffer:
-		pass
+		value = input('')
+		data = {
+		"servico"	: servico,
+		"action"	: "query_add",
+		"value"		: value
+	}
+		client.send(bytes(json.dumps(data).encode()))
 	elif "3" in buffer:
 		pass
 	elif "00" in buffer:
@@ -125,7 +141,8 @@ def acao(action):
 				if recv_len < 4096:
 						break
 		if len(response):
-			formata(response)
+			print(response)
+			print('entrou aqui')
 	
 def usage():
 	print("")
@@ -145,11 +162,13 @@ def menuDeServicos():
 	global servico
 	print(colored("{0}:".format(servico_msg), "blue"))
 	print(colored("1) Informações","cyan") )
-	print(colored("2) Executar Agora","cyan") )
+	print(colored("2) Agendar Inicialização","cyan") )
 	print(colored("3) Parar","cyan") )
-	print(colored("4) Recarregar","cyan") )
 	if "SVC" in servico:
-		print(colored("5)Define Querys a serem executadas","cyan") )		
+		print(colored("4)Define Querys a serem executadas","cyan") )		
+	else:
+		print(colored("4) Executar Agora","cyan") )
+	print(colored("5) Recarregar","cyan") )	
 	print(colored("00)Voltar para Menu Principal","cyan") )
 	print(colored("0) Exit","cyan"))
 	print('\n')
@@ -158,13 +177,16 @@ def menuDeServicos():
 	if '1' in buffer:
 		acao("info")
 	elif '2' in buffer:
-		acao("executar_agora")
+		acao("up")
 	elif '3' in buffer:
-		acao('parar')
-	elif '4' in buffer:
-		acao('recarregar')
-	elif "SVC" in servico and '5' in buffer:
+		acao("parar")
+	elif '4' in buffer and not "SVC" in servico:
+		acao('executar_agora')
+	elif "SVC" in servico and '4' in buffer:
 		query_svc()
+	elif '5' in buffer:
+		acao('recarregar')
+	
 	elif '00' in buffer:
 		Menu()
 	elif buffer == '0':
