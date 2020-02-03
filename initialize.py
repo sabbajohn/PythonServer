@@ -72,7 +72,7 @@ class Initialize:
 		self.Files					= self.Controle.files.getControle()
 		self.servicos 				= self.Controle.servicos
 		self.database 				= DB(self)
-		self.Agenda = {"SMS":None,"SRC":None,"SVC":None}
+		self.Agenda 				= {"SMS":None,"SRC":None,"SVC":None}
 		self.SMS 					= SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
 		self.DataUpdate 			= DataUpdate(M)
@@ -243,7 +243,11 @@ class Initialize:
 		return jobs
 	
 	def ExportControle(self):
-		pass
+		Result = self.todict(self.Controle)
+		with open("{0}/config/DEFAULT.ini".format(self.Controle.Controle.logs.controle_log), "w+") as controlefile:
+			controlefile.write(Result)
+		controlefile.close()
+
 	def SVC_f(self):
 		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
 			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")

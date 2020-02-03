@@ -18,9 +18,6 @@ class Controle(object):
 	""" TODO:
 		! Concluir metodo get/set das variaveis de controle assim como escrita dela no arquivo de configuração
 	"""
-	
-	
-	
 	def reloadControle(self,I, module = "all"):
 		#TODO: Registrar logs
 		if "all" in module:
@@ -412,6 +409,7 @@ class logs(Controle):
 	def __init__(self,Controle):
 
 		self.manager_log	= Controle.Config.get("LOGS","manager_log")
+		self.controle_log	= Controle.Config.get("LOGS","controle_log")
 		self.sdu_log		= Controle.Config.get("LOGS","sdu_log")
 		self.svc_log		= Controle.Config.get("LOGS","svc_log")
 		self.sms_log		= Controle.Config.get("LOGS","sms_log")
