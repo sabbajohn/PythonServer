@@ -85,7 +85,7 @@ class Watch(object):
 						buffer = json.loads(cmd_buffer)
 						r = self.buffer_recv(buffer)
 						if(r):
-							client_socket.send(bytes(json.dumps(r).encode))
+							client_socket.send(bytes(json.dumps(r).encode()))
 							cmd_buffer = ''
 						else:
 							continue
