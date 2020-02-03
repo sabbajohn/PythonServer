@@ -37,8 +37,6 @@ class recuperacaoDeCarrinhos(object):
 				return
 			self.db_monitor_src()
 			self.Manager.SRC_info['last_run'] = self.Manager.Agenda['SRC'].last_run
-			self.Manager.SRC_controle.setControle(self.Manager.SRC_info,self.Manager)
-			self.Manager.MANDRILL_controle.setControle(self.Manager.MANDRILL_info, self.Manager)
 			self.Manager.update_info()
 			time.sleep(1)
 			return

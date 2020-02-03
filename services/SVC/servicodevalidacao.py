@@ -92,11 +92,6 @@ class servicoDeValidacao(object):
 				self.Manager.Jobs['SDU'] = threading.Thread(target=self.Manager.DataUpdate.start, name="SDU")
 			self.Manager.SDU_info['last_run'] = datetime.datetime.now()
 			self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
-			self.Manager.SVC_controle.setControle(self.Manager.SVC_info,self.Manager)
-			self.Manager.SOA_controle.setControle(self.Manager.SOA_info,self.Manager)
-			self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info,self.Manager)
-			self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info,self.Manager)
-			self.Manager.SDU_controle.setControle(self.Manager.SDU_info,self.Manager)
 			self.Manager.update_info()
 			
 			time.sleep(1)
