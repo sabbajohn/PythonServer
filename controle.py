@@ -65,37 +65,45 @@ class Controle(object):
 					try:
 						with open("{0}/config/DEFAULT.ini".format(Controle.Controle.Key.root), "w+") as configfile:		
 							Controle.Config.write(configfile)
-							return True
+						
+						configfile.close()
 					except Exception as e:
 						print(type(e))
 						print(e)
 						return False
+					
 					try:
 						with open("{0}/config/{1}.ini".format(Controle.Controle.Key.root,Controle.Controle.Key.env), "w+") as configfile:		
-							Controle.Config.write(configfile)
-							return True
+							Controle.Config_ENV.write(configfile)
+						configfile.close()
 					except Exception as e:
 						print(type(e))
 						print(e)
 						return False
+
+					return True
 				elif "env" in conf:
 					try:
 						with open("{0}/config/{1}.ini".format(Controle.Controle.Key.root,Controle.Controle.Key.env), "w+") as configfile:		
 							Controle.Config.write(configfile)
-							return True
+						configfile.close()
 					except Exception as e:
 						print(type(e))
 						print(e)
 						return False
+					else:
+						return True
 				elif "default" in conf:
 					try:
 						with open("{0}/config/DEFAULT.ini".format(Controle.Controle.Key.root), "w+") as configfile:		
 							Controle.Config.write(configfile)
-							return True
+						configfile.close()
 					except Exception as e:
 						print(type(e))
 						print(e)
 						return False
+					else:
+						return True
 				else:
 					return False
 				

@@ -17,7 +17,7 @@ import logging
 from comtele_sdk.textmessage_service import TextMessageService
 from initialize import Initialize
 from termcolor import colored
-
+import schedule
 
 
 
@@ -96,22 +96,28 @@ class Manager(Initialize):
 			
 			if self.SMS_info["init"] is True:
 				self.SMS_info['init_time']=datetime.datetime.now()
+				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
+				self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
 				self.SMS_controle.setControle(self.SMS_info,self)
-				self.Jobs['SMS'].start()
+				#self.Jobs['SMS'].start()
 				
 
 			if self.SRC_info['init'] is True:
 				self.SRC_info['init_time']=datetime.datetime.now()
+				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+				self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
 				self.SRC_controle.setControle(self.SRC_info,self)
-				self.Jobs['SRC'].start()
+				#self.Jobs['SRC'].start()
 				
 
 			if self.SVC_info['init'] is True:
 				self.SVC_info['init_time']=datetime.datetime.now()
+				self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+				self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
 				self.SVC_controle.setControle(self.SVC_info,self) 
-				self.Jobs['SVC'].start()
 				
-
+				
+		
 		except Exception as err:
 			if "KILL_ALL" in err.args[0]:
 				
@@ -143,7 +149,8 @@ class Manager(Initialize):
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 			#sys.exit()
-
+		self.update_info()
+		self.Agendados()
 
 	# TODO NÂO ESQUECER DE REVER ESSE CARA
 	""" def ValidacaoEUpdate(self):
@@ -163,6 +170,56 @@ class Manager(Initialize):
 					time.sleep(1)
 	 """
 	#TODO no metodo de agendamento verificar se esta agendado
+	
+	def SVC_f(self):
+		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
+		
+			if self.Jobs['SVC']:
+				
+				self.Jobs['SVC'].start()
+			else:
+				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+				
+				self.Jobs['SVC'].start()
+		else:
+			return
+
+	def SRC_f(self):
+		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+	
+			if self.Jobs['SRC']:
+				self.Jobs['SRC'].start()
+			else:
+				self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
+				self.Jobs['SRC'].start()
+		else:
+			return
+
+	def SMS_f(self):
+		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
+	
+			if self.Jobs['SMS']:
+				self.Jobs['SMS'].start()
+			else:
+				self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
+				self.Jobs['SMS'].start()
+		else:
+			return
+	
+	def Agendados(self):
+		while True:
+			
+			if  self.SVC_info['stop']:
+				schedule.clear('SVC')
+			elif  self.SRC_info['stop']:
+				schedule.clear('SRC')
+			elif  self.SMS_info['stop']:
+				schedule.clear('SMS')
+			elif self.SVC_info['stop'] and self.SRC_info['stop'] and self.SMS_info['stop']:
+				schedule.clear()
+				break
+			schedule.run_pending()
+		return
 	
 	def verifica(self):
 		self.update_info()

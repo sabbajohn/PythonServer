@@ -12,15 +12,14 @@ import threading
 import mandrill
 import configparser	
 import asyncio
-import schedule as schedule_src
+
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
-	
+		
 		self.Manager 			= M
 		self.database 			= self.Manager.database
 		self.mandrill_client 	= None
-		self.Manager.Agenda['SRC']=schedule_src.every().hour.at(":00").do(self.db_monitor_src).tag('SRC')
-		self.Manager.SRC_info['next_run'] =self.Manager.Agenda['SRC'].next_run
+		
 		
 
 		
@@ -34,19 +33,15 @@ class recuperacaoDeCarrinhos(object):
 			message.append( "Inicializando Servico de Recuperação de Carrinhos")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			while True:
-				
-				if stop():
-					break
-				schedule_src.run_pending()
-				if self.Manager.Agenda['SRC'].last_run and self.Manager.Agenda['SRC'].last_run > self.Manager.SRC_info['last_run'] :
-					self.Manager.SRC_info['last_run'] = self.Manager.Agenda['SRC'].last_run
-					self.Manager.SRC_controle.setControle(self.Manager.SRC_info,self.Manager)
-					self.Manager.MANDRILL_controle.setControle(self.Manager.MANDRILL_info, self.Manager)
-					self.Manager.update_info()
-					
-				time.sleep(1)
-			
+			if stop():
+				return
+			self.db_monitor_src()
+			self.Manager.SRC_info['last_run'] = self.Manager.Agenda['SRC'].last_run
+			self.Manager.SRC_controle.setControle(self.Manager.SRC_info,self.Manager)
+			self.Manager.MANDRILL_controle.setControle(self.Manager.MANDRILL_info, self.Manager)
+			self.Manager.update_info()
+			time.sleep(1)
+			return
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")

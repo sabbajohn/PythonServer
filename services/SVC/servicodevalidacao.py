@@ -18,7 +18,7 @@ import asyncio
 import aiohttp
 from aiofile import AIOFile, LineReader, Writer
 import ctypes 
-import schedule as schedule_svc
+
 #from Manager import Manager
 
 
@@ -38,31 +38,9 @@ class servicoDeValidacao(object):
 		self.contador_dispensadas = 0
 		self.contador_ViaCep = self.Manager.VIACEP_info['consultas']
 
-		
-		self.Manager.Agenda['SVC'] = schedule_svc.every(1).minutes.do(self.run).tag("SVC")
-		self.Manager.SVC_info['next_run']=  self.Manager.Agenda["SVC"].next_run
 	def start(self):
-		while True:
-				
-				
-				self.Manager.SVC_info['next_run'] = self.Manager.Agenda["SVC"].next_run
-				if self.Manager.SVC_info['stop']:
-					break
-				""" if self.Manager.Agenda['SVC'].next_run >= datetime.datetime.now() and  """
-				schedule_svc.run_pending()
-				if self.Manager.Agenda["SVC"].last_run and self.Manager.Agenda["SVC"].last_run > self.Manager.SVC_info['last_run']:
-					self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
-					self.Manager.SVC_controle.setControle(self.Manager.SVC_info,self.Manager)
-					self.Manager.SOA_controle.setControle(self.Manager.SOA_info,self.Manager)
-					self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info,self.Manager)
-					self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info,self.Manager)
-					self.Manager.SDU_controle.setControle(self.Manager.SDU_info,self.Manager)
-					self.Manager.update_info()
-				time.sleep(1)
-		return
-	def run(self):
 		
-		
+		self.Manager.SVC_info['next_run'] = self.Manager.Agenda["SVC"].next_run
 		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		executor = concurrent.futures.ThreadPoolExecutor(
 			max_workers=1,
@@ -112,7 +90,16 @@ class servicoDeValidacao(object):
 				self.Manager.Jobs['SDU'].start()
 				self.Manager.Jobs['SDU'].join()
 				self.Manager.Jobs['SDU'] = threading.Thread(target=self.Manager.DataUpdate.start, name="SDU")
-			self.Manager.SVC_info['last_run'] = datetime.datetime.now()
+			self.Manager.SDU_info['last_run'] = datetime.datetime.now()
+			self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
+			self.Manager.SVC_controle.setControle(self.Manager.SVC_info,self.Manager)
+			self.Manager.SOA_controle.setControle(self.Manager.SOA_info,self.Manager)
+			self.Manager.HUBD_controle.setControle(self.Manager.HUBD_info,self.Manager)
+			self.Manager.VIACEP_controle.setControle(self.Manager.VIACEP_info,self.Manager)
+			self.Manager.SDU_controle.setControle(self.Manager.SDU_info,self.Manager)
+			self.Manager.update_info()
+			
+			time.sleep(1)
 			return
 
 

@@ -11,7 +11,7 @@ import getpass
 from comtele_sdk.textmessage_service import TextMessageService
 import threading
 import asyncio
-import schedule as schedule_sms
+
 
 
 
@@ -21,9 +21,8 @@ class SMS(object):
 		self.Manager = M
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		self.Manager.Agenda['SMS'] = schedule_sms.every(1).minutes.do(self.db_monitor_sms).tag("SMS")
-		self.Manager.SMS_info['next_run'] = self.Manager.Agenda["SMS"].next_run
-		self.Manager.SMS_controle.setControle(self.Manager.SMS_info, self.Manager)
+		
+		
 
 	def start(self, stop):
 		
@@ -34,18 +33,17 @@ class SMS(object):
 			message.append( "Inicializando SMS")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			while True:
-				if stop():
-					break
-				schedule_sms.run_pending()
-				if self.Manager.Agenda['SMS'].last_run and self.Manager.Agenda['SMS'].last_run >self.Manager.SMS_info['last_run'] :
-					self.Manager.SMS_info['last_run'] = self.Manager.Agenda['SMS'].last_run
-					self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
-					self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
-					self.Manager.update_info()
-					
-				time.sleep(1)
-			#self.db_monitor()
+			
+			if stop():
+				return
+			self.db_monitor_sms()
+			self.Manager.SMS_info['last_run'] = self.Manager.Agenda['SMS'].last_run
+			self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
+			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
+			self.Manager.update_info()
+
+			time.sleep(1)
+			return
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")
