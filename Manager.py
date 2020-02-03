@@ -72,7 +72,7 @@ class Manager(Initialize):
 		self.SOA_controle.setControle(self.SOA_info,self)
 		self.HUBD_controle.setControle(self.HUBD_info,self)
 
-		
+	
 		#GET
 		self.SMS_info = self.SMS_controle.getControle()
 		self.SVC_info = self.SVC_controle.getControle()
@@ -169,40 +169,28 @@ class Manager(Initialize):
 					schedule.run_pending()
 					time.sleep(1)
 	 """
-	#TODO no metodo de agendamento verificar se esta agendado
+
 	
 	def SVC_f(self):
 		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
-		
-			if self.Jobs['SVC']:
-				
-				self.Jobs['SVC'].start()
-			else:
-				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-				
-				self.Jobs['SVC'].start()
+			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+			self.Jobs['SVC'].start()
 		else:
 			return
 
 	def SRC_f(self):
 		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
-	
-			if self.Jobs['SRC']:
-				self.Jobs['SRC'].start()
-			else:
-				self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
-				self.Jobs['SRC'].start()
+
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
+			self.Jobs['SRC'].start()
 		else:
 			return
 
 	def SMS_f(self):
 		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
-	
-			if self.Jobs['SMS']:
-				self.Jobs['SMS'].start()
-			else:
-				self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
-				self.Jobs['SMS'].start()
+
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
+			self.Jobs['SMS'].start()
 		else:
 			return
 	

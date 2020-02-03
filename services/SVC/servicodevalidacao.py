@@ -78,7 +78,7 @@ class servicoDeValidacao(object):
 			message.append("Encerrando serviço.")
 			self.feedback(metodo="start",status=0,message = message)
 			message = None
-			sleep(15)
+			sleep(5)
 			message = []
 			message.append("Inicializaremos a Atualização do Banco em breve.")
 			self.feedback(metodo="start",status=0,message = message)

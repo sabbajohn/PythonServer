@@ -26,7 +26,6 @@ class SMS(object):
 
 	def start(self, stop):
 		
-		
 		self.sms_files = self.Manager.Files['responses_sms']
 		try:
 			message = []
@@ -177,8 +176,7 @@ class SMS(object):
 		message.append( 'Enviando SMS a:{0}'.format(cliente[2]))
 		self.feedback(metodo="send", status =5, message = message, erro = False )
 		message = None
-		
-	
+
 		textmessage_service = TextMessageService(self.Manager.COMTELE_info['api_key'])
 		Receivers = []
 		Receivers.append(str(cliente[2]))

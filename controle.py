@@ -235,8 +235,8 @@ class API(Controle):
 						Controle.Config_ENV.set(self.tag, 'enviados',str(self.enviados))
 					
 					elif 'api_key' in key:
-						self.consultas = variavel['consultas']
-						Controle.Config_ENV.set(self.tag, 'api_key',str(self.consultas ))
+						self.api_key = variavel['api_key']
+						Controle.Config_ENV.set(self.tag, 'api_key',str(self.api_key ))
 						
 		def getControle(self,*args, **kwargst):
 			var = {
@@ -348,7 +348,7 @@ class API(Controle):
 						
 					elif 'key' in key:
 						self.key = variavel['key']
-						sControle.Config_ENV.set(self.tag, 'key',self.key )
+						Controle.Config_ENV.set(self.tag, 'key',self.key )
 					elif 'user' in key:
 						self.key = variavel['user']
 						Controle.Config_ENV.set(self.tag, 'user',self.user )
