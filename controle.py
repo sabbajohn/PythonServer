@@ -233,7 +233,7 @@ class API(Controle):
 					if 'enviados' in key:
 						self.enviados = variavel['enviados']
 						Controle.Config_ENV.set(self.tag, 'enviados',str(self.enviados))
-						return True
+					
 					elif 'api_key' in key:
 						self.consultas = variavel['consultas']
 						Controle.Config_ENV.set(self.tag, 'api_key',str(self.consultas ))
@@ -268,7 +268,7 @@ class API(Controle):
 					if 'enviados' in key:
 						self.enviados = variavel['enviados']
 						Controle.Config_ENV.set(self.tag, 'enviados',str(self.enviados))
-						return True
+						
 					elif 'api_key' in key:
 						self.api_key = variavel['api_key']
 						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
@@ -285,6 +285,7 @@ class API(Controle):
 			self.url		= Controle.Config_ENV.get(self.tag,"url")
 			self.api_key	= Controle.Config_ENV.get(self.tag,"api_key")
 			self.consultas 	= int(Controle.Config_ENV.get(self.tag,"consultas"))
+		
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
@@ -303,7 +304,6 @@ class API(Controle):
 					if 'url' in key:
 						self.url = variavel['url']
 						Controle.Config_ENV.set(self.tag, 'url',self.url )
-						return True
 					elif 'api_key' in key:
 						self.api_key = variavel['api_key']
 						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
@@ -345,7 +345,7 @@ class API(Controle):
 					if 'url' in key:
 						self.url = variavel['url']
 						Controle.Config_ENV.set(self.tag, 'url',self.url )
-						return True
+						
 					elif 'key' in key:
 						self.key = variavel['key']
 						sControle.Config_ENV.set(self.tag, 'key',self.key )
