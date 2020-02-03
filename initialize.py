@@ -72,7 +72,7 @@ class Initialize:
 		self.Files					= self.Controle.files.getControle()
 		self.servicos 				= self.Controle.servicos
 		self.database 				= DB(self)
-		self.Agenda = {}
+		self.Agenda = {"SMS":None,"SRC":None,"SVC":None}
 		self.SMS 					= SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
 		self.DataUpdate 			= DataUpdate(M)
@@ -244,3 +244,27 @@ class Initialize:
 	
 	def ExportControle(self):
 		pass
+	def SVC_f(self):
+		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
+			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+			self.Jobs['SVC'].start()
+		else:
+			return
+
+	def SRC_f(self):
+		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
+			self.Jobs['SRC'].start()
+		else:
+			return
+
+	def SMS_f(self):
+		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
+
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
+			self.Jobs['SMS'].start()
+		else:
+			return
+	
+	

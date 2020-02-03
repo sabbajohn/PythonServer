@@ -99,24 +99,21 @@ class Manager(Initialize):
 				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
 				self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
 				self.SMS_controle.setControle(self.SMS_info,self)
-				#self.Jobs['SMS'].start()
-				
+
 
 			if self.SRC_info['init'] is True:
 				self.SRC_info['init_time']=datetime.datetime.now()
 				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
 				self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
 				self.SRC_controle.setControle(self.SRC_info,self)
-				#self.Jobs['SRC'].start()
-				
+
 
 			if self.SVC_info['init'] is True:
 				self.SVC_info['init_time']=datetime.datetime.now()
 				self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
 				self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
 				self.SVC_controle.setControle(self.SVC_info,self) 
-				
-				
+
 		
 		except Exception as err:
 			if "KILL_ALL" in err.args[0]:
@@ -149,51 +146,10 @@ class Manager(Initialize):
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 			#sys.exit()
+		
 		self.update_info()
 		self.Agendados()
 
-	# TODO NÂO ESQUECER DE REVER ESSE CARA
-	""" def ValidacaoEUpdate(self):
-		
-		self.update_info()
-		self.SVC_info['init_time']=datetime.datetime.now()
-		self.SVC_controle.setControle(self.SVC_info,self) 
-		self.SDU_info['init_time']=datetime.datetime.now()
-		self.SDU_controle.setControle(self.SDU_info) 
-		schedule.every(3).minutes.do(self.inicia, "svc").tag("SVC")
-		schedule.every(3).minutes.do(self.inicia, "sdu").tag("SDU")
-		
-		
-			
-		while self.SVC_info['keepAlive'] is True:
-					schedule.run_pending()
-					time.sleep(1)
-	 """
-
-	
-	def SVC_f(self):
-		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
-			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-			self.Jobs['SVC'].start()
-		else:
-			return
-
-	def SRC_f(self):
-		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
-
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
-			self.Jobs['SRC'].start()
-		else:
-			return
-
-	def SMS_f(self):
-		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
-
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
-			self.Jobs['SMS'].start()
-		else:
-			return
-	
 	def Agendados(self):
 		while True:
 			
@@ -215,18 +171,25 @@ class Manager(Initialize):
 		if not self.Jobs['WATCH'].isAlive():
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
-		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
-			self.Jobs['SMS'].start()
-			self.SMS_controle.setControle(setting,self)
-		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
-			self.Jobs['SRC'].start()
-			self.SRC_controle.setControle(setting,self)
+		if (self.Agenda["SMS"] is None) and (self.SMS_info['keepAlive'] is True):
+			self.SMS_info['init_time']=datetime.datetime.now()
+			self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
+			self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
+			self.SMS_controle.setControle(self.SMS_info,self)
+
+		if (not self.Agenda['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+
+			self.SRC_info['init_time']=datetime.datetime.now()
+			self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+			self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
+			self.SRC_controle.setControle(self.SRC_info,self)
+
 		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
-			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-			self.Jobs['SVC'].start()
-			self.SRC_controle.setControle(setting,self)
+
+			self.SVC_info['init_time']=datetime.datetime.now()
+			self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+			self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
+			self.SVC_controle.setControle(self.SVC_info,self) 
 
 	def finaliza(self, servico):
 		setting = {
