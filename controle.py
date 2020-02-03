@@ -85,7 +85,7 @@ class Controle(object):
 				elif "env" in conf:
 					try:
 						with open("{0}/config/{1}.ini".format(Controle.Controle.Key.root,Controle.Controle.Key.env), "w+") as configfile:		
-							Controle.Config.write(configfile)
+							Controle.Config_ENV.write(configfile)
 						configfile.close()
 					except Exception as e:
 						print(type(e))
