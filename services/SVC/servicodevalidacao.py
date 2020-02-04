@@ -92,6 +92,16 @@ class servicoDeValidacao(object):
 				self.Manager.Jobs['SDU'] = threading.Thread(target=self.Manager.DataUpdate.start, name="SDU")
 			self.Manager.SDU_info['last_run'] = datetime.datetime.now()
 			self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
+			self.failsafe_tasks=[]
+			self.failsafe_cpf = []
+			self.responses = []
+			self.pendentes_f = []
+			self.result=[]	
+			
+			self.contador_failsafe = self.Manager.SOA_info['consultas']
+			self.contador_hd =self.Manager.HUBD_info['consultas']
+			self.contador_dispensadas = 0
+			self.contador_ViaCep = self.Manager.VIACEP_info['consultas']
 			self.Manager.update_info()
 			
 			time.sleep(1)
