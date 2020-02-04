@@ -118,7 +118,7 @@ class recuperacaoDeCarrinhos(object):
 			result = None
 			
 		
-			result = self.database.execute("R",self.self.Manager.SRC_info['query'])
+			result = self.database.execute("R",self.Manager.SRC_info['query'])
 		
 			if len(result)>0:
 			
