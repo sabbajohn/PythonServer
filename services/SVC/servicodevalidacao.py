@@ -131,7 +131,7 @@ class servicoDeValidacao(object):
 		lista['pendentes']={}
 		i = 0
 		for x in self.result:
-			x[3] = x[3].strip()
+			
 			if x[0]!= None and x[1]!=None:
 
 				if len(x[0]) > 11:
