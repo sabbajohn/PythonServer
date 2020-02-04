@@ -143,7 +143,7 @@ def acao(action):
 		if len(response):
 			print(response)
 			print('entrou aqui')
-	
+		menuDeServicos()
 def usage():
 	print("")
 	print("")

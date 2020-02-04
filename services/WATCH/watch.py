@@ -149,9 +149,23 @@ class Watch(object):
 			if len(response):
 				response = json.loads(response)
 				if "query_set" in response['action']:
-					self.Manager.SVC_info['query_set'] = response["value"].split(",")
+					if len(response['value']):
+						self.Manager.SVC_info['query_set'] = response["value"].split(",")
+					data = self.Manager.SVC_info
+					data['init_time'] = str(data['init_time'])
+					data['next_run'] = str(data['next_run'])
+					if data['next_run']:
+						data['next_run'] = str(data['next_run'])
+					client_socket.send(bytes(json.dumps(data).encode()))
 				elif 'query' in response['action']:
-					self.Manager.SVC_info['query_set'].append(response["value"])
+					if len (response['value'])
+						self.Manager.SVC_info['query_set'].append(response["value"])
+					data = self.Manager.SVC_info
+					data['init_time'] = str(data['init_time'])
+					data['next_run'] = str(data['next_run'])
+					if data['next_run']:
+						data['next_run'] = str(data['next_run'])
+					client_socket.send(bytes(json.dumps(data).encode()))
 				else:
 					return False
 			
