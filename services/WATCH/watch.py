@@ -158,7 +158,7 @@ class Watch(object):
 						data['next_run'] = str(data['next_run'])
 					client_socket.send(bytes(json.dumps(data).encode()))
 				elif 'query' in response['action']:
-					if len (response['value'])
+					if len (response['value']):
 						self.Manager.SVC_info['query_set'].append(response["value"])
 					data = self.Manager.SVC_info
 					data['init_time'] = str(data['init_time'])
