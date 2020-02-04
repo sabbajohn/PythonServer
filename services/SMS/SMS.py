@@ -19,22 +19,30 @@ class SMS(object):
 	
 	def __init__(self, M):
 		self.Manager = M
-		
 		self.USER = getpass.getuser()
 		self.database = self.Manager.database
-		self.sms_api = self.Manager.getControle("api")
-		self.sms_files = self.Manager.getControle("files") 
+		
+		
 
 	def start(self, stop):
 		
-		
-		
+		self.sms_files = self.Manager.Files['responses_sms']
 		try:
 			message = []
 			message.append( "Inicializando SMS")
 			self.feedback(metodo="start", status =-1, message = message, erro = False )
 			message = None
-			self.db_monitor(stop)
+			
+			if stop():
+				return
+			self.db_monitor_sms()
+			self.Manager.SMS_info['last_run'] = self.Manager.Agenda['SMS'].last_run
+			self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
+			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
+			self.Manager.update_info()
+
+			time.sleep(1)
+			return
 		except SystemExit:
 			message = []
 			message.append( "Serviço finalizado via Watcher")
@@ -50,21 +58,20 @@ class SMS(object):
 		
 	async def runNow(self):
 
-	
+		self.sms_files = self.Manager.Files['responses_sms']
 		message = []
 		message.append( "Inicializando o Monitoramento do Banco de Dados")
 		self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 		message = None
 		escreveu = False
 		#quem sabe botar isso dentro de um try
-		
+		self.Manage.update_info()
 		
 	
 		try:
 			result = None
-			query = "SELECT * FROM sms WHERE sent_at is NULL"
-		
-			result = self.database.execute("R",query)
+			
+			result = self.database.execute("R",self.Manager.SMS_info['query'])
 		
 			if len(result)>0:
 				if(escreveu == True):
@@ -102,7 +109,7 @@ class SMS(object):
 		finally:
 			return False
 	
-	def db_monitor(self,stop):
+	def db_monitor_sms(self):
 
 	
 		message = []
@@ -114,65 +121,63 @@ class SMS(object):
 		
 		
 		
-		while True:
-			if stop():
-				break
-			
-			try:
-				result = None
-				query = "SELECT * FROM sms WHERE sent_at is NULL"
-			
-				result = self.database.execute("R",query)
-			
-				if len(result)>0:
-					if(escreveu == True):
-						message = []
-						message.append( "Novo sms encontrado!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False )
-						message = None
-
+		#while True:
+		
+		
+		
+		try:
+			result = None
+			result = self.database.execute("R",self.Manager.SMS_info['query'])
+		
+			if len(result)>0:
+				if(escreveu == True):
 					message = []
-					message.append( "{0} sms's a serem enviados!".format(len(result)))
+					message.append( "Novo sms encontrado!")
 					self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 					message = None
-					
-					
-					
-					for x in result:
-						self.send(x)
-					
-					
-				else: 
-					if(escreveu == False):
-						message = []
-						message.append( "Nenhum SMS Pendente no momento!")
-						self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
-						message = None
-						escreveu= True
-					else:
-						pass
-					time.sleep(5)
-			except Exception as e:
 
 				message = []
-				message.append(type(e))
-				message.append(e)
-				self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
+				message.append( "{0} sms's a serem enviados!".format(len(result)))
+				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-			finally:
-				pass
-		sys.exit()
+				
+				
+				
+				for x in result:
+					self.send(x)
+				return
+				
+			else: 
+				if(escreveu == False):
+					message = []
+					message.append( "Nenhum SMS Pendente no momento!")
+					self.feedback(metodo="Monitor", status =5, message = message, erro = False, comments ="Tentaremos novamente em Breve!"  )
+					message = None
+					escreveu= True
+					return
+				
+				
+		except Exception as e:
+			self.Manager.update_info()
+			
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo="Monitor", status =1, message = message, erro = False, comments ="2"  )
+			message = None
+			return
+		
+		return
 
 	def send(self,cliente):
 
 		
 		message = []
 		message.append( 'Enviando SMS a:{0}'.format(cliente[2]))
-		self.feedback(metodo="send", status =5, message = message, erro = False, comments = "send" )
+		self.feedback(metodo="send", status =5, message = message, erro = False )
 		message = None
-		
-	
-		textmessage_service = TextMessageService(self.sms_api.comtele.api_key)
+
+		textmessage_service = TextMessageService(self.Manager.COMTELE_info['api_key'])
 		Receivers = []
 		Receivers.append(str(cliente[2]))
 		try:		
@@ -193,8 +198,9 @@ class SMS(object):
 			message.append( "SMS:{0}".format(result['Message']))
 			self.feedback(metodo="send", status =5, message = message, erro = False)
 			message = None
-			self.sms_api.comtele.enviados +=1
-			self.Manager.configFile()
+			self.Manager.COMTELE_info['enviados'] +=1
+			
+			
 
 			self.update(result, cliente)
 			return
@@ -207,7 +213,7 @@ class SMS(object):
 		self.feedback(metodo="update", status =5, message = message, erro = False)
 		message = None
 		try:
-			with open(self.sms_files.responses_sms, "+a") as f: #Registra solicitações
+			with open(self.sms_files, "+a") as f: #Registra solicitações
 				agora = datetime.datetime.now()
 				f.write("{0}:{1}\n".format(agora ,result))
 		except FileNotFoundError:
@@ -219,7 +225,7 @@ class SMS(object):
 			message = None
 			
 			try:
-				os.system(" touch {0}".format(self.sms_files.responses_sms) )
+				os.system(" touch {0}".format(self.sms_files) )
 				return True 
 			except Exception as e: #tenta criar se não der tudo bem ainda da pra trabalhar status 2
 				message = []
@@ -229,20 +235,21 @@ class SMS(object):
 				message = None
 				pass 
 
-		agora = datetime.datetime.now()
-		query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(agora, cliente[0])
+		
+		query = "UPDATE sms SET sent_at = '{0}' WHERE id = {1} ".format(datetime.datetime.now(), cliente[0])
 		try:
 		
 			self.database.execute("W",query, commit=True)
 		
-			return True
+			
 		except Exception as e :
 			message = []
 			message.append(type(e))
 			message.append(e)
 			self.feedback(metodo="update", status =3, message = message, erro = True, comments="Falha ao atualizar base de dados:\n{0}".format(query))
 			message = None
-			
+			return False
+		return True
 		
 				
 		
@@ -292,7 +299,7 @@ class SMS(object):
 		except:
 			feedback["comments"] = ""
 		
-		feedback['time'] = datetime.datetime.now()
+		feedback['time'] = str(datetime.datetime.now())
 		#with self._lock:
 		self.Manager.callback(feedback)
 

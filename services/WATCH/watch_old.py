@@ -14,13 +14,13 @@ import logging
 
 class Watch(object):
 	def __init__(self, M):
-	
+
 		self.Manager 		= M
 		self.controle 		= self.Manager.getControle('modulos')
 		self.controle_api	= self.Manager.getControle('api')
 		self.watch_vars		= self.Manager.getControle('watch')
-		self.services=['sms','svc','src','sdu','api','SELFDESTROY']
-		
+		self.services=['sms','svc','src','sdu','api','SELFDESTROY', 'reload']
+
 		try:
 			self.target				= self.watch_vars.addr
 		except:
@@ -29,12 +29,12 @@ class Watch(object):
 			self.port				= self.watch_vars.port
 		except:
 			self.port = 5000
-		
+
 
 		# read in the buffer from the commandline
 		# # this will block, so send CTRL-D if not sending input
 		# to stdin
-	
+
 	def start(self):
 		message = []
 		message.append("Inicializando Watcher")
@@ -42,7 +42,7 @@ class Watch(object):
 		message = None
 		self.feedback()
 		self.server_loop()
-	
+
 	def server_loop(self):
 
 		#TODO: RESTART Watch caso de falha de endereço em uso
@@ -147,13 +147,12 @@ class Watch(object):
 				message.append("Comando não contem nenhum serviço conhecido:{0}".format(cmd_buffer))
 				self.feedback(metodo="client_handler", status =5, message = message, erro = False)
 				message = None
-				self.feedback()
 				client_socket.sendall('help'.encode())
 				time.sleep(3)
 				continue
 
 	def job_info(self, service,client_socket ):
-		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'lasttimerunning':'{4}',  'nextrun':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
+		response = "'status':'{0}', 'init':'{1}', 'init_time':'{2}', 'keepAlive': '{3}',  'last_run':'{4}',  'next_run':'{5}',  'firstTime':'{6}', 'stop':'{7}' "
 		response_api="'VIACEP_CONSULTAS':'{0}', 'HUBD_CONSULTAS':'{1}', 'SOA_CONSULTAS':'{2}', 'MANDRILL_ENVIOS': '{3}',  'COMTELE_ENVIOS':'{4}'"
 		
 		service = service.rstrip()
@@ -187,7 +186,7 @@ class Watch(object):
 				self.controle.SMS.init,
 				self.controle.SMS.init_time,
 				self.controle.SMS.keepAlive,
-				self.controle.SMS.lasttimerunning,
+				self.controle.SMS.last_run,
 				self.controle.SMS.nextrun,
 				self.controle.SMS.firstTime,
 				self.controle.SMS.stop),'utf-8')
@@ -221,7 +220,7 @@ class Watch(object):
 				self.controle.SVC.init,
 				self.controle.SVC.init_time,
 				self.controle.SVC.keepAlive,
-				self.controle.SVC.lasttimerunning,
+				self.controle.SVC.last_run,
 				self.controle.SVC.nextrun,
 				self.controle.SVC.firstTime,
 				self.controle.SVC.stop),'utf-8')
@@ -242,13 +241,14 @@ class Watch(object):
 					self.Manager.inicia("sdu")
 		
 			return bytearray(response.format(self.Manager.Jobs['SDU'].isAlive(),
-			 self.controle.SDU.init,
-			 self.controle.SDU.init_time,
-			 self.controle.SDU.keepAlive,
-			 self.controle.SDU.lasttimerunning,
-			 self.controle.SDU.nextrun,
-			 self.controle.SDU.firstTime,
-			 self.controle.SDU.stop),'utf-8')
+				self.controle.SDU.init,
+				self.controle.SDU.init_time,
+				self.controle.SDU.keepAlive,
+				self.controle.SDU.last_run,
+				self.controle.SDU.nextrun,
+				self.controle.SDU.firstTime,
+				self.controle.SDU.stop),'utf-8'
+			)
 		elif 'src' in service :
 			if "mode" in service:
 				if "up" in service:
@@ -279,7 +279,7 @@ class Watch(object):
 			 self.controle.SRC.init,
 			 self.controle.SRC.init_time,
 			 self.controle.SRC.keepAlive,
-			 self.controle.SRC.lasttimerunning,
+			 self.controle.SRC.last_run,
 			 self.controle.SRC.nextrun,
 			 self.controle.SRC.firstTime,
 			 self.controle.SRC.stop),'utf-8')
@@ -352,3 +352,29 @@ class Watch(object):
 		feedback['time'] =str( datetime.datetime.now())
 
 		self.Manager.callback(feedback)
+
+	def reload(self,service = "all"):
+		message = []
+		message.append("Recarregando configurações e parametros. Modulo:{0}".format(service))
+		self.feedback(metodo="reload", status =5, message = message, erro = False)
+		message = None
+		try:
+			# Registrar Logs
+			# Pausa todo mundo, recarrega a classe Controle e re-atribui os valores
+			# para os serviços
+			self.Manager.finaliza(service)
+			self.Manager.Controle(self.Manager,service)
+			self.Manager.inicia(service)
+			message = []
+			message.append("Configurações e Parametros Recarregados:{0}".format(service))
+			self.feedback(metodo="reload", status =5, message = message, erro = False)
+			message = None
+			return True
+		except Exception as e:
+			message = []
+			message.append(type(e))
+			message.append(e)
+			self.feedback(metodo="reload", status =5, message = message, erro = False)
+			message = None
+			self.feedback()
+			return False

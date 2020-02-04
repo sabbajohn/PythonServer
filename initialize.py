@@ -16,11 +16,11 @@ import asyncio.coroutines
 import getpass
 import socket
 import config
-from services.servicodevalidacao import servicoDeValidacao
-from services.DataUpdate import DataUpdate
-from services.SMS import SMS
-from services.watch import Watch
-from services.recupecaoDeCarrinhos import recuperacaoDeCarrinhos
+from services.SVC.servicodevalidacao import servicoDeValidacao
+from services.SDU.DataUpdate import DataUpdate
+from services.SMS.SMS import SMS
+from services.WATCH.watch import Watch
+from services.SRC.recupecaoDeCarrinhos import recuperacaoDeCarrinhos
 from utils.db import DB
 from controle import Controle
 from termcolor import colored
@@ -40,23 +40,53 @@ class Initialize:
 			#stream=sys.stderr,
 		)
 		#Definindo objeto dos Serviços
-		self.Controle = Controle(self)
-		self.servicos = self.Controle.servicos
-		self.database = DB(self)
 
-		self.SMS = SMS(M)
+		self.Controle = Controle(self)
+		self.SMS_controle 			= self.Controle.servicos.SMS
+		self.SVC_controle 			= self.Controle.servicos.SVC
+		self.SDU_controle 			= self.Controle.servicos.SDU
+		self.SRC_controle 			= self.Controle.servicos.SRC
+	
+		self.SMS_info 				= self.SMS_controle.getControle()
+		self.SVC_info 				= self.SVC_controle.getControle()
+		self.SDU_info 				= self.SDU_controle.getControle()
+		self.SRC_info 				= self.SRC_controle.getControle()
+		#API
+		self.VIACEP_controle 		= self.Controle.API.viacep
+		self.MANDRILL_controle 		= self.Controle.API.mandrill
+		self.COMTELE_controle 		= self.Controle.API.comtele
+		self.SOA_controle 			= self.Controle.API.soa
+		self.HUBD_controle 			= self.Controle.API.hubd
+
+		self.VIACEP_info			= self.VIACEP_controle.getControle()
+		self.MANDRILL_info			= self.MANDRILL_controle.getControle()
+		self.COMTELE_info			= self.COMTELE_controle.getControle()
+		self.SOA_info				= self.SOA_controle.getControle()
+		self.HUBD_info				= self.HUBD_controle.getControle()
+
+		#LINK
+		self.LINK_controle 			= self.Controle.LINK
+		self.LINK_info				= self.Controle.LINK.getControle()
+		
+		
+		self.Files					= self.Controle.files.getControle()
+		self.servicos 				= self.Controle.servicos
+		self.database 				= DB(self)
+		self.Agenda 				= {"SMS":None,"SRC":None,"SVC":None}
+		self.SMS 					= SMS(M)
 		self.recuperacaoDeCarrinhos = recuperacaoDeCarrinhos(M)
-		self.DataUpdate = DataUpdate(M)
-		self.servicoDeValidacao = servicoDeValidacao(M)
-		self.Watch = Watch(M)
+		self.DataUpdate 			= DataUpdate(M)
+		self.servicoDeValidacao 	= servicoDeValidacao(M)
+		
+		self.Watch 				= Watch(M)
 
 		#Definindo objeto das API's
 		
-		self.job_sms = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
-		self.job_src = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
-		self.job_servico_de_validacao = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-		self.job_dataupdate = threading.Thread(target=self.DataUpdate.start, name="SDU")
-		self.job_watch = threading.Thread(target=self.Watch.start, name="WATCH")
+		self.job_sms 					= threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
+		self.job_src 					= threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
+		self.job_servico_de_validacao	= threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+		self.job_dataupdate 			= threading.Thread(target=self.DataUpdate.start, name="SDU")
+		self.job_watch 					= threading.Thread(target=self.Watch.start, name="WATCH")
 		# Inicializando
 
 	def __cfg(self):
@@ -79,15 +109,14 @@ class Initialize:
 				print("Não foi possivel Criar um arquivo a partir da amostra DEFAULT.ini.sample")
 				print(type(e))
 				print(e)
-			else:
-				try:
-					self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
-				except Exception as e:
-					print("Verifique o arquivo {0}/config/DEFAULT.ini".format(DIR))
-					print(type(e))
-					print(e)
-				else:
-					pass
+			
+			try:
+				self.Config.read("{0}/config/DEFAULT.ini".format(DIR))
+			except Exception as e:
+				print("Verifique o arquivo {0}/config/DEFAULT.ini".format(DIR))
+				print(type(e))
+				print(e)
+
 
 
 		try:
@@ -145,7 +174,7 @@ class Initialize:
 			print(type(e))
 			print(e)
 		try:
-			 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+			self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
 		except:
 			print("O ARQUIVO config/{0}.ini não existe.".format(self.Config.get("KEY", "env")))
 			print("Iremos cria-lo")
@@ -157,7 +186,7 @@ class Initialize:
 				print(e)
 			else: #CASO NÂO
 				try:#TENTA LÊ
-				 self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
+					self.Config_ENV.read("config/{0}.ini".format(self.Config.get("KEY", "env")))
 				except:#CASO FALHE
 					print("Verifique o arquivo {0}/config/{1}.ini".format(DIR, self.Config.get("KEY", "env")))
 					print(type(e))
@@ -178,30 +207,10 @@ class Initialize:
 			if(cenv_editado):
 				with open("config/{0}.ini".format(self.Config.get("KEY", "env")), "w+") as configfile:
 					self.Config.write(configfile)
-			""" print(colored("\nVerifique se os valores definidos estão corretos.\n", "blue"))
-			for each_section in self.Config_ENV.sections():
-				print("[{0}]".format(each_section))
-				for(each_key, each_val) in self.Config_ENV.items(each_section):
-					 print ("{0} : {1}\n".format(each_key, each_val))
-			print("Se Ok aperte S para continuar")
-
-			if "S" in input():
-
-				pass
-			else:
-				print("Você pode ajustar suas configurações manualemnte em {0}/config/".format(DIR))
-				print("Bye!")
-				sys.exit()
-			
-			
- """
 		except:
 			pass
 		
 		return
-
-
-
 
 	def todict(self,obj, classkey=None):
 		if isinstance(obj, dict):
@@ -223,33 +232,6 @@ class Initialize:
 		else:
 			return obj
 
-	def configFile(self):
-
-		contrle_dict =  self.todict(self.Controle)
-		for mod in contrle_dict:
-
-			if 'api' in mod.casefold():
-				for x in contrle_dict[mod]:
-					if any(api in  x.casefold() for api in ["comtele", "mandrill"]):
-						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"enviados",str(contrle_dict[mod][x]['enviados']))
-					else:
-						self.Config_ENV.set(contrle_dict[mod][x]['tag'],"consultas",str(contrle_dict[mod][x]['consultas']))
-		
-		with open("{0}/config/{1}.ini".format(self.Controle.Key.root,self.Controle.Key.env ), "w+") as configfile:		
-			self.Config_ENV.write(configfile)
-
-	#TODO, metodo para atualizar configurações
-	""" def setMyself(self, module):
-		modulo = self.getControle(module)
-
-		api_dict = modulo.__dict__
-		for x in api_dict:
-
-			self.Config_ENV.set(api_dict[x].tag, api_dict[x].__dict__)
-		
-		with open("{0}/config/BETA.ini".format(self.Controle.Key.root), "w+") as configfile:		
-			self.Config_ENV.write(configfile)	
- 	"""
 	def Jobs(self):
 		jobs = {
 			'SMS': self.job_sms,
@@ -260,60 +242,33 @@ class Initialize:
 		}
 		return jobs
 	
-	def getControle(self, module):
-		if "db" in module.casefold():
-			return self.Controle.DB
-		elif 'files' in module.casefold():
-			return self.Controle.files
-		elif 'api' in module.casefold():
-			return self.Controle.API
-		elif 'modulos' in module.casefold():
-			return self.Controle.servicos
-		elif 'sms' in module.casefold():
-			return self.Controle.servicos.SMS
-		elif 'svc' in module.casefold():
-			return self.Controle.servicos.SVC
-		elif 'src' in module.casefold():
-			return self.Controle.servicos.SRC
-		elif 'sdu' in module.casefold():
-			return self.Controle.servicos.SDU
-		elif 'link' in module.casefold():
-			return self.Controle.LINK
-		elif 'watch' in module.casefold():
-			return self.Controle.servicos.WATCH
-	
-			
-		self.controle	
-	
-	def setConfigFile(self, conf):
-		
-		if "DEFAULT".casefold() in conf.casefold():
-			try:
-				with open("{0}/config/DEFAULT.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config.write(configfile)
-					return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
-		
-		if "BETA".casefold() in conf.casefold():
-			try:
-				with open("{0}/config/BETA.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config_ENV.write(configfile)
-					return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
+	def ExportControle(self):
+		Result = self.todict(self.Controle)
+		with open("{0}/config/DEFAULT.ini".format(self.Controle.Controle.logs.controle_log), "w+") as controlefile:
+			controlefile.write(Result)
+		controlefile.close()
 
-		elif "PROD".casefold() in conf.casefold():
-			try:
-				
-				with open("{0}/config/PROD.ini".format(self.Config.get("KEY", "root")), "w+") as configfile:		
-					self.Config_ENV.write(configfile)
-				return True
-			except Exception as e:
-				print(type(e))
-				print(e)
-				return False
+	def SVC_f(self):
+		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
+			self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
+			self.Jobs['SVC'].start()
+		else:
+			return
+
+	def SRC_f(self):
+		if (not self.Jobs['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+
+			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.SRC_info['stop'],))
+			self.Jobs['SRC'].start()
+		else:
+			return
+
+	def SMS_f(self):
+		if (not self.Jobs['SMS'].isAlive()) and (self.SMS_info['keepAlive'] is True):
+
+			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.SMS_info['stop'],))
+			self.Jobs['SMS'].start()
+		else:
+			return
+	
+	

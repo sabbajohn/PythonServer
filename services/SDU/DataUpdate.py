@@ -17,9 +17,9 @@ class DataUpdate(object):
 	def __init__(self, M):
 		self.Manager = M
 		self.database = self.Manager.database
-		self.sdu_files = self.Manager.getControle("files")
-		self.sdu_servico = self.Manager.getControle("sdu")
-
+		self.sdu_files = self.Manager.Files['query']
+		
+		
 	def QueryRunner(self, database):
 		n_updates = 0
 		rest = 0
@@ -28,7 +28,7 @@ class DataUpdate(object):
 		message.append("Procurando Por Arquivo de Querys.")
 		self.feedback(metodo ='start', status =5, message=message, erro = False)
 		message = None
-		fname = self.sdu_files.query
+		fname = self.sdu_files
 		if os.path.isfile(fname):
 			infile = open(fname, 'r').readlines()
 			if ( not len(infile)>0):
@@ -41,6 +41,7 @@ class DataUpdate(object):
 				line = line.replace('\n','')
 				try:
 					if(rest == 30):
+						message = []
 						rest = 0
 						message = []
 						message.append("Standy by 1s")
@@ -70,7 +71,7 @@ class DataUpdate(object):
 		else:
 			message = []
 			message.append("Arquivo query não encontrado!")
-			message.append("Verificar Diretorio: {0}".format(self.sdu_files.query))
+			message.append("Verificar Diretorio: {0}".format(self.sdu_files))
 			self.feedback(metodo ='start', status =1, message=message, erro = True) #Arquivo de Query vazio....
 			message = None
 			return 0
@@ -80,9 +81,9 @@ class DataUpdate(object):
 
 	def start(self):
 		
-		self._lock =threading.Lock()
-		self._stop_event = threading.Event()
-		self.USER =getpass.getuser()
+
+		setting = {"last_run":datetime.datetime.now()}
+		self.Manager.SDU_controle.setControle(setting,self.Manager)
 		message = []
 		message.append("Inicializando serviço  de Atualização da Base de Dados")
 		self.feedback(metodo ='start', status =-1, message=message, erro = False)
@@ -98,21 +99,20 @@ class DataUpdate(object):
 		self.feedback(metodo ='list_generator', status =0, message=message, erro = False)
 		message = None
 		
-	
-	
-
 		agora = datetime.datetime.now()
 		if result > 0:
 			try:
+				
+				os.system("mv {0} {1}/queries/query_old-{2}.txt".format(self.sdu_files, self.Manager.Controle.Key.root, str(datetime.datetime.now()).replace(' ','')))
+				os.system("touch {0}".format(self.sdu_files))
 
-				os.system("mv {0} {1}/queries/query_old-".format(self.sdu_files.query, self.Manager.Controle.Key.root)+str(agora.hour)+":"+str(agora.minute)+".txt ")
-				os.system("touch {0}".format(self.sdu_files.query))
 			except Exception as e:
 				message = []
 				message.append("Falha ao mover arquivos query")
-
 				self.feedback(metodo ='list_generator', status =4, message=message, erro = False, comments= "Executou as inserções, mas não criou arquivo de query para proximo turno e nem logs")
 				message = None
+				
+			return
 		return 
 		
 		
@@ -164,7 +164,7 @@ class DataUpdate(object):
 			feedback["comments"] = ""
 		
 		feedback['time'] =str(datetime.datetime.now())
-		#with self._lock:
+	
 		self.Manager.callback(feedback)
 
 	def get_id(self): 

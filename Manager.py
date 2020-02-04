@@ -17,6 +17,8 @@ import logging
 from comtele_sdk.textmessage_service import TextMessageService
 from initialize import Initialize
 from termcolor import colored
+import schedule
+
 
 
 class Manager(Initialize):
@@ -40,10 +42,7 @@ class Manager(Initialize):
 	# 	}
 	#
 	
-	def __init__(self):
-		time.time() 
-		
-		
+	def __init__(self): 
 		try:
 			super().__init__(self)
 	
@@ -54,27 +53,68 @@ class Manager(Initialize):
 		
 		log = logging.getLogger('Modulo de Gerenciamento')
 		self.Jobs = super().Jobs()
-		self.inicializando(self.Controle.servicos)#So precisa de modulos, so vai modulos!
-	
-	def inicializando(self, modulos):
+		#Serviços
 		
+		
+
+		self.inicializando()#So precisa de modulos, so vai modulos!
+	
+	def update_info(self):
+		#SET
+		self.SMS_controle.setControle(self.SMS_info,self)
+		self.SVC_controle.setControle(self.SVC_info,self)
+		self.SDU_controle.setControle(self.SDU_info,self)
+		self.SRC_controle.setControle(self.SRC_info,self)
+		
+		self.VIACEP_controle.setControle(self.VIACEP_info,self)
+		self.MANDRILL_controle.setControle(self.MANDRILL_info,self)
+		self.COMTELE_controle.setControle(self.COMTELE_info,self)
+		self.SOA_controle.setControle(self.SOA_info,self)
+		self.HUBD_controle.setControle(self.HUBD_info,self)
+
+	
+		#GET
+		self.SMS_info = self.SMS_controle.getControle()
+		self.SVC_info = self.SVC_controle.getControle()
+		self.SDU_info = self.SDU_controle.getControle()
+		self.SRC_info = self.SRC_controle.getControle()
+
+		self.VIACEP_info		= self.VIACEP_controle.getControle()
+		self.MANDRILL_info		= self.MANDRILL_controle.getControle()
+		self.COMTELE_info		= self.COMTELE_controle.getControle()
+		self.SOA_info			= self.SOA_controle.getControle()
+		self.HUBD_info			= self.HUBD_controle.getControle()
+
+		self.LINK_info			= self.Controle.LINK.getControle()
+		self.Controle.writeConfigFile(self)
+		return
+	
+	def inicializando(self):
+		self.update_info()
 		try:
 			self.Jobs['WATCH'].start()
 			
-			if modulos.SMS.init is True:
-				self.Jobs['SMS'].start()
-				modulos.SMS.init_time =datetime.datetime.now()
-				
-			
-			if modulos.SRC.init is True:
-				self.Jobs['SRC'].start()
-				modulos.SRC.init_time = datetime.datetime.now()
-				
-				
-			if modulos.SVC.init is True:
-				self.ValidacaoEUpdate(self.Controle.servicos.SVC, self.Controle.servicos.SDU)
+			if self.SMS_info["init"] is True:
+				self.SMS_info['init_time']=datetime.datetime.now()
+				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
+				self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
+				self.SMS_controle.setControle(self.SMS_info,self)
 
 
+			if self.SRC_info['init'] is True:
+				self.SRC_info['init_time']=datetime.datetime.now()
+				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+				self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
+				self.SRC_controle.setControle(self.SRC_info,self)
+
+
+			if self.SVC_info['init'] is True:
+				self.SVC_info['init_time']=datetime.datetime.now()
+				self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+				self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
+				self.SVC_controle.setControle(self.SVC_info,self) 
+
+		
 		except Exception as err:
 			if "KILL_ALL" in err.args[0]:
 				
@@ -106,490 +146,212 @@ class Manager(Initialize):
 			#Quando a função lança uma exception o fluxo volta para ca
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 			#sys.exit()
-
-	def ValidacaoEUpdate(self, SVC_c, SDU_c):
 		
-			while SVC_c.keepAlive is True:
-				if SVC_c.firstTime:
-						SVC_c.init_time =datetime.datetime.now()
-						
-						self.Jobs['SVC'].start()
-						SVC_c.firstTime= False
-						self.Jobs['SVC'].join()
-						SVC_c.lasttimerunning = datetime.datetime.now()
-						if not self.Jobs['SVC'].isAlive():
-							try:
-								if SDU_c.init is True:
-									SDU_c.init_time = datetime.datetime.now()
-									self.Jobs['SDU'].start()
-									self.Jobs['SDU'].join() #Quando a função termina com return o fluxo volta para o join 
-									SDU_c.lasttimerunning = datetime.datetime.now()
-									sleep(SVC_c.delay)
-							except SystemExit:
-								pass
-							except not SystemExit:
-								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
-				elif (time.time() - datetime.datetime.timestamp(SVC_c.lasttimerunning))>(SVC_c.delay):
-					if ( SVC_c.keepAlive is True) and (not self.Jobs['SVC'].isAlive()):
-						
-						self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-						SVC_c.init_time =datetime.datetime.now()
-						self.Jobs['SVC'].start()
-						self.Jobs['SVC'].join()
-						SVC_c.lasttimerunning = datetime.datetime.now()
-						if( not self.Jobs['SDU'].isAlive()) and (SDU_c.keepAlive is True):
-							try:
-								self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-								SVC_c.init_time = datetime.datetime.now()
-								self.Jobs['SDU'].start()
-								self.Jobs['SDU'].join()
-								SVC_c.lasttimerunning = datetime.datetime.now()
-								SVC_c.nextrun = datetime.datetime.fromtimestamp(time.time()+SVC_c.delay)
-								sleep(SVC_c.delay)
-							except SystemExit:
-								pass
-							except not SystemExit:
-								print("Oops!{0} occured -- VEU :148.".format(sys.exc_info()))
+		self.update_info()
+		self.Agendados()
 
+	def Agendados(self):
+		while True:
+			
+			if  self.SVC_info['stop']:
+				schedule.clear('SVC')
+			elif  self.SRC_info['stop']:
+				schedule.clear('SRC')
+			elif  self.SMS_info['stop']:
+				schedule.clear('SMS')
+			elif self.SVC_info['stop'] and self.SRC_info['stop'] and self.SMS_info['stop']:
+				schedule.clear()
+				break
+			schedule.run_pending()
+		return
+	
 	def verifica(self):
+		self.update_info()
+		setting ={'init_time': datetime.datetime.now()}
 		if not self.Jobs['WATCH'].isAlive():
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
-		if (not self.Jobs['SMS'].isAlive()) and (self.Controle.servicos.SMS.keepAlive is True):
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS",args=(lambda:self.Controle.servicos.SMS.stop,))
-			self.Jobs['SMS'].start()
-			self.Controle.servicos.SMS.init_time =datetime.datetime.now()
-		if (not self.Jobs['SRC'].isAlive()) and (self.Controle.servicos.SRC.keepAlive is True):
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC",args=(lambda:self.Controle.servicos.SRC.stop,))
-			self.Jobs['SRC'].start()
-			self.Controle.servicos.SRC.init_time = datetime.datetime.now()
-	
-	def finaliza(self, servico):
-		if "sdu" in servico:
-			if self.Jobs['SDU'].isAlive():
-				self.Controle.servicos.SDU.keepAlive=False
-				self.Controle.servicos.SDU.stop=True
-				self.Jobs["SDU"].raise_exception()
-			else:
-				self.Controle.servicos.SDU.keepAlive=False
-				self.Controle.servicos.SDU.stop=True
+		if (self.Agenda["SMS"] is None) and (self.SMS_info['keepAlive'] is True):
+			self.SMS_info['init_time']=datetime.datetime.now()
+			self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
+			self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
+			self.SMS_controle.setControle(self.SMS_info,self)
 
-		if "svc" in servico:
+		if (not self.Agenda['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+
+			self.SRC_info['init_time']=datetime.datetime.now()
+			self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+			self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
+			self.SRC_controle.setControle(self.SRC_info,self)
+
+		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
+
+			self.SVC_info['init_time']=datetime.datetime.now()
+			self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+			self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
+			self.SVC_controle.setControle(self.SVC_info,self) 
+
+	def finaliza(self, servico):
+		setting = {
+			'stop':True,
+			'keepAlive:': False
+		}
+		if "SDU" in servico:
+			self.SDU_controle.setControle(setting,self)
+			self.update_info()
+			if self.Jobs['SDU'].isAlive():
+				self.Jobs["SDU"].raise_exception()
+				
+
+		elif "SVC" in servico:
+			self.SVC_controle.setControle(setting,self)
+			self.update_info()
 			if self.Jobs['SVC'].isAlive():
-				self.Controle.servicos.SDU.keepAlive=False
-				self.Controle.servicos.SDU.stop=True
 				self.Jobs["SVC"].raise_exception()
-			else:
-				self.Controle.servicos.SDU.keepAlive=False
-				self.Controle.servicos.SDU.stop=True
-		if "sms" in servico:
+			
+		elif "SMS" in servico:
 		
-			self.Controle.servicos.SMS.keepAlive=False
-			self.Controle.servicos.SMS.stop=True
+			self.SMS_controle.setControle(setting,self)
+			self.update_info()
 
 				
-		if "src" in servico:
-			self.Controle.servicos.SRC.keepAlive=False
-			self.Controle.servicos.SRC.stop=True
+		elif "SRC" in servico:
+			self.SRC_controle.setControle(setting,self)
+			self.update_info()
+		
+		elif "ALL" in servico:
+			if self.Jobs['SVC'].isAlive():
+				self.Jobs["SVC"].raise_exception()
+			if self.Jobs['SDU'].isAlive():
+				self.Jobs["SDU"].raise_exception()
+
+			self.SVC_controle.setControle(setting,self)
+			self.SDU_controle.setControle(setting,self)
+			self.SMS_controle.setControle(setting,self)
+			self.SRC_controle.setControle(setting,self)
+			self.update_info()
 
 	def run(self,s):
-		if "src" in s:
+		if "SRC" in s:
 			loop = asyncio.new_event_loop()
 			return_value = loop.run_until_complete(self.recuperacaoDeCarrinhos.runNow())
 		
 			return return_value
-		if "sms" in s:
+		if "SMS" in s:
 			loop = asyncio.new_event_loop()
 			return_value = loop.run_until_complete(self.SMS.runNow())
 			return return_value
+		
+		if "SDU" in s:
+			self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
+			self.Jobs['SDU'].start()
+		else :
+			return False
 
 	def inicia(self, servico):
-		if "sdu" in servico:
-			if self.Controle.servicos.SDU.firstTime:
-				self.Controle.servicos.SDU.init_time =datetime.datetime.now()
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
-				self.Controle.servicos.SDU.keepAlive=True
-				self.Controle.servicos.SDU.stop=False
-				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-				self.Jobs['SDU'].start()
-			else:
-				
-				
-				self.Controle.servicos.SDU.keepAlive=True
-				self.Controle.servicos.SDU.stop=False
-				self.Jobs['SDU'] = threading.Thread(target=self.DataUpdate.start, name="SDU")
-				self.Jobs['SDU'].start()
-
+		setting = {
+			'stop':False,
+			'keepAlive:': True
+		}
 		if "svc" in servico:
-			if self.Controle.servicos.SVC.firstTime:
-					self.Controle.servicos.SVC.init_time =datetime.datetime.now()
-					self.Controle.servicos.SVC.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
-					self.Controle.servicos.SVC.keepAlive=True
-					self.Controle.servicos.SVC.stop=False
-					self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-					self.Jobs['SVC'].start()
-			else:
-				self.Controle.servicos.SDU.nextrun=datetime.datetime.fromtimestamp(time.time()+self.Controle.servicos.SVC.delay)
-				self.Controle.servicos.SVC.keepAlive=True
-				self.Controle.servicos.SVC.stop=False
-				self.Jobs['SVC'] = threading.Thread(target=self.servicoDeValidacao.start, name="SVC")
-				self.Jobs['SVC'].start()
-		if "sms" in servico:
-			self.Controle.servicos.SMS.keepAlive=True
-			self.Controle.servicos.SMS.stop=False
-			self.Jobs['SMS'] = threading.Thread(target=self.SMS.start, name="SMS", args=(lambda:self.Controle.servicos.SMS.stop,))
-			self.Jobs['SMS'].start()
-		if "src" in servico:
-			self.Controle.servicos.SRC.keepAlive=True
-			self.Controle.servicos.SRC.stop=False
-			self.Jobs['SRC'] = threading.Thread(target=self.recuperacaoDeCarrinhos.start, name="SRC", args=(lambda:self.Controle.servicos.SRC.stop,))
-			self.Jobs['SRC'].start()
+			
+			self.SVC_controle.setControle(setting,self)
+			self.verifica()
+		elif "sms" in servico:
+			self.SMS_controle.setControle(setting,self)
+			
+			self.verifica()
 
-	# SE vou tratar todo mundo igual porque tantons casos?
-	# Verificar a prioridade entres os serviçoes e se havera tratativas diferentes 
-	# entre os serviços
+		elif "src" in servico:
+			self.SRC_controle.setControle(setting,self)
+		
+			self.verifica()
+
+		elif "all" in servico:
+			self.SVC_controle.setControle(setting,self)
+			
+
+			self.SMS_controle.setControle(setting,self)
+			
+			
+			self.SRC_controle.setControle(setting),self
+			
+			self.inicializando()
+
 	def callback(self,e):
 		
-		if e['class'] == 'SMS':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		elif e['class'] == 'recuperacaoDeCarrinhos':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		elif e['class'] == 'servicoDeValidacao':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-				return 
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptionse(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-			
-		elif e['class'] == 'DataUpdate':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-				return
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		#DAS API'S	
-		elif e['class'] == 'Server':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-				self.Kill()
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		elif e['class'] == 'MockServer':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		
-
-		#DOS MODULOS
-		elif e['class'] == 'CPF':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		elif e['class'] == 'DB':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
-		elif e['class'] == 'Relatorios':
-			if e['status']== -1:
-				self.Logs(e)
-			elif e['status']== 0:
-				self.Logs(e)
-			elif e['status']== 1:
-				self.Exceptions(e)
-			elif e['status']== 2:
-				self.Exceptions(e)
-			elif e['status']== 3:
-				self.Exceptions(e)
-			elif e['status']== 4:
-				self.Exceptions(e)
-			elif e['status']== 5:
-				self.Logs(e)
-			pass
+		if any(status in str(e['status']) for status in ['1','2','3','4'] ) and not str(e['status']) =='-1':
+			self.Exceptions(e)
+		else:
+			self.Logs(e)
 
 	def Exceptions(self, e):
+		self.update_info()
 		""" TODO: 
 		! revisar erros e execeções!
 		"""
-		
 		#DOS SERVIÇOS
-		if e['class'] == 'SMS':	
-			if e['status']== 1:
-				e["Controle"]=self.Controle.servicos.SMS.__dict__
-				self.Controle.servicos.SMS.keepAlive = False
-				self.Controle.servicos.SMS.stop = True
-				self.Logs(e)
+		if 'SMS' in e['class']:	
+			e["Controle"]=self.SMS_info
+			self.SMS_info['keepAlive'] = False
+			self.SMS_info['stop'] = True
+			self.SMS_controle.setControle(self.SMS_info,self)
+			self.Logs(e)
+			
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('sms')
+			else:
+				self.Logs(e)
 
-			elif e['status']== 2:
 			
-				self.Logs(e)
-				
-				
-			elif e['status']== 3:
-				e["Controle"]=self.Controle.servicos.SMS.__dict__
-				self.Controle.servicos.SMS.keepAlive = False
-				self.Controle.servicos.SMS.stop = True
-				self.Logs(e)
-				self.Notificar(e)
-				self.finaliza('sms')
-				sys.exit()
-			elif e['status']== 4:
-				e["Controle"]=self.Controle.servicos.SMS.__dict__
-				self.Controle.servicos.SMS.keepAlive = False
-				self.Controle.servicos.SMS.stop = True
-				self.Logs(e)
-				self.finaliza('sms')
-				
-				
-			pass
-		elif e['class'] == 'recuperacaoDeCarrinhos':
+		elif 'recuperacaoDeCarrinhos' in e['class']  :
 
-			if e['status']== 1:
-				e["Controle"]=self.Controle.servicos.SRC.__dict__
-				self.Controle.servicos.SRC.keepAlive = False
-				self.Logs(e)
+			e["Controle"]=self.SRC_info
+			self.SRC_info['keepAlive'] = False
+			self.SRC_info['stop'] = True
+			self.SRC_controle.setControle(self.SRC_info,self)
+			self.Logs(e)
+			
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('src')
-				
+			else:
+				self.Logs(e)
 
-			elif e['status']== 2:
+		elif 'servicoDeValidacao' in e['class'] :
+			e["Controle"]=self.SVC_info
+			self.SVC_info['keepAlive'] = False
+			self.SVC_info['stop'] = True
+			self.SVC_controle.setControle(self.SVC_info,self)
+			self.Logs(e)
+			
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
+				self.Notificar(e)
+				self.finaliza('svc')
+			else:
 				self.Logs(e)
-				
-			elif e['status']== 3:
-				self.Controle.servicos.SRC.keepAlive = False
-				e["Controle"]=self.Controle.servicos.SRC.__dict__
+
+		elif 'DataUpdate' in e['class']:
+			e["Controle"]=self.SDU_info
+			self.SDU_info['keepAlive'] = False
+			self.SDU_info['stop'] = True
+			self.SDU_controle.setControle(self.SDU_info,self)
+			self.Logs(e)
+			
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
+				self.Notificar(e)
+				self.finaliza('sdu')
+			else:
 				self.Logs(e)
+
+		elif 'DB' in e['class'] :
+			self.Logs(e)
+			if  any(status in str(e['status']) for status in ['1','3','4'] ) and not str(e['status']) =='-1':
 				self.Notificar(e)
 				self.finaliza('src')
-				sys.exit()
-
-			elif e['status']== 4:
-				self.Controle.servicos.SRC.keepAlive = False
-				e["Controle"]=self.Controle.servicos.SRC.__dict__
+			else:
 				self.Logs(e)
-				self.finaliza('src')
-				
-				
-			pass
-		elif e['class'] == 'servicoDeValidacao':
-			if e['status']== 1:
-				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.Controle.servicos.SVC.__dict__
-				self.Logs(e)
-				self.Notificar(e)
-				self.finaliza("svc")
-				
-			elif e['status']== 2:
-				self.Logs(e)
-			
-			elif e['status']== 3:
-				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.Controle.servicos.SVC.__dict__
-				self.Logs(e)
-				self.Notificar(e)
-				self.finaliza("svc")
-				sys.exit()
-				
-			elif e['status']== 4:
-				self.Controle.servicos.SVC.keepAlive = False
-				e["Controle"]=self.Controle.servicos.SVC.__dict__
-				self.Logs(e)
-				self.finaliza("svc")
-				
-			pass
-		elif e['class'] == 'DataUpdate':
-			if e['status']== 1:
-				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=	self.Controle.servicos.SDU.__dict__
-				self.Logs(e)
-				self.Notificar(e)
-				self.finaliza("sdu")
-
-				
-			elif e['status']== 2:
-				self.Logs(e)
-			
-			elif e['status']== 3:
-				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=	self.Controle.servicos.SDU.__dict__
-				self.Logs(e)
-				self.Notificar(e)
-				self.finaliza("sdu")
-				sys.exit()
-			
-			elif e['status']== 4:
-				self.Controle.servicos.SDU.keepAlive = False
-				e["Controle"]=	self.Controle.servicos.SDU.__dict__
-				self.Logs(e)
-				self.finaliza("sdu")
-
-				
-			pass
-
-		#DAS API'S	
-		elif e['class'] == 'Server':
-			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.Logs(e)
-			elif e['status']== 3:
-				self.Logs(e)
-			elif e['status']== 4:
-				self.Logs(e)
-				
-			pass
-		elif e['class'] == 'MockServer':
-			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.Logs(e)
-			elif e['status']== 3:
-				self.Logs(e)
-			elif e['status']== 4:
-				self.Logs(e)
-			
-			pass
-		
-
-		#DOS MODULOS
-		elif e['class'] == 'CPF':
-			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.Logs(e)
-			elif e['status']== 3:
-				self.Logs(e)
-			elif e['status']== 4:
-				self.Logs(e)
-				
-			pass
-		elif e['class'] == 'DB':
-			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
-
-			elif e['status']== 3:
-				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
-			elif e['status']== 4:
-				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
-			pass
-		elif e['class'] == 'Relatorios':
-			if e['status']== 1:
-				self.Logs(e)
-			elif e['status']== 2:
-				self.Logs(e)
-			elif e['status']== 3:
-				self.Logs(e)
-			elif e['status']== 4:
-				self.Logs(e)
-				self.Notificar(e)
-				sys.exit()
-			pass
 
 	def Logs(self, e):
 		e["ENV"] = self.Controle.Key.env
@@ -601,6 +363,7 @@ class Manager(Initialize):
 			log.info(" {0} ".format(e['comments']))
 
 	def Notificar(self, e):
+		Comtele = self.Controle.API.comtele.getControle()
 		e["AMBIENTE"]= self.Controle.Key.env
 		administradores = [
 			'47997619694',
@@ -613,8 +376,8 @@ class Manager(Initialize):
 		log.info( '{0}[!]Notificando Administradores!'.format(datetime.datetime.now()))
 		log.info(e)
 		
-		__api_key = '3aa20522-7c0a-4562-b25d-70ffc3f27f8e'
-		textmessage_service = TextMessageService(__api_key)
+		
+		textmessage_service = TextMessageService(Comtele['api_key'])
 		
 		
 		try:
@@ -625,13 +388,7 @@ class Manager(Initialize):
 			log.info( '{0}[!!!]{1}'.format(datetime.datetime.now(),e))
 			
 		return
-			
-		
 
-
-	
 if __name__ == "__main__":
 	pass
 	M = Manager()
-	
-	

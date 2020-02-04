@@ -9,7 +9,7 @@ What is this repository for?
         Encaminhamento de SMS (SMS)
         Recuperação de Carrinhos Abandonados (SRC)
 
-    Version 4.01
+    Version 4.01b
     Learn Markdown
 
 How do I get set up?
@@ -36,7 +36,7 @@ Contribution guidelines
 		- status 3 Encerrar serviço ou tentar conectar novamente com BD?!
 
 	 WATCH e CWATCH 
-		 - Poder setar configurações de Query e Delay atraves do cwhatch,
+		 - Poder setar configurações de Query e Delay atraves do cwatch,
 		 - Status geral do sistemas
 		 - Ultimos Registros
 	
@@ -45,7 +45,8 @@ Contribution guidelines
 	Implementar Deploy e Mecanismo de Balanceamento
 		- utilizar modulo Chapter 7 como base
 	Desenvolver Interface gráfica para modulo cwatch.py
-   
+    
+    Assegurar que independente do erro o Manager jamais se encerre, assim como o WATCH, para garantir que os serviços possam ser gerenciados via cwatch, e reinicializados caso necessário.
 
 Who do I talk to?
 
