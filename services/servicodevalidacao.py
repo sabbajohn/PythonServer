@@ -190,7 +190,7 @@ class servicoDeValidacao(object):
 						try:
 							r = item2['result']['numero_de_cpf']
 							if r:
-								item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace(caracteres,'')
+								item2['result']['numero_de_cpf'] = item2['result']['numero_de_cpf'].replace('-','').replace('.','')
 						except :
 							pass
 
@@ -441,7 +441,7 @@ class servicoDeValidacao(object):
 		lista['pendentes']={}
 		i = 0
 		for x in self.result:
-
+			x[3] = x[3].strip()
 			if x[0]!= None and x[1]!=None:
 				
 					
