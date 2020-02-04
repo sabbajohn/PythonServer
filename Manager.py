@@ -110,7 +110,7 @@ class Manager(Initialize):
 
 			if self.SVC_info['init'] is True:
 				self.SVC_info['init_time']=datetime.datetime.now()
-				self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+				self.Agenda['SVC'] = schedule.every(5).minutes.do(self.SVC_f).tag("SVC")
 				self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
 				self.SVC_controle.setControle(self.SVC_info,self) 
 
