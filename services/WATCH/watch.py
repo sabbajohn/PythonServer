@@ -71,19 +71,19 @@ class Watch(object):
 		while True:
 				
 			# show a simple prompt
-			try:	
-				client_socket.send(bytes('SERVICES:#> ','utf-8'))
+			""" try:	
+				#client_socket.send(bytes('SERVICES:#> ','utf-8'))
 			except BrokenPipeError:
 				return
-
+ """
 			# now we receive until we see a linefeed (enter key)
 			cmd_buffer = ""
 			while "\n" not in cmd_buffer:
 				try:
 					cmd_buffer += str(client_socket.recv(4096),encoding="utf-8").rstrip()
 					if len(cmd_buffer):
-						buffer = json.loads(cmd_buffer,client_socket)
-						r = self.buffer_recv(buffer)
+						buffer = json.loads(cmd_buffer)
+						r = self.buffer_recv(buffer,client_socket)
 						if(r):
 							client_socket.send(bytes(json.dumps(r).encode()))
 							cmd_buffer = ''
@@ -111,7 +111,7 @@ class Watch(object):
 					
 				continue
 
-	def buffer_recv(self, buffer):
+	def buffer_recv(self, buffer,client_socket):
 		servico = buffer['servico']
 		action = buffer['action']
 		if "parar" in action:
@@ -122,10 +122,6 @@ class Watch(object):
 			self.Manager.run(servico)
 		elif "info":
 			if 'SMS' in servico:	
-				self.Manager.SMS_info['init_time'] =str(self.Manager.SMS_info['init_time']) 
-				if self.Manager.SMS_info['last_run'] :
-					self.Manager.SMS_info['last_time'] =str(self.Manager.SMS_info['last_run']) 
-				self.Manager.SMS_info['next_run'] =str(self.Manager.SMS_info['next_run']) 
 				return self.Manager.SMS_info
 			elif 'SRC' in servico:
 				return self.Manager.SRC_info

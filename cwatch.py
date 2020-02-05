@@ -71,8 +71,18 @@ def client_sender(buffer):
 			
 
 
-def formata(parameter_list):
-	pass
+def formata(r):
+	if r:
+		response = json.loads(r)
+		keys = response.keys()
+		for key in keys:
+			if (key == "query_set" or key == "query") and "SVC" in servico:
+				print(colored("{}:".format(key), "green"))
+				for i,x in enumerate(response[key]):
+					print(colored("	{}:".format(i), "green"),colored("{}".format(x), "yellow"))
+			
+			else:
+				print(colored("{}:".format(key), "green"),colored("{}".format(response[key]), "yellow"))
 
 def query_svc():
 	data = {
@@ -141,9 +151,11 @@ def acao(action):
 				if recv_len < 4096:
 						break
 		if len(response):
-			print(response)
+			formata(response)
 			print('entrou aqui')
-		menuDeServicos()
+			menuDeServicos()
+		else:
+			menuDeServicos()
 def usage():
 	print("")
 	print("")
@@ -161,16 +173,16 @@ def menuDeServicos():
 	global servico_msg
 	global servico
 	print(colored("{0}:".format(servico_msg), "blue"))
-	print(colored("1) Informações","cyan") )
-	print(colored("2) Agendar Inicialização","cyan") )
-	print(colored("3) Parar","cyan") )
+	print(colored("1) 	Informações","cyan") )
+	print(colored("2) 	Agendar Inicialização","cyan") )
+	print(colored("3) 	Parar","cyan") )
 	if "SVC" in servico:
-		print(colored("4)Define Querys a serem executadas","cyan") )		
+		print(colored("4)	Define Querys a serem executadas","cyan") )		
 	else:
-		print(colored("4) Executar Agora","cyan") )
-	print(colored("5) Recarregar","cyan") )	
-	print(colored("00)Voltar para Menu Principal","cyan") )
-	print(colored("0) Exit","cyan"))
+		print(colored("4)	Executar Agora","cyan") )
+	print(colored("5)	Recarregar","cyan") )	
+	print(colored("00)	Voltar para Menu Principal","cyan") )
+	print(colored("0)	Exit","cyan"))
 	print('\n')
 	print(colored("{}:#>".format(servico),"green"))
 	buffer = input('')
@@ -200,13 +212,13 @@ def Menu():
 	global servico_msg
 	global servico
 	print(colored("Selecione um serviço:", "green"))
-	print(colored("1) -  SMS","cyan") )
-	print(colored("2) -  SVC","cyan") )
-	print(colored("3) -  SDU","cyan") )
-	print(colored("4) -  SRC","cyan") )
-	print(colored("5) -  Reload","yellow"))
-	print(colored("6) -  Stop ALL","red"))
-	print(colored("0) -  Exit","cyan"))
+	print(colored("1)", 'green' ),colored(" -  SMS","cyan") )
+	print(colored("2)", 'green' ),colored(" -  SVC","cyan") )
+	print(colored("3)", 'green' ),colored(" -  SDU","cyan") )
+	print(colored("4)", 'green' ),colored(" -  SRC","cyan") )
+	print(colored("5)", 'green' ),colored(" -  Reload","yellow"))
+	print(colored("6)", 'green' ),colored(" -  Stop ALL","red"))
+	print(colored("0)", 'green' ),colored(" -  Exit","cyan"))
 	print('\n')
 	print(colored("SERVICES:#>"))
 	buffer = input('')
