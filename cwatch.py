@@ -83,6 +83,7 @@ def formata(r):
 			
 			else:
 				print(colored("{}:".format(key), "green"),colored("{}".format(response[key]), "yellow"))
+		return
 
 def query_svc():
 	data = {
@@ -90,19 +91,27 @@ def query_svc():
 		"action"	: "query_list"
 	}
 	client.send(bytes(json.dumps(data).encode()))
-	while recv_len:
-		data	 = str(client.recv(4096),encoding="utf-8").rstrip()
-		recv_len = len(data)
-		response+= data
+	while True:
+						
+		# now wait for data back
+		recv_len = 1
+		response = ""
 		
-		if recv_len < 4096:
-				break
+		while recv_len:
+				data	 = str(client.recv(4096),encoding="utf-8").rstrip()
+				recv_len = len(data)
+				response+= data
+				
+				if recv_len < 4096:
+						break
 		if len(response):
+			response = json.loads(response)
 			keys = response.keys()
 		for key in keys:
-			print(colored("{}".format(key), "blue"))
+			print(colored("{}".format(key), "green"))
 			for i, x in enumerate(response[key]):
-				print(colored("{}:{}".format(i,x), "green"))
+				print(colored("	{}:{}".format(i,x), "yellow"))
+		break
 	print(colored("Querys SVC", "blue"))
 	print(colored("1) Definir Querys a serem executadas","cyan") )
 	print(colored("2) Adcionar nova Query","cyan") )
@@ -110,25 +119,32 @@ def query_svc():
 	print(colored("00) Voltar ao Menu Principal","cyan") )
 	buffer = input('')
 	if "1" in buffer:
+		print(colored("Defina quais querys deverão ser executadas separadas por virgula:", "blue"))
 		value = input('')
 		data = {
 		"servico"	: servico,
 		"action"	: "query_set",
 		"value"		: value
 	}
+		 
 		client.send(bytes(json.dumps(data).encode()))
+		acao('info')
 	elif "2" in buffer:
+		print(colored("Entre a Query a ser adicionada:", "blue"))
+		print(colored("Cuidado! Querys mal formadas podem gerar erros:", "red"))
 		value = input('')
 		data = {
 		"servico"	: servico,
 		"action"	: "query_add",
 		"value"		: value
 	}
+	
 		client.send(bytes(json.dumps(data).encode()))
+		acao('info')
 	elif "3" in buffer:
-		pass
-	elif "00" in buffer:
 		menuDeServicos()
+	elif "00" in buffer:
+		Menu()
 
 
 def acao(action):

@@ -120,7 +120,7 @@ class Watch(object):
 			self.Manager.inicia(servico)
 		elif "executar_agora" in action:
 			self.Manager.run(servico)
-		elif "info":
+		elif "info" in action:
 			if 'SMS' in servico:	
 				return self.Manager.SMS_info
 			elif 'SRC' in servico:
