@@ -95,23 +95,23 @@ class Manager(Initialize):
 			self.Jobs['WATCH'].start()
 			
 			if self.SMS_info["init"] is True:
-				self.SMS_info['init_time']=datetime.datetime.now()
+				self.SMS_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
-				self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
+				self.SMS_info['next_run'] = str(self.Agenda["SMS"].next_run)
 				self.SMS_controle.setControle(self.SMS_info,self)
 
 
 			if self.SRC_info['init'] is True:
-				self.SRC_info['init_time']=datetime.datetime.now()
+				self.SRC_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
-				self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
+				self.SRC_info['next_run'] = str(self.Agenda["SRC"].next_run)
 				self.SRC_controle.setControle(self.SRC_info,self)
 
 
 			if self.SVC_info['init'] is True:
-				self.SVC_info['init_time']=datetime.datetime.now()
+				self.SVC_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SVC'] = schedule.every(5).minutes.do(self.SVC_f).tag("SVC")
-				self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
+				self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 				self.SVC_controle.setControle(self.SVC_info,self) 
 
 		
@@ -129,7 +129,7 @@ class Manager(Initialize):
 				"message":message,
 				"erro":True,
 				"comments":"Arrumar uma forma de identificar melhor tais erros...",
-				"time":datetime.datetime.now()
+				"time":str(datetime.datetime.now())
 				}
 				self.callback(e)
 			else:
@@ -140,7 +140,7 @@ class Manager(Initialize):
 				"message": [err, type(err)],
 				"erro":True,
 				"comments":"Arrumar uma forma de identificar melhor tais erros...",
-				"time":datetime.datetime.now()
+				"time":str(datetime.datetime.now())
 				}
 				self.callback(e)
 			#Quando a função lança uma exception o fluxo volta para ca
@@ -172,23 +172,23 @@ class Manager(Initialize):
 			self.Jobs['WATCH'] = threading.Thread(target=self.Watch.start, name="WATCH")
 			self.Jobs['WATCH'].start()
 		if (self.Agenda["SMS"] is None) and (self.SMS_info['keepAlive'] is True):
-			self.SMS_info['init_time']=datetime.datetime.now()
+			self.SMS_info['init_time'] = str(datetime.datetime.now())
 			self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
-			self.SMS_info['next_run'] = self.Agenda["SMS"].next_run
+			self.SMS_info['next_run'] = str(self.Agenda["SMS"].next_run)
 			self.SMS_controle.setControle(self.SMS_info,self)
 
 		if (not self.Agenda['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
 
-			self.SRC_info['init_time']=datetime.datetime.now()
+			self.SRC_info['init_time'] = str(datetime.datetime.now())
 			self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
-			self.SRC_info['next_run'] = self.Agenda["SRC"].next_run
+			self.SRC_info['next_run'] = str(self.Agenda["SRC"].next_run)
 			self.SRC_controle.setControle(self.SRC_info,self)
 
 		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
 
-			self.SVC_info['init_time']=datetime.datetime.now()
+			self.SVC_info['init_time'] = str(datetime.datetime.now())
 			self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
-			self.SVC_info['next_run'] = self.Agenda["SVC"].next_run
+			self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 			self.SVC_controle.setControle(self.SVC_info,self) 
 
 	def finaliza(self, servico):

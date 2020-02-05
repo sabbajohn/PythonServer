@@ -36,7 +36,7 @@ class SMS(object):
 			if stop():
 				return
 			self.db_monitor_sms()
-			self.Manager.SMS_info['last_run'] = self.Manager.Agenda['SMS'].last_run
+			self.Manager.SMS_info['last_run'] = str(self.Manager.Agenda['SMS'].last_run)
 			self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
 			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
 			self.Manager.update_info()

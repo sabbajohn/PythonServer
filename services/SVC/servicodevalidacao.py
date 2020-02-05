@@ -40,7 +40,7 @@ class servicoDeValidacao(object):
 
 	def start(self):
 		
-		self.Manager.SVC_info['next_run'] = self.Manager.Agenda["SVC"].next_run
+		self.Manager.SVC_info['next_run'] = str(self.Manager.Agenda["SVC"].next_run)
 		self.feedback(metodo="start",status=-1,message ='Inicializando serviço de Validação de cadastros...')
 		executor = concurrent.futures.ThreadPoolExecutor(
 			max_workers=1,
@@ -85,13 +85,13 @@ class servicoDeValidacao(object):
 			message = None
 			if (not self.Manager.Jobs['SDU'].isAlive()):
 				
-				self.Manager.SDU_info["init_time"]= datetime.datetime.now()
-				self.Manager.SDU_info["next_run"]=self.Manager.Agenda['SVC'].next_run
+				self.Manager.SDU_info["init_time"] = str(datetime.datetime.now())
+				self.Manager.SDU_info["next_run"]  = str(self.Manager.Agenda['SVC'].next_run)
 				self.Manager.Jobs['SDU'].start()
 				self.Manager.Jobs['SDU'].join()
 				self.Manager.Jobs['SDU'] = threading.Thread(target=self.Manager.DataUpdate.start, name="SDU")
-			self.Manager.SDU_info['last_run'] = datetime.datetime.now()
-			self.Manager.SVC_info['last_run'] = self.Manager.Agenda["SVC"].last_run
+			self.Manager.SDU_info['last_run'] = str(datetime.datetime.now())
+			self.Manager.SVC_info['last_run'] = str(self.Manager.Agenda["SVC"].last_run)
 			self.failsafe_tasks=[]
 			self.failsafe_cpf = []
 			self.responses = []

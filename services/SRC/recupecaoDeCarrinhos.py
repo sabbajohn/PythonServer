@@ -35,7 +35,7 @@ class recuperacaoDeCarrinhos(object):
 			if stop():
 				return
 			self.db_monitor_src()
-			self.Manager.SRC_info['last_run'] = self.Manager.Agenda['SRC'].last_run
+			self.Manager.SRC_info['last_run'] = str(self.Manager.Agenda['SRC'].last_run)
 			self.Manager.update_info()
 			time.sleep(1)
 			return

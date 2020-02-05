@@ -82,7 +82,7 @@ class Watch(object):
 				try:
 					cmd_buffer += str(client_socket.recv(4096),encoding="utf-8").rstrip()
 					if len(cmd_buffer):
-						buffer = json.loads(cmd_buffer)
+						buffer = json.loads(cmd_buffer,client_socket)
 						r = self.buffer_recv(buffer)
 						if(r):
 							client_socket.send(bytes(json.dumps(r).encode()))

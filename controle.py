@@ -512,11 +512,11 @@ class servicos(Controle):
 		def getControle(self):
 			var = {
 				'init': 			self.init,
-				'init_time': 		self.init_time,
+				'init_time': 		str(self.init_time),
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'last_run': 		self.last_run,
-				'next_run': 		self.nextrun,
+				'last_run': 		str(self.last_run),
+				'next_run': 		str(self.nextrun),
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query':			self.query
@@ -611,11 +611,11 @@ class servicos(Controle):
 		def getControle(self,*args, **kwargst):
 			var = {
 				'init': 			self.init,
-				'init_time': 		self.init_time,
+				'init_time': 		str(self.init_time),
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'last_run': 	self.last_run,
-				'next_run': 			self.nextrun,
+				'last_run': 		str(self.last_run),
+				'next_run': 		str(self.nextrun),
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query_set':		self.query_set,
@@ -630,7 +630,7 @@ class servicos(Controle):
 			self.init_time			= None
 			self.delay				= None
 			self.keepAlive			= True
-			self.last_run	= None
+			self.last_run			= None
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
@@ -683,11 +683,11 @@ class servicos(Controle):
 		def getControle(self):
 			var = {
 				'init': 			self.init,
-				'init_time': 		self.init_time,
+				'init_time': 		str(self.init_time),
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'last_run': 	self.last_run,
-				'next_run': 			self.nextrun,
+				'last_run': 		str(self.last_run),
+				'next_run': 		str(self.nextrun),
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop
 			}
@@ -758,11 +758,11 @@ class servicos(Controle):
 		def getControle(self):
 			var = {
 				'init': 			self.init,
-				'init_time': 		self.init_time,
+				'init_time': 		str(self.init_time),
 				'delay': 			self.delay,
 				'keepAlive': 		self.keepAlive,
-				'last_run': 	self.last_run,
-				'next_run': 			self.nextrun,
+				'last_run': 		str(self.last_run),
+				'next_run': 		str(self.nextrun),
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
 				'query':			self.query
