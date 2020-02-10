@@ -406,7 +406,7 @@ class servicoDeValidacao(object):
 								try:
 									err = endereco['erro']
 								except:
-									if self.result[item2['index']][3] == None or self.result[item2['index']][3] == 'None':
+									if self.result[item2['index']][3] == None or self.result[item2['index']][3] == '':
 
 										try:
 
