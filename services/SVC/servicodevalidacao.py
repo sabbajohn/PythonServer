@@ -551,7 +551,7 @@ class servicoDeValidacao(object):
 										try:
 											check = item2['CPF']
 
-											if check and (self.result[item2['index']][3] == None or self.result[item2['index']][3] == "" ):
+											if check and (self.result[item2['index']][3] == None or self.result[item2['index']][3] == '' ):
 												params={}
 												if item2['viaCep']:
 
