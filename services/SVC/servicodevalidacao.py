@@ -241,7 +241,7 @@ class servicoDeValidacao(object):
 				endereco = await r.read()
 				endereco =json.loads(endereco)
 				self.Manager.VIACEP_info['consultas'] += 1
-				endereco['localidade'] = endereco['localidade'].replace("'","´")
+				endereco['localidade'] = endereco['localidade'].replace("'","&#39;")
 				return endereco
 
 	async def api_validation_request(self,session, url,index):
