@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'PAULO SERGIO ROMANO' , motivo ='PAULO SERGIO ROMANO verificado via API em 13:12:38 às 11/01/2020', Cidade='Tabatinga', SgUF='SP',DtNascimento ='1971-08-03', Endereco='', Bairro=''  WHERE CPFCNPJ = '26476476823';

@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'VIVIANE MILLOIDE SOARES' , motivo ='VIVIANE MILLOIDE SOARES verificado via API em 10:50:21 às 26/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1976-09-02', Endereco='Avenida Cupecê', Bairro='Jardim Prudência'  WHERE CPFCNPJ = '16703400822';

@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'IONE PIMENTEL DE OLIVEIRA' , motivo ='IONE PIMENTEL DE OLIVEIRA verificado via API em 10:42:06 às 26/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1968-04-08', Endereco='Rua Maria Amália Lopes Azevedo', Bairro='Vila Albertina'  WHERE CPFCNPJ = '114.077.758-04';

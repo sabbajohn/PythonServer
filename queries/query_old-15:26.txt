@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'KELLEN CRISTINA ALVES DOS SANTOS' , motivo ='KELLEN CRISTINA ALVES DOS SANTOS verificado via API em 15:22:20 às 16/01/2020', Cidade='Ourinhos', SgUF='SP',DtNascimento ='1984-05-12', Endereco='Rua Maria de Paula Leite Moraes', Bairro='Jardim Anchieta'  WHERE CPFCNPJ = '31408992892';

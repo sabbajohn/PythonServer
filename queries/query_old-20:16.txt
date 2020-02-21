@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'SARAH JEANNY MAIA PINHEIRO' , motivo ='SARAH JEANNY MAIA PINHEIRO verificado via API em 20:12:49 às 20/12/2019', Cidade='Barra Bonita', SgUF='SP',DtNascimento ='1964-01-18', Endereco='', Bairro=''  WHERE CPFCNPJ = '77415493753';

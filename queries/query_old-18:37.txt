@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'JOSE CLARIMUNDO PEDROZO DE OLIVEIRA' , motivo ='JOSE CLARIMUNDO PEDROZO DE OLIVEIRA verificado via API em 18:33:25 às 13/01/2020', Cidade='Santo Ângelo', SgUF='RS',DtNascimento ='1957-05-25', Endereco='Rua Quinze de Novembro', Bairro='Centro'  WHERE CPFCNPJ = '23467320015';
