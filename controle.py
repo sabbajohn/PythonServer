@@ -171,7 +171,7 @@ class API(Controle):
 		self.soa 		= self.soa(Controle)
 		self.comtele 	= self.comtele(Controle)
 		self.viacep 	= self.viacep(Controle)
-	
+		self.mp			= self.mp(Controle)
 			
 
 	
@@ -364,6 +364,41 @@ class API(Controle):
 			}
 			return var
 
+	class mp:
+		def __init__(self,Controle):
+			self.tag		= "MP_BOLETO"
+			self.api_key	= Controle.Config_ENV.get(self.tag,"api_key")
+			self.boletos_gerados	= int(Controle.Config_ENV.get(self.tag,"boletos_gerados"))
+		def setControle(self,*args, **kwargst):
+			try:
+				variavel = kwargst['vars']
+				Controle = kwargst['controle']
+			except:
+				try:
+					variavel = args[0]
+					Controle = args[1]
+				except Exception as e:
+					return False
+				else:
+					pass
+			if Controle:
+				keys = variavel.keys()
+				for key in keys:
+					if 'boletos_gerados' in key:
+						self.boletos_gerados = variavel['boletos_gerados']
+						Controle.Config_ENV.set(self.tag, 'boletos_gerados',str(self.boletos_gerados ))
+						return True
+					elif 'api_key' in key:
+						self.api_key = variavel['api_key']
+						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
+					else:
+						return False
+		def getControle(self,*args, **kwargst):
+			var  = {
+				"api_key":			self.api_key,
+				"boletos_gerados":	self.boletos_gerados
+				}
+			return var
 class LINK(Controle):
 	def __init__(self,Controle):
 	

@@ -329,10 +329,19 @@ class recuperacaoDeCarrinhos(object):
 				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
 				self.feedback(metodo="recCarrinho2", status =5, message = message, erro = False )
 				message = None
+				emails = []
+				for x in result:
+					emails.append[x[1]]
+				self.geraBoleto(emails = emails)
+					#clientes.append(self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email = '{}';".format(x[1])))
 				""" params = self.emailParams(result)
 				self.send(params) """
 				return 
 		except:
 			pass
 	def geraBoleto(self,*args, **kwargst):
+		emails = kwargst['emails']
+		clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(emails))
+		for cliente in clientes:
+			print('aeahooo') 
 		pass
