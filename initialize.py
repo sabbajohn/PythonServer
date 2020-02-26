@@ -93,8 +93,9 @@ class Initialize:
 		
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
-		betas						= ["237.29", "192.168.", "10.8.0"]
+		betas						= ["237.29", "10.8.0"]
 		prods						= ["10.255.242","242.52"]
+		
 		cenv_editado				= False
 		self.Config					= configparser.ConfigParser()
 		self.Config_ENV				= configparser.ConfigParser()
@@ -148,6 +149,8 @@ class Initialize:
 			elif any(prod in IP for prod in prods):
 				self.Config.set("KEY", "env", "PROD")
 			else:
+				self.Config.set("KEY", "env", "LOCAL")
+			""" else:
 				print("Não foi Possivel identivicar o ambiente!")
 				try:
 					print("Defina o tipo de Ambiente:")
@@ -166,7 +169,7 @@ class Initialize:
 					raise Exception("Não foi Possivel identivicar o ambiente!")
 					print(sys.exc_info()[0])
 					sys.exit("Erro ao definir env")
-				
+				 """
 			with open("{0}/config/DEFAULT.ini".format(DIR), "w+") as configfile:		
 				self.Config.write(configfile)
 
