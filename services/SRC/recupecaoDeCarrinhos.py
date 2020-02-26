@@ -29,7 +29,8 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			if stop():
 				return
-			self.db_monitor_src()""" INICIA VERIFICAÇÂO DOS CLIENTES A SEREM NOTIFICADOS """
+			self.recCarrinho2()
+			#self.db_monitor_src()""" INICIA VERIFICAÇÂO DOS CLIENTES A SEREM NOTIFICADOS """
 			self.Manager.SRC_info['last_run'] = str(self.Manager.Agenda['SRC'].last_run)
 			self.Manager.update_info()
 			time.sleep(1)
@@ -331,7 +332,7 @@ class recuperacaoDeCarrinhos(object):
 				message = None
 				emails = []
 				for x in result:
-					emails.append[x[1]]
+					emails.append(x[1])
 				self.geraBoleto(emails = emails)
 					#clientes.append(self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email = '{}';".format(x[1])))
 				""" params = self.emailParams(result)
@@ -341,7 +342,28 @@ class recuperacaoDeCarrinhos(object):
 			pass
 	def geraBoleto(self,*args, **kwargst):
 		emails = kwargst['emails']
-		clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(emails))
+		email = ','.join(["'{}'".format(x) for x in emails])
+		clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
 		for cliente in clientes:
+		data= {
+			"payer": {
+				"email": "test_user_19653727@testuser.com",
+				"first_name": "Test",
+				"last_name": "User",
+				"identification": {
+					"type": "CPF",
+					"number": "19119119100"
+				},
+				"address": {
+					"zip_code": "06233200",
+					"street_name": "Av. das Nações Unidas",
+					"street_number": "3003",
+					"neighborhood": "Bonfim",
+					"city": "Osasco",
+					"federal_unit": "SP"
+				}
+			}  
+		}	
+			#Prepara campos para gerar boleto
 			print('aeahooo') 
 		pass
