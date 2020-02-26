@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'EDPO LOPES DE LIMA' , motivo ='EDPO LOPES DE LIMA verificado via API em 14:30:06 às 21/12/2019', Cidade='Mirandópolis', SgUF='SP',DtNascimento ='1988-04-22', Endereco='', Bairro=''  WHERE CPFCNPJ = '368.679.568-07';

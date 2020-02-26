@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'ADRIANA CAMILO RODRIGUES' , motivo ='ADRIANA CAMILO RODRIGUES verificado via API em 21:45:34 às 18/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1976-07-29', Endereco='Avenida do Anastácio', Bairro='City América'  WHERE CPFCNPJ = '277.436.268-73';

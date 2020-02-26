@@ -241,6 +241,9 @@ class servicoDeValidacao(object):
 				endereco = await r.read()
 				endereco =json.loads(endereco)
 				self.Manager.VIACEP_info['consultas'] += 1
+				campos = endereco.keys()
+				for x in campos:
+					endereco[x] = endereco[x].replace("'","&#39;")
 				return endereco
 
 	async def api_validation_request(self,session, url,index):
@@ -551,7 +554,7 @@ class servicoDeValidacao(object):
 										try:
 											check = item2['CPF']
 
-											if check and (self.result[item2['index']][3] == None or self.result[item2['index']][3] == "" ):
+											if check and (self.result[item2['index']][3] == None or self.result[item2['index']][3] == '' ):
 												params={}
 												if item2['viaCep']:
 

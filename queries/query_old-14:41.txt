@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'ALEXANDRE RISKALLA DE MIRANDA' , motivo ='ALEXANDRE RISKALLA DE MIRANDA verificado via API em 2019-12-13 14:40:59.352654', DtNascimento='1963-12-11', Cidade = 'São Paulo', SgUF='SP', Endereco= 'Avenida Fagundes Filho', Bairro='Vila Monte Alegre'   WHERE CPFCNPJ = '10648812898';

@@ -1,1 +1,0 @@
-UPDATE cliente SET id_status='1', Nome = 'MARCOS ROBERTO MARIANO DOS SANTOS' , motivo ='MARCOS ROBERTO MARIANO DOS SANTOS verificado via API em 16:34:43 às 16/12/2019', Cidade='São Paulo', SgUF='SP',DtNascimento ='1981-07-04', Endereco='Estrada de Itapecerica', Bairro='Capão Redondo'  WHERE CPFCNPJ = '223.951.888-08';
