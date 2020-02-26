@@ -19,11 +19,6 @@ class recuperacaoDeCarrinhos(object):
 		self.database 			= self.Manager.database
 		self.mandrill_client 	= None
 		
-		
-
-		
-		
-		
 
 	def start(self, stop):
 	
@@ -34,7 +29,7 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			if stop():
 				return
-			self.db_monitor_src()
+			self.db_monitor_src()""" INICIA VERIFICAÇÂO DOS CLIENTES A SEREM NOTIFICADOS """
 			self.Manager.SRC_info['last_run'] = str(self.Manager.Agenda['SRC'].last_run)
 			self.Manager.update_info()
 			time.sleep(1)
@@ -116,8 +111,8 @@ class recuperacaoDeCarrinhos(object):
 		try:
 			result = None
 			
-		
-			result = self.database.execute("R",self.Manager.SRC_info['query'])
+			
+			result = self.database.execute("R",self.Manager.SRC_info['query'][0])
 		
 			if len(result)>0:
 			
@@ -304,3 +299,40 @@ class recuperacaoDeCarrinhos(object):
 		feedback['time'] = datetime.datetime.now()
 	
 		self.Manager.callback(feedback)
+
+	def recCarrinho2(self,*args, **kwargst):
+		message = []
+		message.append( "Inicializando o Recuperação de Carrinhos II")
+		self.feedback(metodo="recCarrinho2", status =5, message = message, erro = False )
+		message = None
+		escreveu = False
+	
+		try:
+			query = self.Manager.SRC_info['query'][1]
+			# Se não estiver definida sai da função
+		except:
+			pass 
+		
+		try:
+			result = None
+			result = self.database.execute("R",self.Manager.SRC_info['query'][1])
+
+			if len(result)>0:
+			
+				if(escreveu == True):
+					message = []
+					message.append( "Novos carrinhos encontrados!")
+					self.feedback(metodo="recCarrinho2", status =5, message = message, erro = False )
+					message = None
+
+				message = []
+				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+				self.feedback(metodo="recCarrinho2", status =5, message = message, erro = False )
+				message = None
+				""" params = self.emailParams(result)
+				self.send(params) """
+				return 
+		except:
+			pass
+	def geraBoleto(self,*args, **kwargst):
+		pass

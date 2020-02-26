@@ -704,7 +704,14 @@ class servicos(Controle):
 			self.nextrun			= None
 			self.firstTime			= True
 			self.stop				= False
-			self.query				= Controle.Config.get("SRC","query")
+			self.query_set			= [] 
+			self.query				= []
+			
+			self.query_set = Controle.Config.get("SRC", "set").split(",")
+			
+			if isinstance(self.query_set, list):
+				for x in self.query_set:
+					self.query.append(Controle.Config.get("SRC",x))
 		
 		def setControle(self,*args, **kwargst):
 
@@ -748,9 +755,21 @@ class servicos(Controle):
 					elif 'stop' in key:
 						self.stop = variavel[key]
 					elif 'query' in key:
-						self.query = variavel[key]
-						Controle.Config.set("SRC","query", self.query) 
 						
+						if len(variavel[key]) > len(self.query):
+							self.query = list(set().union(self.query,variavel[key])) 
+							for i, x in enumerate(self.query):
+								Controle.Config.set("SRC",i, str(x))
+						else:
+							self.query = variavel[key]
+					elif 'query_set' == key:
+						
+						if len(variavel[key]) > len(self.query_set):
+							self.query_set = list(set().union(self.query_set, variavel[key]))
+						else:
+							self.query = variavel[key]
+						q_s = ','.join([str(x) for x in self.query_set ])
+						Controle.Config.set("SRC","set", q_s)  
 					else:
 						return False
 				return True
@@ -765,6 +784,7 @@ class servicos(Controle):
 				'next_run': 		str(self.nextrun),
 				'firstTime': 		self.firstTime,
 				'stop': 			self.stop,
+				'query_set':		self.query_set,
 				'query':			self.query
 			}
 			return var
