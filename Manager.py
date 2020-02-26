@@ -71,7 +71,7 @@ class Manager(Initialize):
 		self.COMTELE_controle.setControle(self.COMTELE_info,self)
 		self.SOA_controle.setControle(self.SOA_info,self)
 		self.HUBD_controle.setControle(self.HUBD_info,self)
-
+		self.MP_controle.setControle(self.MP_info,self)
 	
 		#GET
 		self.SMS_info = self.SMS_controle.getControle()
@@ -84,6 +84,7 @@ class Manager(Initialize):
 		self.COMTELE_info		= self.COMTELE_controle.getControle()
 		self.SOA_info			= self.SOA_controle.getControle()
 		self.HUBD_info			= self.HUBD_controle.getControle()
+		self.MP_info			= self.MP_controle.getControle()
 
 		self.LINK_info			= self.Controle.LINK.getControle()
 		self.Controle.writeConfigFile(self)
@@ -103,7 +104,8 @@ class Manager(Initialize):
 
 			if self.SRC_info['init'] is True:
 				self.SRC_info['init_time']=str(datetime.datetime.now())
-				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+				self.Agenda['SRC'] = schedule.every(1).minutes.do(self.SRC_f).tag('SRC')
+				#self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
 				self.SRC_info['next_run'] = str(self.Agenda["SRC"].next_run)
 				self.SRC_controle.setControle(self.SRC_info,self)
 
@@ -361,7 +363,7 @@ class Manager(Initialize):
 				log.info(" {0} ".format(msg))
 		if e['comments']!="" and e['comments'] is not None:
 			log.info(" {0} ".format(e['comments']))
-
+	#TODO INSERIR INFORMAÇÔES DE NOTIFICAÇÂO NO CONTROLER TAMBÈM
 	def Notificar(self, e):
 		Comtele = self.Controle.API.comtele.getControle()
 		e["AMBIENTE"]= self.Controle.Key.env

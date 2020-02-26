@@ -11,7 +11,7 @@ import getpass
 import threading
 import mandrill
 import configparser	
-import asyncio
+import requests
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 		
@@ -333,37 +333,55 @@ class recuperacaoDeCarrinhos(object):
 				emails = []
 				for x in result:
 					emails.append(x[1])
-				self.geraBoleto(emails = emails)
+				email = ','.join(["'{}'".format(x) for x in emails])
+				clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
+				message = []
+				message.append('[INFO]:Gerando Boletos via MP')
+				self.feedback(metodo="recCarrinho2", status =5, message = message )
+				message = None
+
+				
+				for cliente in clientes:
+					nome = cliente[0].split(" ")
+					data= {
+						"payer": {
+							"email": cliente[1],
+							"first_name": nome[0],
+							"last_name": nome[len(nome)-1],
+							"identification": {
+								"type": "CPF",
+								"number": cliente[2]
+							},
+							"address": {
+								"zip_code": cliente[8],
+								"street_name": cliente[3],
+								"street_number": cliente[4],
+								"neighborhood": cliente[5],
+								"city": cliente[6],
+								"federal_unit": cliente[7]
+							}
+						}  
+					}
+					self.geraBoleto(data)
 					#clientes.append(self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email = '{}';".format(x[1])))
 				""" params = self.emailParams(result)
 				self.send(params) """
 				return 
 		except:
 			pass
-	def geraBoleto(self,*args, **kwargst):
-		emails = kwargst['emails']
-		email = ','.join(["'{}'".format(x) for x in emails])
-		clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
-		for cliente in clientes:
-		data= {
-			"payer": {
-				"email": "test_user_19653727@testuser.com",
-				"first_name": "Test",
-				"last_name": "User",
-				"identification": {
-					"type": "CPF",
-					"number": "19119119100"
-				},
-				"address": {
-					"zip_code": "06233200",
-					"street_name": "Av. das Nações Unidas",
-					"street_number": "3003",
-					"neighborhood": "Bonfim",
-					"city": "Osasco",
-					"federal_unit": "SP"
-				}
-			}  
-		}	
-			#Prepara campos para gerar boleto
-			print('aeahooo') 
-		pass
+
+	def geraBoleto(self,data):
+		
+
+		self.Manager.MP_info['boletos_gerados'] += 1
+		body = json.dumps(data).encode('utf8')
+		url = "{}access_token={}".format(self.Manager.MP_info['url'],self.Manager.MP_info['api_key'])
+		
+		response = requests.post(url=url, data=body)
+
+		#response =   r.read()
+		response=json.loads(response)
+		if len(response)>0:
+			print("VOLTOU")
+	
+	

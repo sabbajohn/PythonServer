@@ -57,12 +57,14 @@ class Initialize:
 		self.COMTELE_controle 		= self.Controle.API.comtele
 		self.SOA_controle 			= self.Controle.API.soa
 		self.HUBD_controle 			= self.Controle.API.hubd
+		self.MP_controle 			= self.Controle.API.mp
 
 		self.VIACEP_info			= self.VIACEP_controle.getControle()
 		self.MANDRILL_info			= self.MANDRILL_controle.getControle()
 		self.COMTELE_info			= self.COMTELE_controle.getControle()
 		self.SOA_info				= self.SOA_controle.getControle()
 		self.HUBD_info				= self.HUBD_controle.getControle()
+		self.MP_info				= self.MP_controle.getControle()
 
 		#LINK
 		self.LINK_controle 			= self.Controle.LINK
@@ -93,7 +95,7 @@ class Initialize:
 		
 		DIR							= os.getcwd()
 		USER						= getpass.getuser()
-		betas						= ["237.29", "10.8.0"]
+		betas						= ["237.29"]
 		prods						= ["10.255.242","242.52"]
 		
 		cenv_editado				= False

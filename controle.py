@@ -366,9 +366,10 @@ class API(Controle):
 
 	class mp:
 		def __init__(self,Controle):
-			self.tag		= "MP_BOLETO"
-			self.api_key	= Controle.Config_ENV.get(self.tag,"api_key")
+			self.tag				= "MP_BOLETO"
+			self.api_key			= Controle.Config_ENV.get(self.tag,"api_key")
 			self.boletos_gerados	= int(Controle.Config_ENV.get(self.tag,"boletos_gerados"))
+			self.url				= Controle.Config_ENV.get(self.tag,"url")
 		def setControle(self,*args, **kwargst):
 			try:
 				variavel = kwargst['vars']
@@ -391,10 +392,15 @@ class API(Controle):
 					elif 'api_key' in key:
 						self.api_key = variavel['api_key']
 						Controle.Config_ENV.set(self.tag, 'api_key',self.api_key )
+					elif 'url' in key:
+						self.url = variavel['url']
+						Controle.Config_ENV.set(self.tag, 'url',self.url )
+
 					else:
 						return False
 		def getControle(self,*args, **kwargst):
 			var  = {
+				"url":				self.url,
 				"api_key":			self.api_key,
 				"boletos_gerados":	self.boletos_gerados
 				}
