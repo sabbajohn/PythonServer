@@ -315,10 +315,10 @@ class recuperacaoDeCarrinhos(object):
 			pass 
 		
 		try:
-			result = None
-			result = self.database.execute("R",self.Manager.SRC_info['query'][1])
+			carrinhos = None
+			carrinhos = self.database.execute("R",self.Manager.SRC_info['query'][1])
 
-			if len(result)>0:
+			if len(carrinhos)>0:
 			
 				if(escreveu == True):
 					message = []
@@ -327,27 +327,35 @@ class recuperacaoDeCarrinhos(object):
 					message = None
 
 				message = []
-				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
+				message.append( "{0} Carrinhos a serem Resgatados!".format(len(carrinhos)))
 				self.feedback(metodo="recCarrinho2", status =5, message = message, erro = False )
 				message = None
 				emails = []
-				for x in result:
-					emails.append(x[1])
-				email = ','.join(["'{}'".format(x) for x in emails])
-				clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
 				message = []
-				message.append('[INFO]:Gerando Boletos via MP')
+				message.append('Gerando Boletos via MP')
 				self.feedback(metodo="recCarrinho2", status =5, message = message )
 				message = None
+				
+				for x in carrinhos:
+					""" emails.append(x[1]) """
+					c = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email ='{}'".format(x[1]))
+					cliente = list(c[0])
+					cliente.append(x[3]) 
+				#email = ','.join(["'{}'".format(x) for x in emails])
+				#clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
+				
 
 				
-				for cliente in clientes:
+					#for cliente in cliente:
 					nome = cliente[0].split(" ")
 					data= {
+						"transaction_amount": cliente[9],
+						"description": "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGASORTE",
+						"payment_method_id": "bolbradesco",
 						"payer": {
 							"email": cliente[1],
 							"first_name": nome[0],
-							"last_name": nome[len(nome)-1],
+							"last_name": nome[len(nome)-2],
 							"identification": {
 								"type": "CPF",
 								"number": cliente[2]
@@ -367,7 +375,8 @@ class recuperacaoDeCarrinhos(object):
 				""" params = self.emailParams(result)
 				self.send(params) """
 				return 
-		except:
+		except Exception as e:
+			print(e)
 			pass
 
 	def geraBoleto(self,data):
