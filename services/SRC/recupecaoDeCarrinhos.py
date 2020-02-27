@@ -29,8 +29,9 @@ class recuperacaoDeCarrinhos(object):
 			message = None
 			if stop():
 				return
+			
+			self.db_monitor_src()
 			self.recCarrinho2()
-			#self.db_monitor_src()""" INICIA VERIFICAÇÂO DOS CLIENTES A SEREM NOTIFICADOS """
 			self.Manager.SRC_info['last_run'] = str(self.Manager.Agenda['SRC'].last_run)
 			self.Manager.update_info()
 			time.sleep(1)
@@ -336,50 +337,44 @@ class recuperacaoDeCarrinhos(object):
 				self.feedback(metodo="recCarrinho2", status =5, message = message )
 				message = None
 				
-				for x in carrinhos:
-					""" emails.append(x[1]) """
-					c = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email ='{}'".format(x[1]))
-					cliente = list(c[0])
-					cliente.append(x[3]) 
-				#email = ','.join(["'{}'".format(x) for x in emails])
-				#clientes = self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email in ({})".format(email))
-				
-
-				
-					#for cliente in cliente:
-					nome = cliente[0].split(" ")
+				for i, carrinho in enumerate(carrinhos):
+					carrinhos[i] = list(carrinhos[i])
+					nome = carrinho[2].split(" ")
+					if not nome[len(nome)-1] == "":
+						sobrenome = nome[len(nome)-1]
+					else:
+						sobrenome = nome[len(nome)-2]
+					nome = nome[0]
 					data= {
-						"transaction_amount": cliente[9],
-						"description": "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGASORTE",
+						"transaction_amount": carrinho[11],
+						"description": "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGA SORTE",
 						"payment_method_id": "bolbradesco",
 						"payer": {
-							"email": cliente[1],
-							"first_name": nome[0],
-							"last_name": nome[len(nome)-2],
+							"email": carrinho[3],
+							"first_name": nome,
+							"last_name": sobrenome,
 							"identification": {
 								"type": "CPF",
-								"number": cliente[2]
+								"number": carrinho[4]
 							},
 							"address": {
-								"zip_code": cliente[8],
-								"street_name": cliente[3],
-								"street_number": cliente[4],
-								"neighborhood": cliente[5],
-								"city": cliente[6],
-								"federal_unit": cliente[7]
+								"zip_code": carrinho[10],
+								"street_name": carrinho[5],
+								"street_number": carrinho[6],
+								"neighborhood": carrinho[7],
+								"city": carrinho[8],
+								"federal_unit": carrinho[9]
 							}
 						}  
 					}
-					self.geraBoleto(data)
-					#clientes.append(self.database.execute("R","SELECT Nome, Email, CPFCNPJ, Endereco, Numero, Bairro,Cidade, SgUF,CEP FROM megasorte.cliente where Email = '{}';".format(x[1])))
-				""" params = self.emailParams(result)
-				self.send(params) """
+					carrinhos[i] = self.geraBoleto(data, carrinho)
+				send2(carrinhos)
 				return 
 		except Exception as e:
 			print(e)
 			pass
 
-	def geraBoleto(self,data):
+	def geraBoleto(self,data,carrinho):
 		
 
 		self.Manager.MP_info['boletos_gerados'] += 1
@@ -387,10 +382,93 @@ class recuperacaoDeCarrinhos(object):
 		url = "{}access_token={}".format(self.Manager.MP_info['url'],self.Manager.MP_info['api_key'])
 		
 		response = requests.post(url=url, data=body)
-
+		status = response.status_code
 		#response =   r.read()
-		response=json.loads(response)
-		if len(response)>0:
-			print("VOLTOU")
+		response=json.loads(response.text)
+		if status > 204 or status < 200:
+			print("DEU PAUUUUU!!!")
+		else:
+			pass
+			self.Manager.MP_info['boletos_gerados'] += 1
+			# Registra boleto no banco de Dados
+			vencimento = response['date_of_expiration'].split("T")[0]
+			query = "INSERT INTO `megasorte`.`boleto_mp` (`gateway_payment_id`, `id_cliente`, `valor`, `vencimento`, `nosso_numero`, `linha_digitavel`, `link_mp`, `id_status`) VALUES ({1}, {2}, {3}, '{4}', '{5}', '{6}', '{7}', 0)".format(response['id'],carrinho[1], response['transaction_amount'],vencimento,response['transaction_details']['payment_method_reference_id'],response['barcode']['content'],response['transaction_details']['external_resource_url'])
+			self.database.execute("W",query,commit=True)
+			carrinho.append(response['barcode']['content'])
+			carrinho.append(response['transaction_details']['external_resource_url'])
+			return carrinho
+			# retorna dados do boleto 
+		
+	def emailParams2(self, result):
+		cont = 0
+		to = []
+		merge_vars = []
+		keys_to = [ "email","name","VlBilhete"]
+		template_content =  [{'content': 'example content', 'name': 'example name'}]# faço nem ideia do que seja isso
+		global_merge_vars=  [{'content':  self.Manager.LINK_info['link_site'], 'name': 'link_site'},{'content': self.Manager.LINK_info['contact_mail'], 'name': 'CONTACT_MAIL'},{'content':  self.Manager.LINK_info['link_de_compra'], 'name': 'link_de_compra'}]
+		for x in result:
+			nome = x[2].split(" ",1)
+			vlbilhete = format(x[11], '.2f').replace(".",",")
+			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[2], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':linhaDigitavel},{'content':x[16],'name':link_boleto},{'content':x[14],'name':Valor}})
+			#É aqui que vou passar raiva, nem lembro o que é isso
+			to.append(dict(zip(keys_to, x)))
+			cont +=1
+
+		
+		message = {
+			'global_merge_vars':global_merge_vars,
+			'to': to,
+			'merge_vars':merge_vars,
+			'track_clicks': True,
+			'track_opens': True
+			
+			
+		}
+		return {
+			"template_content":template_content,
+			"message":message,
+			"cont":cont
+		}
+ 
+	def send2(self,carrinhos):
+		if(self.checkAPI()):
+			try:
+				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados-adv', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
+				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
+					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
+					
+						
+					
+					messages = []
+					messages.append("{0} email's foram enviados".format(p['cont'] ))
+					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
+					messages = None
+					
+					return True
+			except mandrill.Error as e:
+				
+				
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
+				messages = None
+				
+				return False
 	
+			except Exception as e:
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =1, message = messages, erro = True)
+				messages = None
+				return False
+		else:
+				messages = []
+				messages.append( "Não foi Possivel validara a Chave API")
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Chave Mandrill" )
+				messages = None
+				return False
+
+		
 	
