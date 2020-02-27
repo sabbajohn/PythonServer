@@ -398,7 +398,7 @@ class recuperacaoDeCarrinhos(object):
 			carrinho.append(response['transaction_details']['external_resource_url'])
 			return carrinho
 			# retorna dados do boleto 
-		
+	
 	def emailParams2(self, result):
 		cont = 0
 		to = []
@@ -409,9 +409,14 @@ class recuperacaoDeCarrinhos(object):
 		for x in result:
 			nome = x[2].split(" ",1)
 			vlbilhete = format(x[11], '.2f').replace(".",",")
-			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[2], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':linhaDigitavel},{'content':x[16],'name':link_boleto},{'content':x[14],'name':Valor}})
+			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[2], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':linhaDigitavel},{'content':x[16],'name':link_boleto},{'content':int(x[14])*int(vlbilhete),'name':Valor}]})
 			#É aqui que vou passar raiva, nem lembro o que é isso
-			to.append(dict(zip(keys_to, x)))
+			values_to = []
+			values_to.append(x[3])
+			values_to.append(x[2])
+			values_to.append(x[11])
+
+			to.append(dict(zip(keys_to, values_to)))
 			cont +=1
 
 		
@@ -421,54 +426,14 @@ class recuperacaoDeCarrinhos(object):
 			'merge_vars':merge_vars,
 			'track_clicks': True,
 			'track_opens': True
-			
-			
+	
 		}
 		return {
 			"template_content":template_content,
 			"message":message,
 			"cont":cont
 		}
- 
-	def send2(self,carrinhos):
-		if(self.checkAPI()):
-			try:
-				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados-adv', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
-				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
-					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
-					
-						
-					
-					messages = []
-					messages.append("{0} email's foram enviados".format(p['cont'] ))
-					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
-					messages = None
-					
-					return True
-			except mandrill.Error as e:
-				
-				
-				messages = []
-				messages.append( type(e))
-				messages.append(e)
-				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
-				messages = None
-				
-				return False
 	
-			except Exception as e:
-				messages = []
-				messages.append( type(e))
-				messages.append(e)
-				self.feedback(metodo="send", status =1, message = messages, erro = True)
-				messages = None
-				return False
-		else:
-				messages = []
-				messages.append( "Não foi Possivel validara a Chave API")
-				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Chave Mandrill" )
-				messages = None
-				return False
-
-		
+	def funcname(self, parameter_list):
+		pass		
 	
