@@ -338,6 +338,7 @@ class recuperacaoDeCarrinhos(object):
 				message = None
 				
 				for i, carrinho in enumerate(carrinhos):
+					carrinho = list(carrinho)
 					carrinhos[i] = list(carrinhos[i])
 					nome = carrinho[2].split(" ")
 					if not nome[len(nome)-1] == "":
@@ -345,8 +346,15 @@ class recuperacaoDeCarrinhos(object):
 					else:
 						sobrenome = nome[len(nome)-2]
 					nome = nome[0]
+					total = float(carrinho[11]*carrinho[14])
+					if total < 10:	
+						valorBoleto = 10
+					else:
+						valorBoleto = total
+						valorBoleto = format(valorBoleto, '.2f')
+
 					data= {
-						"transaction_amount": carrinho[11],
+						"transaction_amount": float(valorBoleto),
 						"description": "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGA SORTE",
 						"payment_method_id": "bolbradesco",
 						"payer": {
@@ -393,7 +401,7 @@ class recuperacaoDeCarrinhos(object):
 			self.Manager.MP_info['boletos_gerados'] += 1
 			# Registra boleto no banco de Dados
 			vencimento = response['date_of_expiration'].split("T")[0]
-			query = "INSERT INTO `megasorte`.`boleto_mp` (`gateway_payment_id`, `id_cliente`, `valor`, `vencimento`, `nosso_numero`, `linha_digitavel`, `link_mp`, `id_status`) VALUES ({1}, {2}, {3}, '{4}', '{5}', '{6}', '{7}', 0)".format(response['id'],carrinho[1], response['transaction_amount'],vencimento,response['transaction_details']['payment_method_reference_id'],response['barcode']['content'],response['transaction_details']['external_resource_url'])
+			query = "INSERT INTO `megasorte`.`boleto_mp` (`gateway_payment_id`, `id_cliente`, `valor`, `vencimento`, `nosso_numero`, `linha_digitavel`, `link_mp`, `id_status`) VALUES ({0}, {1}, {2}, '{3}', '{4}', '{5}', '{6}', 0)".format(response['id'],carrinho[1], response['transaction_amount'],vencimento,response['transaction_details']['payment_method_reference_id'],response['barcode']['content'],response['transaction_details']['external_resource_url'])
 			self.database.execute("W",query,commit=True)
 			carrinho.append(response['barcode']['content'])
 			carrinho.append(response['transaction_details']['external_resource_url'])
@@ -410,7 +418,7 @@ class recuperacaoDeCarrinhos(object):
 		for x in result:
 			nome = x[2].split(" ",1)
 			vlbilhete = format(x[11], '.2f').replace(".",",")
-			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[2], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':linhaDigitavel},{'content':x[16],'name':link_boleto},{'content':int(x[14])*int(vlbilhete),'name':Valor}]})
+			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':'linhaDigitavel'},{'content':x[16],'name':'link_boleto'},{'content':float(x[14])*float(x[11]),'name':'Valor'}]})
 			#É aqui que vou passar raiva, nem lembro o que é isso
 			values_to = []
 			values_to.append(x[3])
