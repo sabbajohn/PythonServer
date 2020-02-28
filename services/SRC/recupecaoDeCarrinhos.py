@@ -457,7 +457,7 @@ class recuperacaoDeCarrinhos(object):
 					
 					messages = []
 					messages.append("{0} email's foram enviados".format(p['cont'] ))
-					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
+					self.feedback(metodo="send2", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
 					messages = None
 					
 					return True
@@ -467,7 +467,7 @@ class recuperacaoDeCarrinhos(object):
 				messages = []
 				messages.append( type(e))
 				messages.append(e)
-				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
+				self.feedback(metodo="send2", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
 				messages = None
 				
 				return False
@@ -476,7 +476,7 @@ class recuperacaoDeCarrinhos(object):
 				messages = []
 				messages.append( type(e))
 				messages.append(e)
-				self.feedback(metodo="send", status =1, message = messages, erro = True)
+				self.feedback(metodo="send2", status =1, message = messages, erro = True)
 				messages = None
 				return False
 		else:
