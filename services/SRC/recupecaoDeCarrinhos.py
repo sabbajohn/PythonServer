@@ -420,7 +420,7 @@ class recuperacaoDeCarrinhos(object):
 			valor = float(x[14])*float(x[11])
 			valor = format(valor, '.2f').replace(".",",")
 			vlbilhete = format(x[11], '.2f').replace(".",",")
-			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':'linhaDigitavel'},{'content':x[16],'name':'link_boleto'},{'content':valor),'name':'Valor'}]})
+			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':'linhaDigitavel'},{'content':x[16],'name':'link_boleto'},{'content':valor,'name':'Valor'}]})
 			#É aqui que vou passar raiva, nem lembro o que é isso
 			values_to = []
 			values_to.append(x[3])
