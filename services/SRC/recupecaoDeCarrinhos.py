@@ -368,7 +368,8 @@ class recuperacaoDeCarrinhos(object):
 						}  
 					}
 					carrinhos[i] = self.geraBoleto(data, carrinho)
-				send2(carrinhos)
+				email = self.emailParams2(carrinhos)
+				self.send2(email)
 				return 
 		except Exception as e:
 			print(e)
@@ -434,6 +435,44 @@ class recuperacaoDeCarrinhos(object):
 			"cont":cont
 		}
 	
-	def funcname(self, parameter_list):
-		pass		
+	def send2(self, p):
+		
+		if(self.checkAPI()):
+			try:
+				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados-adv', template_content=p['template_content'], message=p['message'], ip_pool='Main Pool')
+				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
+					self.Manager.MANDRILL_info['enviados'] += p['cont'] 
+					
+						
+					
+					messages = []
+					messages.append("{0} email's foram enviados".format(p['cont'] ))
+					self.feedback(metodo="send", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
+					messages = None
+					
+					return True
+			except mandrill.Error as e:
+				
+				
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Provavelmente algum erro no mandrill" )
+				messages = None
+				
+				return False
 	
+			except Exception as e:
+				messages = []
+				messages.append( type(e))
+				messages.append(e)
+				self.feedback(metodo="send", status =1, message = messages, erro = True)
+				messages = None
+				return False
+		else:
+				messages = []
+				messages.append( "Não foi Possivel validara a Chave API")
+				self.feedback(metodo="send", status =1, message = messages, erro = True, comments = "Chave Mandrill" )
+				messages = None
+				return False
+
