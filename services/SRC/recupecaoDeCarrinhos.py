@@ -395,7 +395,10 @@ class recuperacaoDeCarrinhos(object):
 		#response =   r.read()
 		response=json.loads(response.text)
 		if status > 204 or status < 200:
-			print("DEU PAUUUUU!!!")
+				message = []
+				message.append( "Não foi possivel gerar Boleto. Status {}".format(status))
+				self.feedback(metodo="Gera Boleto", status =5, message = message, erro = False )
+				message = None
 		else:
 			pass
 			self.Manager.MP_info['boletos_gerados'] += 1
