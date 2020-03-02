@@ -179,60 +179,72 @@ class Manager(Initialize):
 			self.SMS_info['next_run'] = str(self.Agenda["SMS"].next_run)
 			self.SMS_controle.setControle(self.SMS_info,self)
 
-		if (not self.Agenda['SRC'].isAlive()) and (self.SRC_info['keepAlive'] is True):
+		if (not self.Agenda['SRC'] is None ) and (self.SRC_info['keepAlive'] is True):
 
 			self.SRC_info['init_time'] = str(datetime.datetime.now())
 			self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
 			self.SRC_info['next_run'] = str(self.Agenda["SRC"].next_run)
 			self.SRC_controle.setControle(self.SRC_info,self)
 
-		if (not self.Jobs['SVC'].isAlive()) and (self.SVC_info['keepAlive'] is True):
+		if (not self.Jobs['SVC'] is None) and (self.SVC_info['keepAlive'] is True):
 
 			self.SVC_info['init_time'] = str(datetime.datetime.now())
 			self.Agenda['SVC'] = schedule.every(5).minutes.do(self.SVC_f).tag("SVC")
 			self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 			self.SVC_controle.setControle(self.SVC_info,self) 
 
+	
 	def finaliza(self, servico):
-		setting = {
-			'stop':True,
-			'keepAlive:': False
-		}
+		""" /* *
+		TODO: Um metodo para evitar essa repetição de instruções
+		*/ """
+		
+		
 		if "SDU" in servico:
-			self.SDU_controle.setControle(setting,self)
+			
 			self.update_info()
 			if self.Jobs['SDU'].isAlive():
 				self.Jobs["SDU"].raise_exception()
 				
 
 		elif "SVC" in servico:
-			self.SVC_controle.setControle(setting,self)
+			self.SVC_info['stop'] = True
+			self.SVC_info['keepAlive'] = False
 			self.update_info()
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
 			schedule.clear('SVC')
+			self.Agenda['SVC'] = None
 		elif "SMS" in servico:
 		
-			self.SMS_controle.setControle(setting,self)
+			self.SMS_info['stop'] = True
+			self.SMS_info['keepAlive'] = False
 			self.update_info()
 			schedule.clear('SMS')
-				
+			self.Agenda['SMS'] = None
 		elif "SRC" in servico:
-			self.SRC_controle.setControle(setting,self)
+			self.SRC_info['stop'] = True
+			self.SRC_info['keepAlive'] = False
 			self.update_info()
 			schedule.clear('SRC')
+			self.Agenda['SRC'] = None
 		elif "ALL" in servico:
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
 			if self.Jobs['SDU'].isAlive():
 				self.Jobs["SDU"].raise_exception()
 
-			self.SVC_controle.setControle(setting,self)
-			self.SDU_controle.setControle(setting,self)
-			self.SMS_controle.setControle(setting,self)
-			self.SRC_controle.setControle(setting,self)
+			self.SVC_info['stop'] = True
+			self.SVC_info['keepAlive'] = False
+			self.SMS_info['stop'] = True
+			self.SMS_info['keepAlive'] = False
+			self.SRC_info['stop'] = True
+			self.SRC_info['keepAlive'] = False
+			self.SRC_info['stop'] = True
+			self.SRC_info['keepAlive'] = False
 			self.update_info()
 			schedule.clear()
+	
 	def run(self,s):
 		if "SRC" in s:
 			loop = asyncio.new_event_loop()
@@ -251,32 +263,33 @@ class Manager(Initialize):
 			return False
 
 	def inicia(self, servico):
-		setting = {
-			'stop':False,
-			'keepAlive:': True
-		}
-		if "svc" in servico:
+		
+		if "SVC" in servico:
 			
-			self.SVC_controle.setControle(setting,self)
+			self.SVC_info['stop'] = False
+			self.SVC_info['keepAlive'] = True
 			self.verifica()
-		elif "sms" in servico:
-			self.SMS_controle.setControle(setting,self)
+		elif "SMS" in servico:
+			self.SMS_info['stop'] = False
+			self.SMS_info['keepAlive'] = True
 			
 			self.verifica()
 
-		elif "src" in servico:
-			self.SRC_controle.setControle(setting,self)
+		elif "SRC" in servico:
+			self.SRC_info['stop'] = False
+			self.SRC_info['keepAlive'] = True
 		
 			self.verifica()
 
-		elif "all" in servico:
-			self.SVC_controle.setControle(setting,self)
-			
+		elif "ALL" in servico:
+			self.SVC_info['stop'] = False
+			self.SVC_info['keepAlive'] = True
 
-			self.SMS_controle.setControle(setting,self)
-			
-			
-			self.SRC_controle.setControle(setting),self
+			self.SMS_info['stop'] = False
+			self.SMS_info['keepAlive'] = True
+
+			self.SRC_info['stop'] = False
+			self.SRC_info['keepAlive'] = True
 			
 			self.inicializando()
 

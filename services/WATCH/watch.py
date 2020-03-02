@@ -115,10 +115,28 @@ class Watch(object):
 		servico = buffer['servico']
 		action = buffer['action']
 		if "parar" in action:
-			self.Manager.finaliza(servico)
+			try:
+				self.Manager.finaliza(servico)
+			except:
+				return {"erro":True,"message":"Não Foi possvel Finalizar a Tarefa"}
+			else:
+				return {"message":"Serviço {} finalizado com Sucesso!".format(servico), "success":True}
+			
 		elif "up" in action:
-			self.Manager.inicia(servico)
+			try:
+				self.Manager.inicia(servico)
+			except Exception as e:
+				return {"erro":True,"message":"Não Foi possvel agendar o inicio desta Tarefa"}
+			else:
+				return {"message":"Serviço {} será iniado de acordo com seu agendamento padrão!".format(servico), "success":True}
+			
 		elif "executar_agora" in action:
+			try:
+				self.Manager.run(servico)
+			except:
+				return {"erro":True,"message":"Não Foi possvel Executa esta Tarefa"}
+			else:
+				return {"message":"Serviço {} está sendo Executado!".format(servico), "success":True}
 			self.Manager.run(servico)
 		elif "info" in action:
 			if 'SMS' in servico:	

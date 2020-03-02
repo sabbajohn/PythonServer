@@ -126,7 +126,7 @@ def query_svc():
 		"action"	: "query_set",
 		"value"		: value
 	}
-		 
+		
 		client.send(bytes(json.dumps(data).encode()))
 		acao('info')
 	elif "2" in buffer:
@@ -137,13 +137,15 @@ def query_svc():
 		"servico"	: servico,
 		"action"	: "query_add",
 		"value"		: value
-	}
+		}
 	
 		client.send(bytes(json.dumps(data).encode()))
 		acao('info')
 	elif "3" in buffer:
 		menuDeServicos()
 	elif "00" in buffer:
+		Menu()
+	else:
 		Menu()
 
 
