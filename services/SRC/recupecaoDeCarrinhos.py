@@ -252,56 +252,6 @@ class recuperacaoDeCarrinhos(object):
 				messages = None
 				return False
 
-	def feedback(self,*args, **kwargst):
-		message = kwargst.get('message')
-		comments = kwargst.get('comments')
-		metodo =kwargst.get('metodo')
-		status =kwargst.get('status')
-		try:
-			erro =kwargst.get('erro')
-		except:
-			erro = False
-		feedback = {
-			"class":"recuperacaoDeCarrinhos",
-			"metodo":kwargst.get('metodo'),
-			"status":kwargst.get('status'),
-			"message":[],
-			"erro":False,
-			"comments":"",
-			"time":None
-		}
-		feedback["metodo"] = metodo
-		feedback["status"] = status
-		feedback["erro"]=erro
-		if feedback['status']== 0:
-			for msg in message:
-				feedback["message"].append( '[OK]:{0}'.format(msg)) 
-			
-		elif feedback['status']== 1:
-			for msg in message:
-				feedback["message"].append('[X]:{0}'.format(msg))
-		elif feedback['status']== 2:
-			for msg in message:
-				feedback["message"].append('[!]:{0}'.format(msg))
-		elif feedback['status']== 3:
-			for msg in message:
-				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
-		elif feedback['status']== 4:
-			for msg in message:
-				feedback["message"].append('[!!!]:{0}'.format(msg))
-		elif feedback['status']== 5:
-			for msg in message:
-				feedback["message"].append('[INFO]:{0}'.format(msg)) 
-		
-		try: 
-			feedback["comments"] = comments
-		except:
-			feedback["comments"] = ""
-		
-		feedback['time'] = datetime.datetime.now()
-	
-		self.Manager.callback(feedback)
-
 	def recCarrinho2(self,*args, **kwargst):
 		message = []
 		message.append( "Inicializando o Recuperação de Carrinhos II")
@@ -380,8 +330,10 @@ class recuperacaoDeCarrinhos(object):
 				self.send2(email)
 				return 
 		except Exception as e:
-			print(e)
-			pass
+			message = []
+			message.append( "{0} ".format(len(e)))
+			self.feedback(metodo="recCarrinho2", status =2, message = message, erro = False )
+			message = None
 
 	def geraBoleto(self,data,carrinho):
 		
@@ -460,7 +412,7 @@ class recuperacaoDeCarrinhos(object):
 					
 					messages = []
 					messages.append("{0} email's foram enviados".format(p['cont'] ))
-					self.feedback(metodo="send2", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho" )
+					self.feedback(metodo="send2", status =5, message = messages, erro = True, comments = "Email's de recuperação de carrinho(ADV)" )
 					messages = None
 					
 					return True
@@ -489,3 +441,54 @@ class recuperacaoDeCarrinhos(object):
 				messages = None
 				return False
 
+	def feedback(self,*args, **kwargst):
+		message = kwargst.get('message')
+		comments = kwargst.get('comments')
+		metodo =kwargst.get('metodo')
+		status =kwargst.get('status')
+		try:
+			erro =kwargst.get('erro')
+		except:
+			erro = False
+		feedback = {
+			"class":"recuperacaoDeCarrinhos",
+			"metodo":kwargst.get('metodo'),
+			"status":kwargst.get('status'),
+			"message":[],
+			"erro":False,
+			"comments":"",
+			"time":None
+		}
+		feedback["metodo"] = metodo
+		feedback["status"] = status
+		feedback["erro"]=erro
+		if feedback['status']== 0:
+			for msg in message:
+				feedback["message"].append( '[OK]:{0}'.format(msg)) 
+			
+		elif feedback['status']== 1:
+			for msg in message:
+				feedback["message"].append('[X]:{0}'.format(msg))
+		elif feedback['status']== 2:
+			for msg in message:
+				feedback["message"].append('[!]:{0}'.format(msg))
+		elif feedback['status']== 3:
+			for msg in message:
+				feedback["message"].append( '[SQL_ERRO]:{0}'.format(msg))
+		elif feedback['status']== 4:
+			for msg in message:
+				feedback["message"].append('[!!!]:{0}'.format(msg))
+		elif feedback['status']== 5:
+			for msg in message:
+				feedback["message"].append('[INFO]:{0}'.format(msg)) 
+		
+		try: 
+			feedback["comments"] = comments
+		except:
+			feedback["comments"] = ""
+		
+		feedback['time'] = datetime.datetime.now()
+	
+		self.Manager.callback(feedback)
+
+	
