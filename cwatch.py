@@ -51,14 +51,9 @@ def client_sender(buffer):
 		else:
 			print(colored("Connected","green"))
 			Menu()
-		
-					
-						
+	
 
-						
-
-			
-				
+	
 """ except (ConnectionResetError,BrokenPipeError) as e:
 	print(colored(type(e), "red", "on_grey"))	
 	print(colored(e, "yellow"))
@@ -76,7 +71,7 @@ def formata(r):
 		response = json.loads(r)
 		keys = response.keys()
 		for key in keys:
-			if (key == "query_set" or key == "query") and "SVC" in servico:
+			if (key == "query_set" or key == "query") and ("SVC" in servico or "SRC" in servico ):
 				print(colored("{}:".format(key), "green"))
 				for i,x in enumerate(response[key]):
 					print(colored("	{}:".format(i), "green"),colored("{}".format(x), "yellow"))
@@ -174,6 +169,7 @@ def acao(action):
 			menuDeServicos()
 		else:
 			menuDeServicos()
+
 def usage():
 	print("")
 	print("")

@@ -244,6 +244,8 @@ class Manager(Initialize):
 			self.SRC_info['keepAlive'] = False
 			self.update_info()
 			schedule.clear()
+			self.Agenda = None
+			self.Agenda = []
 	
 	def run(self,s):
 		if "SRC" in s:

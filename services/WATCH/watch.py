@@ -82,8 +82,12 @@ class Watch(object):
 				try:
 					cmd_buffer += str(client_socket.recv(4096),encoding="utf-8").rstrip()
 					if len(cmd_buffer):
-						buffer = json.loads(cmd_buffer)
-						r = self.buffer_recv(buffer,client_socket)
+						
+						if 'exit' in cmd_buffer or  cmd_buffer == '0':
+						return
+						else:
+							buffer = json.loads(cmd_buffer)
+							r = self.buffer_recv(buffer,client_socket)
 						if(r):
 							client_socket.send(bytes(json.dumps(r).encode()))
 							cmd_buffer = ''
@@ -108,7 +112,7 @@ class Watch(object):
 
 					self.feedback(metodo="client_handler", status =5, message = message, erro = False, comments="Era para ser code 4 mas ainda preciso remodelar os erros")
 					message = None
-					
+					break
 				continue
 
 	def buffer_recv(self, buffer,client_socket):
