@@ -84,7 +84,7 @@ class Watch(object):
 					if len(cmd_buffer):
 						
 						if 'exit' in cmd_buffer or  cmd_buffer == '0':
-						return
+							return
 						else:
 							buffer = json.loads(cmd_buffer)
 							r = self.buffer_recv(buffer,client_socket)
