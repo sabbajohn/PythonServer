@@ -210,17 +210,17 @@ class Manager(Initialize):
 			self.update_info()
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
-			
+			schedule.clear('SVC')
 		elif "SMS" in servico:
 		
 			self.SMS_controle.setControle(setting,self)
 			self.update_info()
-
+			schedule.clear('SMS')
 				
 		elif "SRC" in servico:
 			self.SRC_controle.setControle(setting,self)
 			self.update_info()
-		
+			schedule.clear('SRC')
 		elif "ALL" in servico:
 			if self.Jobs['SVC'].isAlive():
 				self.Jobs["SVC"].raise_exception()
@@ -232,7 +232,7 @@ class Manager(Initialize):
 			self.SMS_controle.setControle(setting,self)
 			self.SRC_controle.setControle(setting,self)
 			self.update_info()
-
+			schedule.clear()
 	def run(self,s):
 		if "SRC" in s:
 			loop = asyncio.new_event_loop()
