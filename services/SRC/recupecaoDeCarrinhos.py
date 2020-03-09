@@ -337,7 +337,7 @@ class recuperacaoDeCarrinhos(object):
 
 	def geraBoleto(self,data,carrinho):
 		
-
+		weekDays = ("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
 		self.Manager.MP_info['boletos_gerados'] += 1
 		body = json.dumps(data).encode('utf8')
 		url = "{}access_token={}".format(self.Manager.MP_info['url'],self.Manager.MP_info['api_key'])
@@ -358,6 +358,37 @@ class recuperacaoDeCarrinhos(object):
 			vencimento = response['date_of_expiration'].split("T")[0]
 			query = "INSERT INTO `megasorte`.`boleto_mp` (`gateway_payment_id`, `id_cliente`, `valor`, `vencimento`, `nosso_numero`, `linha_digitavel`, `link_mp`, `id_status`) VALUES ({0}, {1}, {2}, '{3}', '{4}', '{5}', '{6}', 0)".format(response['id'],carrinho[1], response['transaction_amount'],vencimento,response['transaction_details']['payment_method_reference_id'],response['barcode']['content'],response['transaction_details']['external_resource_url'])
 			self.database.execute("W",query,commit=True)
+			today = datetime.datetime.now().weekday()
+			weekday = weekDays[today]
+
+			log = {
+				"env"  : "production",
+				"fn"   : "BOLETO-SRC",
+				"type" : "BOLETO-SRC", 
+				"cliente":{
+					"sexo":carrinho[13],
+					"cidade":carrinho[8],
+					"uf":carrinho[9],
+					"nascimento":str(carrinho[14])
+				},
+				"payment":{
+					"payment_method_id":"BOLETO-SRC",
+					"status":"approved",
+					"transaction_amount":response['transaction_amount'],
+					"weekday":weekday,
+					
+				},
+				"pdv":{
+					"CNPJ":"",
+					"codigo":"",
+					
+				}
+			}
+			with open("/tmp/megasorte-credito.log","a+") as f:
+				l = json.dumps(log)
+				f.write(l)
+				f.write('\n')
+			f.close
 			carrinho.append(response['barcode']['content'])
 			carrinho.append(response['transaction_details']['external_resource_url'])
 			return carrinho
