@@ -296,7 +296,7 @@ class recuperacaoDeCarrinhos(object):
 					else:
 						sobrenome = nome[len(nome)-2]
 					nome = nome[0]
-					total = float(carrinho[11]*carrinho[14])
+					total = float(carrinho[11]*carrinho[16])
 					if total < 10:	
 						valorBoleto = 10
 					else:
@@ -373,10 +373,10 @@ class recuperacaoDeCarrinhos(object):
 		global_merge_vars=  [{'content':  self.Manager.LINK_info['link_site'], 'name': 'link_site'},{'content': self.Manager.LINK_info['contact_mail'], 'name': 'CONTACT_MAIL'},{'content':  self.Manager.LINK_info['link_de_compra'], 'name': 'link_de_compra'}]
 		for x in result:
 			nome = x[2].split(" ",1)
-			valor = float(x[14])*float(x[11])
+			valor = float(x[16])*float(x[11])
 			valor = format(valor, '.2f').replace(".",",")
 			vlbilhete = format(x[11], '.2f').replace(".",",")
-			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[15],'name':'linhaDigitavel'},{'content':x[16],'name':'link_boleto'},{'content':valor,'name':'Valor'}]})
+			merge_vars.append({'rcpt':x[3],'vars': [{'content': nome[0], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x[17],'name':'linhaDigitavel'},{'content':x[18],'name':'link_boleto'},{'content':valor,'name':'Valor'}]})
 			#É aqui que vou passar raiva, nem lembro o que é isso
 			values_to = []
 			values_to.append(x[3])

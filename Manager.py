@@ -371,6 +371,9 @@ class Manager(Initialize):
 				self.Logs(e)
 
 	def Logs(self, e):
+		""" 
+		TODO:Definir arquivos de logs individuais para cada serviço para melhor analise dos mesmos
+		"""
 		e["ENV"] = self.Controle.Key.env
 		log = logging.getLogger('{message:{fill}^{width}}'.format(message=e['class']+"."+e['metodo'],fill=" ",align="^",width=50	))
 		for msg in e['message']:
