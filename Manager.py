@@ -112,7 +112,7 @@ class Manager(Initialize):
 
 			if self.SVC_info['init'] is True:
 				self.SVC_info['init_time']=str(datetime.datetime.now())
-				self.Agenda['SVC'] = schedule.every(1).minutes.do(self.SVC_f).tag("SVC")
+				self.Agenda['SVC'] = schedule.every(2).minutes.do(self.SVC_f).tag("SVC")
 				self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 				self.SVC_controle.setControle(self.SVC_info,self) 
 
@@ -189,7 +189,7 @@ class Manager(Initialize):
 		if (not self.Jobs['SVC'] is None) and (self.SVC_info['keepAlive'] is True):
 
 			self.SVC_info['init_time'] = str(datetime.datetime.now())
-			self.Agenda['SVC'] = schedule.every(5).minutes.do(self.SVC_f).tag("SVC")
+			self.Agenda['SVC'] = schedule.every(2).minutes.do(self.SVC_f).tag("SVC")
 			self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 			self.SVC_controle.setControle(self.SVC_info,self) 
 
