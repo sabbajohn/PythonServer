@@ -463,11 +463,7 @@ class recuperacaoDeCarrinhos(object):
 					"weekday":weekday,
 					
 				},
-				"pdv":{
-					"CNPJ":"",
-					"codigo":"",
-					
-				}
+				
 			}
 		with open("/tmp/megasorte-credito.log","a+") as f:
 			l = json.dumps(log)
