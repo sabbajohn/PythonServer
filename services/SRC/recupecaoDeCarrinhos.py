@@ -449,7 +449,7 @@ class recuperacaoDeCarrinhos(object):
 		log = {
 				"env"  : "production",
 				"fn"   : "BOLETO-SRC",
-				"type" : "BOLETO-SRC", 
+				"type" : "Credito", 
 				"cliente":{
 					"sexo":carrinho[13],
 					"cidade":carrinho[8],
@@ -465,7 +465,7 @@ class recuperacaoDeCarrinhos(object):
 				},
 				
 			}
-		with open("/tmp/megasorte-credito.log","a+") as f:
+		with open("/tmp/megasorte-vendas.log","a+") as f:
 			l = json.dumps(log)
 			f.write(l)
 			f.write('\n')
