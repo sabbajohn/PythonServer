@@ -800,7 +800,7 @@ class servicos(Controle):
 						if len(variavel[key]) > len(self.query):
 							self.query = list(set().union(self.query,variavel[key])) 
 							for i, x in enumerate(self.query):
-								Controle.Config.set("SRC",i, str(x))
+								Controle.Config.set("SRC",str(i), str(x))
 						else:
 							self.query = variavel[key]
 					elif 'query_set' == key:
