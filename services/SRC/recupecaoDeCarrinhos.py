@@ -449,7 +449,7 @@ class recuperacaoDeCarrinhos(object):
 		log = {
 				"env"  : "production",
 				"fn"   : "BOLETO-SRC",
-				"type" : "Credito", 
+				"type" : "CREDITO", 
 				"cliente":{
 					"sexo":carrinho[13],
 					"cidade":carrinho[8],
