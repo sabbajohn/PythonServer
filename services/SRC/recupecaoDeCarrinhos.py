@@ -465,7 +465,7 @@ class recuperacaoDeCarrinhos(object):
 				},
 				
 			}
-		with open("/tmp/megasorte-vendas.log","a+") as f:
+		with open("/tmp/megasorte-venda.log","a+") as f:
 			l = json.dumps(log)
 			f.write(l)
 			f.write('\n')
