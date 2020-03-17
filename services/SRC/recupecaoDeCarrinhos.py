@@ -448,8 +448,8 @@ class recuperacaoDeCarrinhos(object):
 		weekday = weekDays[today]
 		log = {
 				"env"  : "production",
-				"fn"   : "BOLETO-SRC",
-				"type" : "CREDITO", 
+				"fn"   : "SRC-II",
+				"type" : "BOLETO-SRC", 
 				"cliente":{
 					"sexo":carrinho[13],
 					"cidade":carrinho[8],
