@@ -102,7 +102,7 @@ class servicoDeValidacao(object):
 			self.contador_hd =self.Manager.HUBD_info['consultas']
 			self.contador_dispensadas = 0
 			self.contador_ViaCep = self.Manager.VIACEP_info['consultas']
-			self.Manager.update_info()
+			
 			
 			time.sleep(1)
 			return

@@ -93,31 +93,32 @@ class Manager(Initialize):
 		self.Controle.writeConfigFile(self)
 		return
 	
+
 	def inicializando(self):
 		self.update_info()
 		try:
 			self.Jobs['WATCH'].start()
-			
+			self.Agenda['UPDATE'] = schedule.every().day.at("12:30").do(self.atualiza).tag('UPDATE')
 			if self.SMS_info["init"] is True:
 				self.SMS_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
 				self.SMS_info['next_run'] = str(self.Agenda["SMS"].next_run)
-				self.SMS_controle.setControle(self.SMS_info,self)
+				#self.SMS_controle.setControle(self.SMS_info,self)
 
 
 			if self.SRC_info['init'] is True:
 				self.SRC_info['init_time']=str(datetime.datetime.now())
-				#self.Agenda['SRC'] = schedule.every(1).minutes.do(self.SRC_f).tag('SRC')
-				self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
+				self.Agenda['SRC'] = schedule.every(1).minutes.do(self.SRC_f).tag('SRC')
+				#self.Agenda['SRC'] = schedule.every().hour.at(":00").do(self.SRC_f).tag('SRC')
 				self.SRC_info['next_run'] = str(self.Agenda["SRC"].next_run)
-				self.SRC_controle.setControle(self.SRC_info,self)
+				#self.SRC_controle.setControle(self.SRC_info,self)
 
 
 			if self.SVC_info['init'] is True:
 				self.SVC_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SVC'] = schedule.every(2).minutes.do(self.SVC_f).tag("SVC")
 				self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
-				self.SVC_controle.setControle(self.SVC_info,self) 
+				#self.SVC_controle.setControle(self.SVC_info,self) 
 
 		
 		except Exception as err:
@@ -154,6 +155,10 @@ class Manager(Initialize):
 		
 		self.update_info()
 		self.Agendados()
+
+	def atualiza(self):
+		shedule.clear()
+		self.inicializando()
 
 	def Agendados(self):
 		while True:
@@ -196,7 +201,6 @@ class Manager(Initialize):
 			self.SVC_info['next_run'] = str(self.Agenda["SVC"].next_run)
 			self.SVC_controle.setControle(self.SVC_info,self) 
 
-	
 	def finaliza(self, servico):
 		""" /* *
 		TODO: Um metodo para evitar essa repetição de instruções

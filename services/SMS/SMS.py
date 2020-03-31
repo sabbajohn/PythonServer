@@ -39,7 +39,7 @@ class SMS(object):
 			self.Manager.SMS_info['last_run'] = str(self.Manager.Agenda['SMS'].last_run)
 			self.Manager.SMS_controle.setControle(self.Manager.SMS_info,self.Manager)
 			self.Manager.COMTELE_controle.setControle(self.Manager.COMTELE_info,self.Manager)
-			self.Manager.update_info()
+			
 
 			time.sleep(1)
 			return
@@ -65,7 +65,7 @@ class SMS(object):
 		message = None
 		escreveu = False
 		#quem sabe botar isso dentro de um try
-		self.Manage.update_info()
+		
 		
 	
 		try:
@@ -158,7 +158,7 @@ class SMS(object):
 				
 				
 		except Exception as e:
-			self.Manager.update_info()
+		
 			
 			message = []
 			message.append(type(e))
