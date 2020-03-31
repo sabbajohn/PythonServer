@@ -7,11 +7,11 @@ from datetime import date
 import json
 import requests
 import random
-
+from utils import funcoes
 
 class Digimais(object):
 	
- def __init__(self, M):
+	def __init__(self, M):
 		try:
 			self.Manager
 		except NameError:
@@ -51,6 +51,31 @@ class Digimais(object):
 		
 		return response
 	
+	def dados(self, type, compra, form, cliente):
+		
+		if 'incluir_cliente' in type:
+			data = {
+				"cardHolder" : {
+					"entity" : {
+						"name"				 	: cliente["Nome"],
+						"phoneCelular"		 	: funcoes.soNumero(cliente["Ceular"]),
+						"email"				 	: cliente["Email"],
+						"erpUniqueId"		 	: cliente["id"],
+						"vatNumber"			 	: funcoes.soNumero(cliente["CPFCNPJ"]),
+						"identificationTypeId" :1
+					}
+				}
+				
+				
+			}
+		else:
+			data = {}
+		
+		if len(data)>0:
+			return data
+		else:
+			return False
+		
 	def Logs(self, request, response):
 			log = {
 				'datetime' str(datetime.datetime.now())
