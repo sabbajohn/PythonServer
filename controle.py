@@ -509,6 +509,7 @@ class logs(Controle):
 		self.startup_log	= Controle.Config.get("LOGS","startup_log")
 		self.watch_log		= Controle.Config.get("LOGS","watch_log")
 		self.Digimais_log	= Controle.Config.get("LOGS","digimais")
+		self.MercadoPago_log	= Controle.Config.get("LOGS","mercadopago")
 
 class files(Controle):
 	def __init__(self,Controle):
