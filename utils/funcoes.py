@@ -2,7 +2,7 @@
 # coding: utf-8
 import sys
 import os
-import datetime
+from datetime import datetime
 from datetime import date
 import json
 import re
@@ -31,3 +31,36 @@ def todict(obj, classkey=None):
 			return data
 		else:
 			return obj
+
+def saveGoogleLog( carrinho, response):
+		weekDays = ("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+		today = datetime.now().weekday()
+		weekday = weekDays[today]
+		log = {
+				"env"  : "production",
+				"fn"   : "SRC-II",
+				"type" : "BOLETO-SRC", 
+				"cliente":{
+					"sexo":carrinho['Sexo'],
+					"cidade":carrinho['Cidade'],
+					"uf":carrinho['SgUF'],
+					"nascimento":str(carrinho[14])
+				},
+				"payment":{
+					"payment_method_id":"BOLETO-SRC",
+					"status":"approved",
+					"transaction_amount":carrinho['boleto']['valor'],
+					"weekday":weekday,
+					
+				},
+				
+			}
+		with open("/tmp/megasorte-venda.log","a+") as f:
+			l = json.dumps(log)
+			f.write(l)
+			f.write('\n')
+		f.close
+		return
+def formataValor(val):
+    
+	return format(val, '.2f').replace(".",",")
