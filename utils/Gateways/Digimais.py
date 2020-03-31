@@ -106,18 +106,18 @@ class Digimais(object):
 		}
 
 		transacao = self.tranascao('gerar_boleto', boleto)
-		if transacao.body['responseCode'] == '0':
+		if transacao['body']['responseCode'] == '0':
 			boleto_dm = {
 			"id_cliente"		 	: carrinho["user_id"],
-			"gateway_payment_id" 	: transacao["invoiceUUID"],
+			"gateway_payment_id" 	: transacao['body']["invoiceUUID"],
 			"valor"			  		: valor_boleto,
 			"vencimento"		 	: datetime.date(datetime.now()) + timedelta(weeks=5),
-			"nosso_numero"	   		: transacao["uniqueInvoiceNumber"],
-			"linha_digitavel"		: transacao["barcode"],
-			"url"					: transacao["url"],
+			"nosso_numero"	   		: transacao['body']["uniqueInvoiceNumber"],
+			"linha_digitavel"		: transacao['body']["barcode"],
+			"url"					: transacao['body']["url"],
 		}
 			query = "INSERT INTO %s (%s) VALUES(%s)" % ('boleto_digimais', ",".join(boleto_dm.keys()), ",".join(boleto_dm.values()))
-			boleto_id = self.database('W',query,commit=True)
+			self.database('W',query,commit=True)
 			return = boleto_dm
 		else:
 			return False
