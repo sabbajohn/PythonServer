@@ -107,7 +107,7 @@ class DB:
 		cursor.close()
 		conn.close()
 
-	def execute(self,mode, sql, args=None, commit=False):
+	def execute(self,mode, sql, args=None, commit=False,serialized = False):
 		"""
 		Execute a sql, it could be with args and with out args. The usage is 
 		similar with execute() function in module pymysql.
@@ -148,6 +148,15 @@ class DB:
 			self.close(conn, cursor)
 			return None
 		else:
+			if serialized:
+				row_headers=[x[0] for x in cursor.description] 
+				res = cursor.fetchall()
+				response = []
+				for result in res:
+					response.append(dict(zip(row_headers,result)))
+				self.close(conn, cursor)
+				return response
+
 			res = cursor.fetchall()
 			self.close(conn, cursor)
 			return res
