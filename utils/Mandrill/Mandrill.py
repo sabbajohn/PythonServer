@@ -84,8 +84,8 @@ class Mandrill(object):
 			"message":message,
 			"cont":cont
 		}
-  
-	def send(self, type, data):
+
+	def send(self, data):
 		lista_de_envio = None
 		
 		lista_de_envio = self.Params(data)
