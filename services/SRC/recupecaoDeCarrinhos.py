@@ -13,6 +13,9 @@ import mandrill
 import configparser	
 import requests
 import random
+from utils.Gateways.Digimais import Digimais
+from utils.Mandrill.Mandrill import Mandrill
+from utils import funcoes
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 		
@@ -289,47 +292,35 @@ class recuperacaoDeCarrinhos(object):
 				message = None
 				
 				for i, carrinho in enumerate(carrinhos):
-					carrinho = list(carrinho)
-					carrinhos[i] = list(carrinhos[i])
-					nome = carrinho[2].split(" ")
+					
+					
+					carrinho['fullNome'] = carrinho['nome']
+					nome = carrinho[̈́'nome'] .split(" ")
 					if not nome[len(nome)-1] == "":
 						sobrenome = nome[len(nome)-1]
 					else:
 						sobrenome = nome[len(nome)-2]
-					nome = nome[0]
+					carrinho['nome'] = nome[0]
+					carrinho['sobrenome'] =  sobrenome
 					total = float(carrinho[11]*carrinho[16])
 					if total < 10:	
-						valorBoleto = 10
+						carrinho['ValorBoleto'] = float(10)
 					else:
-						valorBoleto = total
-						valorBoleto = format(valorBoleto, '.2f')
+						
+						carrinho['ValorBoleto'] = funcoes.formataValor(total)
+					
+					if 'Digimais' in self.Manager.Controle.Key.gateway:
+						Gate = Digimais(self.Manager)
+						boleto = Gate.boleto(carrinho)
+						if boleto:
+							carrinho['boleto'] = boleto
+							carrinhos[i] = carrinho
+							funcoes.saveGoogleLog(carrinho)
+					else:
+						return
 
-					data= {
-						"transaction_amount": float(valorBoleto),
-						"description": "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGA SORTE",
-						"payment_method_id": "bolbradesco",
-						"payer": {
-							"email": carrinho[3],
-							"first_name": nome,
-							"last_name": sobrenome,
-							"identification": {
-								"type": "CPF",
-								"number": carrinho[4]
-							},
-							"address": {
-								"zip_code": carrinho[10],
-								"street_name": carrinho[5],
-								"street_number": carrinho[6],
-								"neighborhood": carrinho[7],
-								"city": carrinho[8],
-								"federal_unit": carrinho[9]
-							}
-						}  
-					}
-					#TODO decidir qual Gateway utilizar
-					carrinhos[i] = self.geraBoletoMP(data, carrinho)
-				email = self.emailParams2(carrinhos)
-				self.send2(email)
+				Mandrill = Mandrill(self.Manager)
+				Mandrill.send('boleto', carrinhos)
 				return 
 		except Exception as e:
 			message = []
@@ -376,24 +367,7 @@ class recuperacaoDeCarrinhos(object):
 			carrinho.append(response['transaction_details']['external_resource_url'])
 			return carrinho
 			# retorna dados do boleto 
-	
-	def digimais_transacao(self, type, data):
-		api_url = {
-		"incluir_cliente"		: "/acquire/cardHolder/add",
-		"salvar_cartao"			: "/acquire/cardManager/add",
-		"compra_direta"			: "/acquire/card/authorize",
-		"compra_cartao_salvo"	: "/acquire/card/authorize",
-		"remover_cartao"		: "/acquire/cardManager/remove",
-		"gerar_boleto"			: "/acquire/invoice/create"
-		}
-	
-	default_headers = [
-		"Content-Type: application/json", 
-		"requester-id: {}".format(),
-		"requester-token: {}".format(),
-		"unique-trx-id: {}".format()
-	];
- 
+
 	def geraBoletoMP(self,data,carrinho):
 		
 		
@@ -422,7 +396,6 @@ class recuperacaoDeCarrinhos(object):
 			carrinho.append(response['transaction_details']['external_resource_url'])
 			return carrinho
 			# retorna dados do boleto 
-	
 	
 	def emailParams2(self, result):
 		cont = 0
@@ -582,16 +555,3 @@ class recuperacaoDeCarrinhos(object):
 	
 		self.Manager.callback(feedback)
 
-	
-	"""  "incluir_cliente":
-            $data = [
-                "cardHolder" => [
-                    "entity" => [
-                        "name"                 => $cliente["Nome"],
-                        "phoneCelular"         => soNumero($form["Ceular"]),
-                        "email"                => $cliente["Email"],
-                        "erpUniqueId"          => $cliente["id"],
-                        "vatNumber"            => soNumero($cliente["CPFCNPJ"]),
-                        "identificationTypeId" => 1
-                    ]
-                ] """
