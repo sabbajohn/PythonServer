@@ -172,7 +172,7 @@ class API(Controle):
 		self.comtele 	= self.comtele(Controle)
 		self.viacep 	= self.viacep(Controle)
 		self.mp			= self.mp(Controle)
-			
+		self.digimais	= self.digimais(Controle)	
 
 	
 	class viacep:
@@ -453,7 +453,8 @@ class API(Controle):
 				'destinationUUID':			self.destinationUUID,
 				'transactionUUID':			self.transactionUUID,
 				'url' :						self.url,
-				'boletos_gerados' :			self.boletos_gerados
+				'boletos_gerados' :			self.boletos_gerados,
+				'cardtype':					self.cardtype
 				}
 			return var
 class LINK(Controle):

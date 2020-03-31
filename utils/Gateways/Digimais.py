@@ -12,21 +12,19 @@ from datetime import timedelta
 class Digimais(object):
 	
 	def __init__(self, M):
-		try:
-			self.Manager
-		except NameError:
-			self.Manager 			= M
-			self.database 			= self.Manager.database
-			self.Logfile			= M.Controle.logs.Digimais_log
-		self.url				= self.Manager.Digimais_info['url']
-		self.token				= self.Manager.Digimais_info['token']
-		self.gateway_uuid		= self.Manager.Digimais_info['gateway_id']
-		self.cardTypeUUID 		= self.Manager.Digimais_info['cardtype']
-		self.resquester_id		= self.Manager.Digimais_info['requesterId']
+	
+		self.Manager 			= M
+		self.database 			= self.Manager.database
+		self.Logfile			= M.Controle.logs.Digimais_log
+		self.url				= self.Manager.DIGIMAIS_info['url']
+		self.token				= self.Manager.DIGIMAIS_info['token']
+		self.gateway_uuid		= self.Manager.DIGIMAIS_info['gateway_id']
+		self.cardTypeUUID 		= self.Manager.DIGIMAIS_info['cardtype']
+		self.resquester_id		= self.Manager.DIGIMAIS_info['requesterId']
 		
-		self.boletos_gerados 	= self.Manager.Digimais_info['boletos_gerados']
+		
 
-	def	tranascao(self,type,data):
+	def	transacao(self,type,data):
 		unique_id			= random.randrange(0, 999999999)
 		api_url = {
 			"incluir_cliente"		: "/acquire/cardHolder/add",
@@ -38,13 +36,15 @@ class Digimais(object):
 		}
 		
 		default_headers = {
-			"Content-Type: application/json", 
-			"requester-id: {}".format(self.resquester_id),
-			"requester-token: {}".format(self.token),
-			"unique-trx-id: {}".format(unique_id)
+			"Content-Type": "application/json", 
+			"requester-id":	self.resquester_id,
+			"requester-token": self.token,
+			"unique-trx-id": str(unique_id)
 		}
-		res = requests.post(url=self.url+api_url[type], data=body, headers=default_headers)
-		self.Logs({'headers':default_headers,'body':body},res)
+		#default_headers = json.dumps(default_headers).encode('utf8')
+		data = json.dumps(data).encode('utf8')
+		res = requests.post(self.url+api_url[type], data=data, headers=default_headers,timeout=3.50)
+		self.Logs({'headers':default_headers,'body':data},res)
 		response = {
 			'status_code': res.status_code,
 			'body':json.loads(res.text)
@@ -59,7 +59,7 @@ class Digimais(object):
 				"cardHolder" : {
 					"entity" : {
 						"name"				 	: cliente["Nome"],
-						"phoneCelular"		 	: funcoes.soNumero(cliente["Ceular"]),
+						"phoneCelular"		 	: funcoes.soNumero(cliente["Celular"]),
 						"email"				 	: cliente["Email"],
 						"erpUniqueId"		 	: cliente["id"],
 						"vatNumber"			 	: funcoes.soNumero(cliente["CPFCNPJ"]),
@@ -79,11 +79,12 @@ class Digimais(object):
 	
 	def boleto(self, carrinho):
 		if not carrinho['digimais_id']:
-			cardHolder = self.dados("incluir_cliente", false, false, carrinho)
+			cardHolder = self.dados("incluir_cliente", False, False, carrinho)
 		if cardHolder:
-			transacao = self.transacao("incluir_cliente", card_holder)
-			if transacao.body['responseCode'] == '0':
-				cardHolderUUID = carrinho["digimais_id"] = transacao["cardHolderUUID"]
+			transacao = self.transacao("incluir_cliente", cardHolder)
+			if transacao['body']['responseCode'] == '0':
+				self.Manager.DIGIMAIS_info['boletos_gerados'] += 1
+				cardHolderUUID = carrinho["digimais_id"] = transacao['body']["cardHolderUUID"]
 				cliente_id = carrinho["id"]
 				query = 'UPDATE cliente SET digimais_id = "{}" WHERE id = {}'.format(cardHolderUUID, cliente_id)
 				self.database.execute("W",query,commit=True)
@@ -101,11 +102,11 @@ class Digimais(object):
 			"destinationUUID"		: self.destinationUUID,
 			"dateDue"				: datetime.date(datetime.now()) + timedelta(weeks=5),
 			"transactionType"		: 1,
-			"callBackInvoiceInfoURL" : callBack
+			"callBackInvoiceInfoURL" : callBack,
 			"softDescriptor"		 : "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGA SORTE"
 		}
 
-		transacao = self.tranascao('gerar_boleto', boleto)
+		transacao = self.transacao('gerar_boleto', boleto)
 		if transacao['body']['responseCode'] == '0':
 			boleto_dm = {
 			"id_cliente"		 	: carrinho["user_id"],
@@ -118,13 +119,13 @@ class Digimais(object):
 		}
 			query = "INSERT INTO %s (%s) VALUES(%s)" % ('boleto_digimais', ",".join(boleto_dm.keys()), ",".join(boleto_dm.values()))
 			self.database('W',query,commit=True)
-			return = boleto_dm
+			return boleto_dm
 		else:
 			return False
 
 	def Logs(self, request, response):
 			log = {
-				'datetime' str(datetime.datetime.now())
+				'datetime': str(datetime.now()),
 				'request': request,
 				'response':{
 					'status_code':response.status_code,

@@ -168,7 +168,7 @@ class recuperacaoDeCarrinhos(object):
 		
 		try:
 			carrinhos = None
-			carrinhos = self.database.execute("R",self.Manager.SRC_info['query'][1],'serialized'=True)
+			carrinhos = self.database.execute("R",self.Manager.SRC_info['query'][1],serialized=True)
 
 			if len(carrinhos)>0:
 			
@@ -184,22 +184,22 @@ class recuperacaoDeCarrinhos(object):
 				message = None
 				emails = []
 				message = []
-				message.append('Gerando Boletos via MP')
+				message.append('Gerando Boletos via {}'.format(self.Manager.Controle.Key.gateway))
 				self.feedback(metodo="recCarrinho2", status =5, message = message )
 				message = None
 				
 				for i, carrinho in enumerate(carrinhos):
 					
 					
-					carrinho['fullNome'] = carrinho['nome']
-					nome = carrinho[̈́'nome'] .split(" ")
+					
+					nome =  carrinho['Nome'].split(" ")
 					if not nome[len(nome)-1] == "":
 						sobrenome = nome[len(nome)-1]
 					else:
 						sobrenome = nome[len(nome)-2]
-					carrinho['nome'] = nome[0]
-					carrinho['sobrenome'] =  sobrenome
-					total = float(carrinho[11]*carrinho[16])
+					carrinho['Nome'] = nome[0]
+					carrinho['Sobrenome'] =  sobrenome
+					total = float(carrinho['Quantidade']*carrinho['VlBilhete'])
 					if total < 10:	
 						carrinho['ValorBoleto'] = float(10)
 					else:
@@ -277,7 +277,7 @@ class recuperacaoDeCarrinhos(object):
 		except:
 			feedback["comments"] = ""
 		
-		feedback['time'] = datetime.datetime.now()
+		feedback['time'] = str(datetime.datetime.now())
 	
 		self.Manager.callback(feedback)
 

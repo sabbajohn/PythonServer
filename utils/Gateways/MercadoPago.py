@@ -10,7 +10,7 @@ from utils import funcoes
 from datetime import timedelta  
 
 class MercadoPago(object):
-    def __init__(self, M):
+	def __init__(self, M):
 		try:
 			self.Manager
 		except NameError:
@@ -55,7 +55,7 @@ class MercadoPago(object):
 		}
 		
 		self.Manager.MP_info['boletos_gerados'] += 1
-		boleto = json.dumps(boleto).encode('utf8')
+		
 		
 		
 		transacao = self.transacao(boleto)
@@ -67,7 +67,7 @@ class MercadoPago(object):
 				"id_cliente"		 	: carrinho["user_id"],
 				"gateway_payment_id" 	: transacao['body']["id"],
 				"valor"			  		: boleto_mp['body']['transaction_amount'],
-				"vencimento"		 	: transacao['body']['date_of_expiration'].split("T")[0]
+				"vencimento"		 	: transacao['body']['date_of_expiration'].split("T")[0],
 				"nosso_numero"	   		: transacao['body']['transaction_details']['payment_method_reference_id'],
 				"linha_digitavel"		: transacao['body']['barcode']['content'],
 				"link_mp"				: transacao['body']['transaction_details']['external_resource_url'],
@@ -83,7 +83,7 @@ class MercadoPago(object):
 
 	def Logs(self, request, response):
 			log = {
-				'datetime' str(datetime.datetime.now())
+				'datetime': str(datetime.now()),
 				'request': request,
 				'response':{
 					'status_code':response.status_code,
