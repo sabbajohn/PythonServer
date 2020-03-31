@@ -112,10 +112,10 @@ class Key(Controle):
 		
 	
 		
-		self.env  = Controle.Config.get("KEY","env")
-		self.root = Controle.Config.get("KEY","root")
-		self.user = Controle.Config.get("KEY","user")
-
+		self.env  		= Controle.Config.get("KEY","env")
+		self.root 		= Controle.Config.get("KEY","root")
+		self.user 		= Controle.Config.get("KEY","user")
+		self.gateway 	= Controle.Config.get("KEY","gateway")
 class DB(Controle):
 
 	def __init__(self,Controle):
