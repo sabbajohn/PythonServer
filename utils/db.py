@@ -107,7 +107,7 @@ class DB:
 		cursor.close()
 		conn.close()
 
-	def execute(self,mode, sql, args=None, commit=False,serialized = False):
+	def execute(self,mode, sql, args=None, commit=False, serialized = False, lastId = False):
 		"""
 		Execute a sql, it could be with args and with out args. The usage is 
 		similar with execute() function in module pymysql.
@@ -145,6 +145,10 @@ class DB:
 		
 		if commit is True:
 			conn.commit()
+			if lastId is True:
+				rowId = cursor.lastrowid
+				self.close(conn, cursor)
+				return rowId
 			self.close(conn, cursor)
 			return None
 		else:
