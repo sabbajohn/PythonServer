@@ -12,6 +12,7 @@ import threading
 import mandrill
 import configparser	
 import requests
+import random
 class recuperacaoDeCarrinhos(object):
 	def __init__(self, M):
 		
@@ -267,7 +268,7 @@ class recuperacaoDeCarrinhos(object):
 		
 		try:
 			carrinhos = None
-			carrinhos = self.database.execute("R",self.Manager.SRC_info['query'][1])
+			carrinhos = self.database.execute("R",self.Manager.SRC_info['query'][1],'serialized'=True)
 
 			if len(carrinhos)>0:
 			
@@ -325,7 +326,8 @@ class recuperacaoDeCarrinhos(object):
 							}
 						}  
 					}
-					carrinhos[i] = self.geraBoleto(data, carrinho)
+					#TODO decidir qual Gateway utilizar
+					carrinhos[i] = self.geraBoletoMP(data, carrinho)
 				email = self.emailParams2(carrinhos)
 				self.send2(email)
 				return 
@@ -335,7 +337,64 @@ class recuperacaoDeCarrinhos(object):
 			self.feedback(metodo="recCarrinho2", status =2, message = message, erro = False )
 			message = None
 
-	def geraBoleto(self,data,carrinho):
+	def geraBoletoDigimais(self,data,carrinho):
+		
+		
+		self.Manager.DIGIMAIS_info['boletos_gerados'] += 1
+		boleto = {
+			"amount"                 => data['valor_boleto'],
+			"invoiceTemplateUUID"    => invoiceTemplateUUID,
+			"originUUID"             => cliente["digimais_id"],
+			"transactionUUID"        => $transactionUUID,
+			"destinationUUID"        => $destinationUUID,
+			"dateDue"                => date("Y-m-d", strtotime("5 weekdays")),
+			"transactionType"        => 1,
+			"callBackInvoiceInfoURL" => $is_online_server ? "https://www.megasorte.com/gateway/notifications_digimais" : "https://webhook.site/28100f89-bb10-4fd3-afd7-8edb0c1c1130",
+			"softDescriptor"         => "Mega Sorte - Título de Capitalização"
+		}
+		body = json.dumps(data).encode('utf8')
+		url = "{}access_token={}".format(self.Manager.MP_info['url'],self.Manager.MP_info['api_key'])
+		
+		response = requests.post(url=url, data=body)
+		status = response.status_code
+		#response =   r.read()
+		response=json.loads(response.text)
+		if status > 204 or status < 200:
+				message = []
+				message.append( "Não foi possivel gerar Boleto. Status {}".format(status))
+				self.feedback(metodo="Gera Boleto", status =5, message = message, erro = False )
+				message = None
+		else:
+			pass
+			self.Manager.MP_info['boletos_gerados'] += 1
+			# Registra boleto no banco de Dados
+			vencimento = response['date_of_expiration'].split("T")[0]
+			query = "INSERT INTO `megasorte`.`boleto_mp` (`gateway_payment_id`, `id_cliente`, `valor`, `vencimento`, `nosso_numero`, `linha_digitavel`, `link_mp`, `id_status`) VALUES ({0}, {1}, {2}, '{3}', '{4}', '{5}', '{6}', 0)".format(response['id'],carrinho[1], response['transaction_amount'],vencimento,response['transaction_details']['payment_method_reference_id'],response['barcode']['content'],response['transaction_details']['external_resource_url'])
+			self.database.execute("W",query,commit=True)
+			self.googleLog(carrinho, response)
+			carrinho.append(response['barcode']['content'])
+			carrinho.append(response['transaction_details']['external_resource_url'])
+			return carrinho
+			# retorna dados do boleto 
+	
+	def digimais_transacao(self, type, data):
+		api_url = {
+		"incluir_cliente"		: "/acquire/cardHolder/add",
+		"salvar_cartao"			: "/acquire/cardManager/add",
+		"compra_direta"			: "/acquire/card/authorize",
+		"compra_cartao_salvo"	: "/acquire/card/authorize",
+		"remover_cartao"		: "/acquire/cardManager/remove",
+		"gerar_boleto"			: "/acquire/invoice/create"
+		}
+	
+	default_headers = [
+		"Content-Type: application/json", 
+		"requester-id: {}".format(),
+		"requester-token: {}".format(),
+		"unique-trx-id: {}".format()
+	];
+ 
+	def geraBoletoMP(self,data,carrinho):
 		
 		
 		self.Manager.MP_info['boletos_gerados'] += 1
@@ -363,6 +422,7 @@ class recuperacaoDeCarrinhos(object):
 			carrinho.append(response['transaction_details']['external_resource_url'])
 			return carrinho
 			# retorna dados do boleto 
+	
 	
 	def emailParams2(self, result):
 		cont = 0
@@ -523,4 +583,15 @@ class recuperacaoDeCarrinhos(object):
 		self.Manager.callback(feedback)
 
 	
-	
+	"""  "incluir_cliente":
+            $data = [
+                "cardHolder" => [
+                    "entity" => [
+                        "name"                 => $cliente["Nome"],
+                        "phoneCelular"         => soNumero($form["Ceular"]),
+                        "email"                => $cliente["Email"],
+                        "erpUniqueId"          => $cliente["id"],
+                        "vatNumber"            => soNumero($cliente["CPFCNPJ"]),
+                        "identificationTypeId" => 1
+                    ]
+                ] """

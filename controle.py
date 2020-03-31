@@ -276,6 +276,7 @@ class API(Controle):
 				"api_key":self.api_key
 				}
 			return var
+	
 	class hubd:
 		def __init__(self,Controle):
 			self.tag		= "HUBD"
@@ -316,6 +317,7 @@ class API(Controle):
 				"consultas":	self.consultas
 				}
 			return var
+	
 	class soa:
 		def __init__(self,Controle):
 			self.tag		= "SOA"
@@ -405,6 +407,55 @@ class API(Controle):
 				"boletos_gerados":	self.boletos_gerados
 				}
 			return var
+
+	class digimais:
+		def __init__(self,Controle):
+			self.tag					= "DIGIMAIS"
+			self.working_operation_uuid = Controle.Config_ENV.get(self.tag,"working_operation_uuid")
+			self.gateway_id				= Controle.Config_ENV.get(self.tag,"gateway_id")
+			self.requesterId			= Controle.Config_ENV.get(self.tag,"requesterId")
+			self.invoiceTemplateUUID	= Controle.Config_ENV.get(self.tag,"invoiceTemplateUUID")
+			self.destinationUUID		=  Controle.Config_ENV.get(self.tag,"destinationUUID")
+			self.transactionUUID		=  Controle.Config_ENV.get(self.tag,"transactionUUID")
+			self.url					= Controle.Config_ENV.get(self.tag,"url")
+			self.token					= Controle.Config_ENV.get(self.tag,"token")
+			self.cardtype				= Controle.Config_ENV.get(self.tag,"cardtype")
+			self.boletos_gerados		= int(Controle.Config_ENV.get(self.tag,"boletos_gerados"))
+		def setControle(self,*args, **kwargst):
+			try:
+				variavel = kwargst['vars']
+				Controle = kwargst['controle']
+			except:
+				try:
+					variavel = args[0]
+					Controle = args[1]
+				except Exception as e:
+					return False
+				else:
+					pass
+			if Controle:
+				keys = variavel.keys()
+				for key in keys:
+					if 'boletos_gerados' in key:
+						self.boletos_gerados = variavel['boletos_gerados']
+						Controle.Config_ENV.set(self.tag, 'boletos_gerados',str(self.boletos_gerados ))
+						return True
+					
+					else:
+						return False
+		def getControle(self,*args, **kwargst):
+			var  = {
+				'working_operation_uuid' :	self.working_operation_uuid,
+				'gateway_id' :				self.gateway_id,
+				'requesterId' :				self.requesterId,
+				'token':					self.token,
+				'invoiceTemplateUUID':		self.invoiceTemplateUUID,
+				'destinationUUID':			self.destinationUUID,
+				'transactionUUID':			self.transactionUUID,
+				'url' :						self.url,
+				'boletos_gerados' :			self.boletos_gerados
+				}
+			return var
 class LINK(Controle):
 	def __init__(self,Controle):
 	
@@ -457,6 +508,7 @@ class logs(Controle):
 		self.api_log		= Controle.Config.get("LOGS","api_log")
 		self.startup_log	= Controle.Config.get("LOGS","startup_log")
 		self.watch_log		= Controle.Config.get("LOGS","watch_log")
+		self.Digimais_log	= Controle.Config.get("LOGS","digimais")
 
 class files(Controle):
 	def __init__(self,Controle):

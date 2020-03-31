@@ -59,7 +59,7 @@ class Manager(Initialize):
 
 		self.inicializando()#So precisa de modulos, so vai modulos!
 	
-	def update_info(self):
+	def update_info(self): # TODO: Melhorar esse metodo
 		#SET
 		self.SMS_controle.setControle(self.SMS_info,self)
 		self.SVC_controle.setControle(self.SVC_info,self)
@@ -72,6 +72,7 @@ class Manager(Initialize):
 		self.SOA_controle.setControle(self.SOA_info,self)
 		self.HUBD_controle.setControle(self.HUBD_info,self)
 		self.MP_controle.setControle(self.MP_info,self)
+		self.DIGIMAIS_controle.setControle(self.DIGIMAIS_info,self)
 	
 		#GET
 		self.SMS_info = self.SMS_controle.getControle()
@@ -85,6 +86,8 @@ class Manager(Initialize):
 		self.SOA_info			= self.SOA_controle.getControle()
 		self.HUBD_info			= self.HUBD_controle.getControle()
 		self.MP_info			= self.MP_controle.getControle()
+		self.DIGIMAIS_info		= self.DIGIMAIS_controle.getControle()
+
 
 		self.LINK_info			= self.Controle.LINK.getControle()
 		self.Controle.writeConfigFile(self)

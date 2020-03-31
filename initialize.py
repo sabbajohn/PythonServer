@@ -41,7 +41,7 @@ class Initialize:
 		)
 		#Definindo objeto dos Serviços
 
-		self.Controle = Controle(self)
+		self.Controle 				= Controle(self)
 		self.SMS_controle 			= self.Controle.servicos.SMS
 		self.SVC_controle 			= self.Controle.servicos.SVC
 		self.SDU_controle 			= self.Controle.servicos.SDU
@@ -58,6 +58,7 @@ class Initialize:
 		self.SOA_controle 			= self.Controle.API.soa
 		self.HUBD_controle 			= self.Controle.API.hubd
 		self.MP_controle 			= self.Controle.API.mp
+		self.DIGIMAIS_controle 		= self.Controle.API.digimais
 
 		self.VIACEP_info			= self.VIACEP_controle.getControle()
 		self.MANDRILL_info			= self.MANDRILL_controle.getControle()
@@ -65,6 +66,7 @@ class Initialize:
 		self.SOA_info				= self.SOA_controle.getControle()
 		self.HUBD_info				= self.HUBD_controle.getControle()
 		self.MP_info				= self.MP_controle.getControle()
+		self.DIGIMAIS_info			= self.DIGIMAIS_controle.getControle()
 
 		#LINK
 		self.LINK_controle 			= self.Controle.LINK
@@ -80,7 +82,7 @@ class Initialize:
 		self.DataUpdate 			= DataUpdate(M)
 		self.servicoDeValidacao 	= servicoDeValidacao(M)
 		
-		self.Watch 				= Watch(M)
+		self.Watch 					= Watch(M)
 
 		#Definindo objeto das API's
 		
