@@ -32,7 +32,7 @@ def todict(obj, classkey=None):
 		else:
 			return obj
 
-def saveGoogleLog( carrinho, response):
+def saveGoogleLog(carrinho):
 		weekDays = ("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
 		today = datetime.now().weekday()
 		weekday = weekDays[today]
@@ -44,7 +44,7 @@ def saveGoogleLog( carrinho, response):
 					"sexo":carrinho['Sexo'],
 					"cidade":carrinho['Cidade'],
 					"uf":carrinho['SgUF'],
-					"nascimento":str(carrinho[14])
+					"nascimento":str(carrinho['DtNascimento'])
 				},
 				"payment":{
 					"payment_method_id":"BOLETO-SRC",
@@ -61,6 +61,11 @@ def saveGoogleLog( carrinho, response):
 			f.write('\n')
 		f.close
 		return
+
 def formataValor(val):
     
 	return format(val, '.2f').replace(".",",")
+
+def formataValorInter(val):
+    
+	return val.replace(",",".")

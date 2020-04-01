@@ -153,7 +153,7 @@ class Manager(Initialize):
 			print("INITALIZE -__init__ Oops!{0} occured.".format(sys.exc_info()[0]))
 			#sys.exit()
 		
-		self.update_info()
+		
 		self.Agendados()
 
 	def atualiza(self):

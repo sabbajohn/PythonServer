@@ -21,7 +21,9 @@ class Digimais(object):
 		self.gateway_uuid		= self.Manager.DIGIMAIS_info['gateway_id']
 		self.cardTypeUUID 		= self.Manager.DIGIMAIS_info['cardtype']
 		self.resquester_id		= self.Manager.DIGIMAIS_info['requesterId']
-		
+		self.invoiceTemplateUUID= self.Manager.DIGIMAIS_info['invoiceTemplateUUID']
+		self.transactionUUID	= self.Manager.DIGIMAIS_info["transactionUUID"]
+		self.destinationUUID	= self.Manager.DIGIMAIS_info["destinationUUID"]
 		
 
 	def	transacao(self,type,data):
@@ -42,8 +44,8 @@ class Digimais(object):
 			"unique-trx-id": str(unique_id)
 		}
 		#default_headers = json.dumps(default_headers).encode('utf8')
-		data = json.dumps(data).encode('utf8')
-		res = requests.post(self.url+api_url[type], data=data, headers=default_headers,timeout=3.50)
+		data = json.dumps(data)
+		res = requests.post(self.url+api_url[type], data=data, headers=default_headers)
 		self.Logs({'headers':default_headers,'body':data},res)
 		response = {
 			'status_code': res.status_code,
@@ -80,27 +82,27 @@ class Digimais(object):
 	def boleto(self, carrinho):
 		if not carrinho['digimais_id']:
 			cardHolder = self.dados("incluir_cliente", False, False, carrinho)
-		if cardHolder:
-			transacao = self.transacao("incluir_cliente", cardHolder)
-			if transacao['body']['responseCode'] == '0':
-				self.Manager.DIGIMAIS_info['boletos_gerados'] += 1
-				cardHolderUUID = carrinho["digimais_id"] = transacao['body']["cardHolderUUID"]
-				cliente_id = carrinho["id"]
-				query = 'UPDATE cliente SET digimais_id = "{}" WHERE id = {}'.format(cardHolderUUID, cliente_id)
-				self.database.execute("W",query,commit=True)
-		else:
-			return False
+			if cardHolder:
+				transacao = self.transacao("incluir_cliente", cardHolder)
+				if  transacao['body']['responseCode'] == '0':
+					self.Manager.DIGIMAIS_info['boletos_gerados'] += 1
+					cardHolderUUID = carrinho["digimais_id"] = transacao['body']["cardHolderUUID"]
+					cliente_id = carrinho["id"]
+					query = 'UPDATE cliente SET digimais_id = "{}" WHERE id = {}'.format(cardHolderUUID, cliente_id)
+					self.database.execute("W",query,commit=True)
+			else:
+				return False
 		if self.Manager.Controle.Key.env in ('BETA', 'PROD'):
 			callBack ="https://www.megasorte.com/gateway/notifications_digimais"
 		else:
 			callBack =  "https://webhook.site/28100f89-bb10-4fd3-afd7-8edb0c1c1130"
 		boleto = {
-			"amount"				 : valor_boleto,
+			"amount"				 : funcoes.formataValorInter(carrinho['ValorBoleto']),
 			"invoiceTemplateUUID"	: self.invoiceTemplateUUID,
 			"originUUID"			 : carrinho["digimais_id"],
 			"transactionUUID"		: self.transactionUUID,
 			"destinationUUID"		: self.destinationUUID,
-			"dateDue"				: datetime.date(datetime.now()) + timedelta(weeks=5),
+			"dateDue"				: str(datetime.date(datetime.now()) + timedelta(weeks=5)),
 			"transactionType"		: 1,
 			"callBackInvoiceInfoURL" : callBack,
 			"softDescriptor"		 : "Eis aqui uma nova oportunidade de Concluir sua Compra! MEGA SORTE"
@@ -109,16 +111,17 @@ class Digimais(object):
 		transacao = self.transacao('gerar_boleto', boleto)
 		if transacao['body']['responseCode'] == '0':
 			boleto_dm = {
-			"id_cliente"		 	: carrinho["user_id"],
+			"id_cliente"		 	: str(carrinho["id"]),
 			"gateway_payment_id" 	: transacao['body']["invoiceUUID"],
-			"valor"			  		: valor_boleto,
-			"vencimento"		 	: datetime.date(datetime.now()) + timedelta(weeks=5),
+			"valor"			  		: funcoes.formataValorInter(carrinho['ValorBoleto']),
+			"vencimento"		 	: str(datetime.date(datetime.now()) + timedelta(weeks=5)),
 			"nosso_numero"	   		: transacao['body']["uniqueInvoiceNumber"],
 			"linha_digitavel"		: transacao['body']["barcode"],
 			"url"					: transacao['body']["url"],
 		}
-			query = "INSERT INTO %s (%s) VALUES(%s)" % ('boleto_digimais', ",".join(boleto_dm.keys()), ",".join(boleto_dm.values()))
-			self.database('W',query,commit=True)
+			query = "INSERT INTO %s (%s) VALUES('%s')" % ('boleto_digimais', ",".join(boleto_dm.keys()), "','".join(boleto_dm.values()))
+			self.database.execute('W',query,boleto_dm.values(),commit=True)
+			
 			return boleto_dm
 		else:
 			return False

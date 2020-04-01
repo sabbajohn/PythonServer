@@ -9,7 +9,6 @@ from datetime import date
 import json
 import getpass
 import threading
-import mandrill
 import configparser	
 import requests
 import random
@@ -221,9 +220,9 @@ class recuperacaoDeCarrinhos(object):
 							carrinhos[i] = carrinho
 							funcoes.saveGoogleLog(carrinho)
 
-				Mandrill = Mandrill(self.Manager)
-				Mandrill.send('boleto', carrinhos)
-				Mandrill = None
+				Email = Mandrill(self.Manager)
+				Email.send( carrinhos)
+				Email = None
 				return 
 		except Exception as e:
 			message = []

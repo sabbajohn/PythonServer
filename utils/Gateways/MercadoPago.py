@@ -23,9 +23,9 @@ class MercadoPago(object):
 		url = "{}access_token={}".format(self.Manager.MP_info['url'],self.Manager.MP_info['api_key'])
 		res = requests.post(url=url, data=body)
 		self.Logs({'body':body},res)
-		status = res.status_code
+		status = res.status_cod
 		response = {
-			'status_code' :status,
+			'status_code' :res.status_code,
 			'body':json.loads(res)
 		}
 		return response
