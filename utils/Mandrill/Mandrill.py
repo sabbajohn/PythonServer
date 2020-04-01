@@ -61,7 +61,7 @@ class Mandrill(object):
 			vlbilhete = funcoes.formataValor(x['VlBilhete'])
 			
 			if 'boleto' in x.keys():
-				valor = funcoes.formataValorInter(x['boleto']['valor'])
+				valor = funcoes.formataValor(float(x['boleto']['valor']))
 				merge_vars.append({'rcpt':x['Email'],'vars': [{'content': x['Nome'], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'},{'content':x['boleto']['linha_digitavel'],'name':'linhaDigitavel'},{'content':x['boleto']['url'],'name':'link_boleto'},{'content':valor,'name':'Valor'}]})
 			else:
 				merge_vars.append({'rcpt':x['Email'],'vars': [{'content': x['Nome'], 'name':'Nome'},{'content':vlbilhete, 'name':'VlBilhete'}]})
