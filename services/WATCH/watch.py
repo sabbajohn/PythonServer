@@ -29,7 +29,7 @@ class Watch(object):
 		try:
 			self.port				= self.watch_vars.port
 		except:
-			self.port = 5000
+			self.port = 5001
 
 
 		# read in the buffer from the commandline
