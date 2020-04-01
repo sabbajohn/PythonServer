@@ -129,8 +129,8 @@ class recuperacaoDeCarrinhos(object):
 				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
 				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
-				Mandrill.send(result)
-				Mandrill = None
+				Email.send(result,1)
+				Email = None
 				return
 				
 			else: 
@@ -221,7 +221,7 @@ class recuperacaoDeCarrinhos(object):
 							funcoes.saveGoogleLog(carrinho)
 
 				Email = Mandrill(self.Manager)
-				Email.send( carrinhos)
+				Email.send(carrinhos,2)
 				Email = None
 				return 
 		except Exception as e:

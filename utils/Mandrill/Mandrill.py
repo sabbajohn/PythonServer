@@ -85,13 +85,17 @@ class Mandrill(object):
 			"cont":cont
 		}
 
-	def send(self, data):
+	def send(self, data,type):
 		lista_de_envio = None
 		
 		lista_de_envio = self.Params(data)
+		if type == 1:
+			template_name  = 'carrinhos-recuperados'
+		else:
+			template_name  = 'carrinhos-recuperados-adv'
 		if(self.checkAPI()):
 			try:
-				result = self.mandrill_client.messages.send_template(template_name='carrinhos-recuperados', template_content=lista_de_envio['template_content'], message=lista_de_envio['message'], ip_pool='Main Pool')
+				result = self.mandrill_client.messages.send_template(template_name=template_name, template_content=lista_de_envio['template_content'], message=lista_de_envio['message'], ip_pool='Main Pool')
 				if 'queued' in result[0]["status"] or 'sent' in result[0]["status"] :
 					self.Manager.MANDRILL_info['enviados'] += lista_de_envio['cont'] 
 					
