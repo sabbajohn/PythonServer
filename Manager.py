@@ -157,7 +157,7 @@ class Manager(Initialize):
 		self.Agendados()
 
 	def atualiza(self):
-		shedule.clear()
+		schedule.clear()
 		self.inicializando()
 
 	def Agendados(self):
