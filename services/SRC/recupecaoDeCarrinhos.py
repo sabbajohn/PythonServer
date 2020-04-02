@@ -37,7 +37,7 @@ class recuperacaoDeCarrinhos(object):
 			self.db_monitor_src()
 			self.recCarrinho2()
 			self.Manager.SRC_info['last_run'] = str(self.Manager.Agenda['SRC'].last_run)
-		
+			self.Manager.update_info()
 			time.sleep(1)
 			return
 		except SystemExit:
@@ -129,6 +129,7 @@ class recuperacaoDeCarrinhos(object):
 				message.append( "{0} Carrinhos a serem Resgatados!".format(len(result)))
 				self.feedback(metodo="Monitor", status =5, message = message, erro = False )
 				message = None
+				Email = Mandrill(self.Manager)
 				Email.send(result,1)
 				Email = None
 				return

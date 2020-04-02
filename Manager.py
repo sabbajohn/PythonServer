@@ -98,7 +98,7 @@ class Manager(Initialize):
 		self.update_info()
 		try:
 			self.Jobs['WATCH'].start()
-			self.Agenda['UPDATE'] = schedule.every(4).hours.do(self.atualiza).tag('UPDATE')
+
 			if self.SMS_info["init"] is True:
 				self.SMS_info['init_time']=str(datetime.datetime.now())
 				self.Agenda['SMS'] = schedule.every(1).minutes.do(self.SMS_f).tag("SMS")
@@ -156,9 +156,6 @@ class Manager(Initialize):
 		
 		self.Agendados()
 
-	def atualiza(self):
-		schedule.clear()
-		self.inicializando()
 
 	def Agendados(self):
 		while True:
