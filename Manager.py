@@ -169,8 +169,8 @@ class Manager(Initialize):
 			elif self.SVC_info['stop'] and self.SRC_info['stop'] and self.SMS_info['stop']:
 				schedule.clear()
 				break
-			sleep(1)
 			schedule.run_pending()
+			sleep(1)
 		return
 	
 	def verifica(self):
