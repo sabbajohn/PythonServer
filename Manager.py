@@ -165,6 +165,7 @@ class Manager(Initialize):
 				schedule.clear()
 				break
 			schedule.run_pending()
+			sleep(1)
 		return
 	
 	def verifica(self):
